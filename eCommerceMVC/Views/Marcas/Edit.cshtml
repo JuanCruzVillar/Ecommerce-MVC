@@ -1,44 +1,40 @@
 ﻿@model eCommerceMVC.Models.Marca
-
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Marca";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
+    <h2>Editar Marca</h2>
+    <hr />
 
-<h4>Marca</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdMarca" />
-            <div class="form-group">
-                <label asp-for="Descripcion" class="control-label"></label>
-                <input asp-for="Descripcion" class="form-control" />
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Activo" class="control-label"></label>
-                <input asp-for="Activo" class="form-control" />
-                <span asp-validation-for="Activo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaRegistro" class="control-label"></label>
-                <input asp-for="FechaRegistro" class="form-control" />
-                <span asp-validation-for="FechaRegistro" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="IdMarca" />
+        <input type="hidden" asp-for="FechaRegistro" />
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <div class="mb-3">
+            <label asp-for="Descripcion" class="form-label"></label>
+            <input asp-for="Descripcion" class="form-control" />
+            <span asp-validation-for="Descripcion" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="hidden" asp-for="Activo" value="false" />
+            <input asp-for="Activo" class="form-check-input" />
+            <label asp-for="Activo" class="form-check-label">Activo</label>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="FechaRegistro" class="form-label"></label>
+            <input asp-for="FechaRegistro" class="form-control" readonly />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

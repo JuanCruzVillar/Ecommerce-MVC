@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using eCommerceMVC.Models;
+using eCommerceMVC.ViewModels;
 
 namespace eCommerceMVC.Controllers
 {
@@ -48,48 +49,122 @@ namespace eCommerceMVC.Controllers
         // POST: Productos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Productos producto)
+        public async Task<IActionResult> Create(ProductoViewModel vm)
         {
             if (ModelState.IsValid)
             {
+                var producto = new Productos
+                {
+                    Nombre = vm.Nombre,
+                    Descripcion = vm.Descripcion,
+                    IdMarca = vm.IdMarca,
+                    IdCategoria = vm.IdCategoria,
+                    Precio = vm.Precio,
+                    Stock = vm.Stock,
+                    Activo = true,
+                    FechaRegistro = DateTime.Now
+                };
+
+                // Guardar imagen si se subió
+                if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
+                {
+                    var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(rutaCarpeta)) Directory.CreateDirectory(rutaCarpeta);
+
+                    var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(vm.ImagenArchivo.FileName);
+                    var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                    using (var stream = new FileStream(rutaArchivo, FileMode.Create))
+                    {
+                        await vm.ImagenArchivo.CopyToAsync(stream);
+                    }
+
+                    producto.RutaImagen = "/images/" + nombreArchivo;
+                    producto.NombreImagen = vm.ImagenArchivo.FileName;
+                }
+
                 _context.Productos.Add(producto);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            // Si hay error, volver a cargar los dropdowns
-            CargarDropdowns(producto);
-            return View(producto);
+            CargarDropdowns(vm);
+            return View(vm);
         }
 
         // GET: Productos/Edit/5
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var producto = _context.Productos.Find(id);
+            var producto = await _context.Productos.FindAsync(id);
             if (producto == null) return NotFound();
 
-            CargarDropdowns(producto);
-            return View(producto);
+            var vm = new ProductoViewModel
+            {
+                IdProducto = producto.IdProducto,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                IdMarca = producto.IdMarca,
+                IdCategoria = producto.IdCategoria,
+                Precio = producto.Precio,
+                Stock = producto.Stock,
+                Activo = producto.Activo ?? true, // si es null, setear true
+                FechaRegistro = producto.FechaRegistro,
+                RutaImagen = producto.RutaImagen,
+                NombreImagen = producto.NombreImagen
+            };
+
+
+            CargarDropdowns(vm);
+            return View(vm);
         }
 
         // POST: Productos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Productos producto)
+        public async Task<IActionResult> Edit(int id, ProductoViewModel vm)
         {
-            if (id != producto.IdProducto) return NotFound();
+            if (id != vm.IdProducto) return NotFound();
 
             if (ModelState.IsValid)
             {
+                var producto = await _context.Productos.FindAsync(id);
+                if (producto == null) return NotFound();
+
+                producto.Nombre = vm.Nombre;
+                producto.Descripcion = vm.Descripcion;
+                producto.IdMarca = vm.IdMarca;
+                producto.IdCategoria = vm.IdCategoria;
+                producto.Precio = vm.Precio;
+                producto.Stock = vm.Stock;
+                producto.Activo = vm.Activo;
+
+                // Guardar nueva imagen si se subió
+                if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
+                {
+                    var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                    if (!Directory.Exists(rutaCarpeta)) Directory.CreateDirectory(rutaCarpeta);
+
+                    var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(vm.ImagenArchivo.FileName);
+                    var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                    using (var stream = new FileStream(rutaArchivo, FileMode.Create))
+                    {
+                        await vm.ImagenArchivo.CopyToAsync(stream);
+                    }
+
+                    producto.RutaImagen = "/images/" + nombreArchivo;
+                    producto.NombreImagen = vm.ImagenArchivo.FileName;
+                }
+
                 _context.Update(producto);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            CargarDropdowns(producto);
-            return View(producto);
+            CargarDropdowns(vm);
+            return View(vm);
         }
 
         // GET: Productos/Delete/5
@@ -122,13 +197,13 @@ namespace eCommerceMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private void CargarDropdowns(Productos producto = null)
+        private void CargarDropdowns(ProductoViewModel? vm = null)
         {
             var marcas = _context.Marcas.ToList();
             var categorias = _context.Categorias.ToList();
 
-            ViewBag.IdMarca = new SelectList(marcas, "IdMarca", "Descripcion", producto?.IdMarca);
-            ViewBag.IdCategoria = new SelectList(categorias, "IdCategoria", "Descripcion", producto?.IdCategoria);
+            ViewBag.IdMarca = new SelectList(marcas, "IdMarca", "Descripcion", vm?.IdMarca);
+            ViewBag.IdCategoria = new SelectList(categorias, "IdCategoria", "Descripcion", vm?.IdCategoria);
         }
 
         private bool ProductosExists(int id)

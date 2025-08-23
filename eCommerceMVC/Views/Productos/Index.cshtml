@@ -1,86 +1,84 @@
 ﻿@model IEnumerable<eCommerceMVC.Models.Productos>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Productos";
 }
 
-<h1>Index</h1>
+<h1>Productos</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary mb-2">
+        <i class="bi bi-plus-circle"></i> Crear Nuevo
+    </a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descripcion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Precio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Stock)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RutaImagen)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NombreImagen)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Activo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaRegistro)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdCategoriaNavigation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdMarcaNavigation)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descripcion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Precio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stock)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RutaImagen)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NombreImagen)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Activo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaRegistro)
-            </td>
-                <td>@item.IdCategoriaNavigation?.Descripcion</td>
-                <td>@item.IdMarcaNavigation?.Descripcion</td>
 
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdProducto">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.IdProducto">Detalles</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdProducto">Borrar</a>
-            </td>
-        </tr>
+<div class="table-responsive table-responsive-sm">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th style="width:70px;">Imagen</th>
+                <th>@Html.DisplayNameFor(m => m.Nombre)</th>
+                <th>@Html.DisplayNameFor(m => m.Descripcion)</th>
+                <th>@Html.DisplayNameFor(m => m.Precio)</th>
+                <th>@Html.DisplayNameFor(m => m.Stock)</th>
+                <th style="width:60px;">Activo</th>
+                <th>@Html.DisplayNameFor(m => m.FechaRegistro)</th>
+                <th>@Html.DisplayNameFor(m => m.IdCategoriaNavigation)</th>
+                <th>@Html.DisplayNameFor(m => m.IdMarcaNavigation)</th>
+                <th style="width:150px;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.RutaImagen))
+                        {
+                            <img src="@item.RutaImagen" alt="@item.Nombre" class="img-thumbnail" style="max-width:60px;" />
+                        }
+                    </td>
+                    <td>@item.Nombre</td>
+                    <td>@(item.Descripcion?.Length > 50 ? item.Descripcion.Substring(0, 50) + "..." : item.Descripcion)</td>
+
+                    <td>@string.Format("${0:N2}", item.Precio)</td>
+                    <td>@item.Stock</td>
+                    <td class="text-center">
+                        @if (item.Activo == true)
+                        {
+                            <i class="bi bi-check-circle-fill text-success" title="Activo"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-x-circle-fill text-danger" title="Inactivo"></i>
+                        }
+                    </td>
+                    <td>@item.FechaRegistro?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.IdCategoriaNavigation?.Descripcion</td>
+                    <td>@item.IdMarcaNavigation?.Descripcion</td>
+                    <td class="text-nowrap">
+                        <a asp-action="Edit" asp-route-id="@item.IdProducto" class="btn btn-warning" data-bs-toggle="tooltip" title="Editar">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.IdProducto" class="btn btn-info" data-bs-toggle="tooltip" title="Ver Detalles">
+                            <i class="bi bi-eye-fill"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.IdProducto" class="btn btn-danger" data-bs-toggle="tooltip" title="Eliminar">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        // Activar tooltips de Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
 }
-    </tbody>
-</table>
