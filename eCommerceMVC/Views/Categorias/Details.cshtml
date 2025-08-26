@@ -1,36 +1,39 @@
 ﻿@model eCommerceMVC.Models.Categorias
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles Categoría";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Categorias</h4>
+<div class="container mt-4">
+    <h2>Detalles de la Categoría</h2>
     <hr />
+
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descripcion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descripcion)
+        <dt class="col-sm-3">Descripción</dt>
+        <dd class="col-sm-9">@Model.Descripcion</dd>
+
+        <dt class="col-sm-3">Activo</dt>
+        <dd class="col-sm-9">
+            @if (Model.Activo == true)
+{
+    <i class="bi bi-check-circle-fill text-success"></i> <span>Activo</span>
+}
+else
+{
+    <i class="bi bi-x-circle-fill text-danger"></i> <span>Inactivo</span>
+}
+
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Activo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Activo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaRegistro)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaRegistro)
-        </dd>
+
+        <dt class="col-sm-3">Fecha de Registro</dt>
+        <dd class="col-sm-9">@Model.FechaRegistro?.ToString("dd/MM/yyyy HH:mm")</dd>
     </dl>
+
+    <a asp-action="Edit" asp-route-id="@Model.IdCategoria" class="btn btn-warning">
+        <i class="bi bi-pencil-fill"></i> Editar
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdCategoria">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+ 

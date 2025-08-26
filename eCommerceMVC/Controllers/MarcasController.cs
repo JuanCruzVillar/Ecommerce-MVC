@@ -45,7 +45,6 @@ namespace eCommerceMVC.Controllers
             if (!ModelState.IsValid) return View(marca);
 
             marca.FechaRegistro = DateTime.Now; // Fecha automática
-
             _context.Add(marca);
             await _context.SaveChangesAsync();
 
@@ -69,17 +68,18 @@ namespace eCommerceMVC.Controllers
         public async Task<IActionResult> Edit(int id, Marca marca)
         {
             if (id != marca.IdMarca) return NotFound();
+
             if (!ModelState.IsValid) return View(marca);
 
             var marcaExistente = await _context.Marcas.FindAsync(id);
             if (marcaExistente == null) return NotFound();
 
-            // Actualizamos solo campos editables
+            // 🔹 Solo actualizamos lo que corresponde
             marcaExistente.Descripcion = marca.Descripcion;
             marcaExistente.Activo = marca.Activo;
+            // ❌ No tocamos FechaRegistro
 
             await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -101,10 +101,31 @@ namespace eCommerceMVC.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var marca = await _context.Marcas.FindAsync(id);
-            if (marca != null) _context.Marcas.Remove(marca);
 
+            if (marca == null)
+            {
+                return NotFound();
+            }
+
+            // Verificar si la marca tiene productos asignados
+            bool tieneProductos = await _context.Productos.AnyAsync(p => p.IdMarca == id);
+
+            if (tieneProductos)
+            {
+                // Podés mostrar un mensaje de error en la vista
+                TempData["ErrorMessage"] = "No se puede eliminar la marca porque tiene productos asignados.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Marcas.Remove(marca);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+
+        private bool MarcaExists(int id)
+        {
+            return _context.Marcas.Any(e => e.IdMarca == id);
         }
     }
 }
