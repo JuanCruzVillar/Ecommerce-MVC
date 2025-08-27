@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - EcommerceMVCAdmin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.dataTables.css" />
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
@@ -52,8 +53,8 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Usuarios", "Home")">
-                    <i class="fas fa-fw fa-bookmark"></i>
+                <a class="nav-link" href="@Url.Action("Index", "Usuarios")">
+                    <i class="fas fa-users fa-bookmark"></i>
                     <span>Usuarios</span>
                 </a>
             </li>
@@ -374,6 +375,7 @@
                         &copy; 2025 - EcommerceMVCAdmin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </div>
                 </footer>
+                <script src="https://cdn.datatables.net/2.3.3/js/dataTables.js"></script>
                 <script src="~/lib/jquery/dist/jquery.min.js"></script>
                 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
                 <script src="~/js/site.js" asp-append-version="true"></script>

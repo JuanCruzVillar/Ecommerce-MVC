@@ -16,11 +16,15 @@ namespace eCommerceMVC.Controllers
             _context = context;
         }
 
+       
+
         // GET: Categorias
         public async Task<IActionResult> Index()
         {
             return View(await _context.Categorias.ToListAsync());
         }
+
+
 
         // GET: Categorias/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -45,6 +49,8 @@ namespace eCommerceMVC.Controllers
             if (!ModelState.IsValid) return View(categoria);
 
             categoria.FechaRegistro = DateTime.Now;
+            categoria.Activo = true;
+
 
             _context.Add(categoria);
             await _context.SaveChangesAsync();
@@ -108,12 +114,26 @@ namespace eCommerceMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var categoria = await _context.Categorias.FindAsync(id);
-            if (categoria != null) _context.Categorias.Remove(categoria);
+            var categoria = await _context.Categorias
+                .Include(c => c.Productos) // suponiendo que tenés la relación
+                .FirstOrDefaultAsync(c => c.IdCategoria == id);
 
+            if (categoria == null)
+                return NotFound();
+
+            if (categoria.Productos.Any())
+            {
+                // Podés usar TempData para mostrar un mensaje en la vista
+                TempData["Error"] = "No se puede eliminar esta categoría porque tiene productos asociados.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Categorias.Remove(categoria);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool CategoriaExists(int id)
         {

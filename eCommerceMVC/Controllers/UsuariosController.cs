@@ -1,11 +1,13 @@
-﻿using System;
+﻿using eCommerceMVC.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using eCommerceMVC.Models;
 
 namespace eCommerceMVC.Controllers
 {
@@ -56,17 +58,32 @@ namespace eCommerceMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdUsuario,IdCliente,Nombres,Apellidos,Correo,Contraseña,Restablecer,Activo,FechaRegistro")] Usuario usuario)
+        public async Task<IActionResult> Create(Usuario usuario)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(usuario);
-                await _context.SaveChangesAsync();
+                // Hash de la contraseña
+                var hasher = new PasswordHasher<Usuario>();
+                var hashedPassword = hasher.HashPassword(usuario, usuario.Contraseña);
+
+                // Ejecutar procedimiento almacenado
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC RegistrarUsuario @Nombres, @Apellidos, @Correo, @Contrasena",
+                    new SqlParameter("@Nombres", usuario.Nombres),
+                    new SqlParameter("@Apellidos", usuario.Apellidos),
+                    new SqlParameter("@Correo", usuario.Correo),
+                    new SqlParameter("@Contrasena", hashedPassword)
+                );
+
+                TempData["SuccessMessage"] = "Usuario creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdCliente"] = new SelectList(_context.Clientes, "IdCliente", "IdCliente", usuario.IdCliente);
+
             return View(usuario);
         }
+
+
+
 
         // GET: Usuarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -90,36 +107,43 @@ namespace eCommerceMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdUsuario,IdCliente,Nombres,Apellidos,Correo,Contraseña,Restablecer,Activo,FechaRegistro")] Usuario usuario)
+        public async Task<IActionResult> Edit(int id, Usuario usuario, string NuevaContrasena)
         {
             if (id != usuario.IdUsuario)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
-                try
+                var userDb = await _context.Usuarios.FindAsync(id);
+                if (userDb == null)
+                    return NotFound();
+
+                userDb.Nombres = usuario.Nombres;
+                userDb.Apellidos = usuario.Apellidos;
+                userDb.Correo = usuario.Correo;
+               
+
+                if (!string.IsNullOrEmpty(NuevaContrasena))
                 {
-                    _context.Update(usuario);
-                    await _context.SaveChangesAsync();
+                    var hasher = new PasswordHasher<Usuario>();
+                    userDb.Contraseña = hasher.HashPassword(userDb, NuevaContrasena);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UsuarioExists(usuario.IdUsuario))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
+                _context.Update(userDb);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Usuario actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdCliente"] = new SelectList(_context.Clientes, "IdCliente", "IdCliente", usuario.IdCliente);
+
+            // Si hay errores de validación, vuelve a mostrar la vista
             return View(usuario);
         }
+
+
+
+
+
 
         // GET: Usuarios/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -149,11 +173,14 @@ namespace eCommerceMVC.Controllers
             if (usuario != null)
             {
                 _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
+
+                TempData["DangerMessage"] = "Usuario eliminado correctamente.";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool UsuarioExists(int id)
         {

@@ -112,7 +112,7 @@ namespace eCommerceMVC.Controllers
 
             if (tieneProductos)
             {
-                // Podés mostrar un mensaje de error en la vista
+                // Mensaje de error para que no se elimine la marca
                 TempData["ErrorMessage"] = "No se puede eliminar la marca porque tiene productos asignados.";
                 return RedirectToAction(nameof(Index));
             }
