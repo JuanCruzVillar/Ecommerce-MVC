@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace eCommerceMVC.Models
+namespace eCommerce.Entities
 {
-    public partial class Productos
+    public partial class Producto
     {
         public int IdProducto { get; set; }
 
@@ -34,7 +34,7 @@ namespace eCommerceMVC.Models
 
         public virtual ICollection<DetalleVentas> DetalleVenta { get; set; } = new List<DetalleVentas>();
 
-        public virtual Categorias? IdCategoriaNavigation { get; set; }
+        public virtual Categoria? IdCategoriaNavigation { get; set; }
 
         public virtual Marca? IdMarcaNavigation { get; set; }
     }

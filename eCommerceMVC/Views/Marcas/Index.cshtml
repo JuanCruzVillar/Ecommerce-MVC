@@ -1,4 +1,5 @@
-﻿@model IEnumerable<eCommerceMVC.Models.Marca>
+﻿@using eCommerce.Entities
+@model IEnumerable<Marca>
 
 @{
     ViewData["Title"] = "Marcas";
@@ -53,9 +54,12 @@
                         <a asp-action="Details" asp-route-id="@item.IdMarca" class="btn btn-sm btn-info me-1 text-white">
                             <i class="bi bi-eye"></i> Detalles
                         </a>
-                        <a asp-action="Delete" asp-route-id="@item.IdMarca" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i> Eliminar
-                        </a>
+                        <form asp-action="Delete" asp-route-id="@item.IdMarca" method="post" class="d-inline form-eliminar">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </form>
+
 
                     </td>
                 </tr>

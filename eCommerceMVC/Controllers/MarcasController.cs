@@ -1,25 +1,23 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using eCommerce.Entities;
+using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using eCommerceMVC.Models;
+using System.Threading.Tasks;
 
 namespace eCommerceMVC.Controllers
 {
     public class MarcasController : Controller
     {
-        private readonly DbecommerceContext _context;
+        private readonly IMarcaService _marcaService;
 
-        public MarcasController(DbecommerceContext context)
+        public MarcasController(IMarcaService marcaService)
         {
-            _context = context;
+            _marcaService = marcaService;
         }
-
         // GET: Marcas
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Marcas.ToListAsync());
+            var marcas = await _marcaService.GetAllAsync();
+            return View(marcas);
         }
 
         // GET: Marcas/Details/5
@@ -27,8 +25,7 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var marca = await _context.Marcas
-                .FirstOrDefaultAsync(m => m.IdMarca == id);
+            var marca = await _marcaService.GetByIdAsync(id.Value);
             if (marca == null) return NotFound();
 
             return View(marca);
@@ -44,10 +41,17 @@ namespace eCommerceMVC.Controllers
         {
             if (!ModelState.IsValid) return View(marca);
 
-            marca.FechaRegistro = DateTime.Now; // Fecha automática
-            _context.Add(marca);
-            await _context.SaveChangesAsync();
+            marca.FechaRegistro = System.DateTime.Now;
+            marca.Activo = true;
 
+            var result = await _marcaService.CreateAsync(marca);
+            if (!result)
+            {
+                TempData["Error"] = "Ya existe una marca con esa descripción.";
+                return View(marca);
+            }
+
+            TempData["Success"] = "Marca creada correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -56,7 +60,7 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var marca = await _context.Marcas.FindAsync(id);
+            var marca = await _marcaService.GetByIdAsync(id.Value);
             if (marca == null) return NotFound();
 
             return View(marca);
@@ -68,18 +72,16 @@ namespace eCommerceMVC.Controllers
         public async Task<IActionResult> Edit(int id, Marca marca)
         {
             if (id != marca.IdMarca) return NotFound();
-
             if (!ModelState.IsValid) return View(marca);
 
-            var marcaExistente = await _context.Marcas.FindAsync(id);
-            if (marcaExistente == null) return NotFound();
+            var result = await _marcaService.UpdateAsync(marca);
+            if (!result)
+            {
+                TempData["Error"] = "Ya existe otra marca con esa descripción.";
+                return View(marca);
+            }
 
-            // 🔹 Solo actualizamos lo que corresponde
-            marcaExistente.Descripcion = marca.Descripcion;
-            marcaExistente.Activo = marca.Activo;
-            // ❌ No tocamos FechaRegistro
-
-            await _context.SaveChangesAsync();
+            TempData["Success"] = "Marca actualizada correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -88,8 +90,7 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var marca = await _context.Marcas
-                .FirstOrDefaultAsync(m => m.IdMarca == id);
+            var marca = await _marcaService.GetByIdAsync(id.Value);
             if (marca == null) return NotFound();
 
             return View(marca);
@@ -100,32 +101,14 @@ namespace eCommerceMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var marca = await _context.Marcas.FindAsync(id);
+            var result = await _marcaService.DeleteAsync(id);
 
-            if (marca == null)
-            {
-                return NotFound();
-            }
+            if (!result)
+                TempData["Error"] = "No se puede eliminar esta marca porque tiene productos asociados.";
+            else
+                TempData["Success"] = "La marca se eliminó correctamente.";
 
-            // Verificar si la marca tiene productos asignados
-            bool tieneProductos = await _context.Productos.AnyAsync(p => p.IdMarca == id);
-
-            if (tieneProductos)
-            {
-                // Mensaje de error para que no se elimine la marca
-                TempData["ErrorMessage"] = "No se puede eliminar la marca porque tiene productos asignados.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            _context.Marcas.Remove(marca);
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-
-        private bool MarcaExists(int id)
-        {
-            return _context.Marcas.Any(e => e.IdMarca == id);
         }
     }
 }

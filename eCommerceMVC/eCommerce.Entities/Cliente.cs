@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eCommerceMVC.Models;
+namespace eCommerce.Entities;
 
 public partial class Cliente
 {
@@ -23,5 +23,5 @@ public partial class Cliente
 
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 
-    public virtual ICollection<Ventas> Venta { get; set; } = new List<Ventas>();
+    public virtual ICollection<Venta> Venta { get; set; } = new List<Venta>();
 }

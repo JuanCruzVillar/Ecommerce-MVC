@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eCommerceMVC.Models;
+namespace eCommerce.Entities;
 
 public partial class Carrito
 {
@@ -15,5 +15,5 @@ public partial class Carrito
 
     public virtual Cliente? IdClienteNavigation { get; set; }
 
-    public virtual Productos? IdProductoNavigation { get; set; }
+    public virtual Producto? IdProductoNavigation { get; set; }
 }

@@ -1,24 +1,9 @@
-﻿@model IEnumerable<eCommerceMVC.Models.Usuario>
+﻿@using eCommerce.Entities
+@model IEnumerable<Usuario>
 
 @{
     ViewData["Title"] = "Usuarios";
     Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-@if (TempData["DangerMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["DangerMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
 }
 
 <div class="container mt-4">
@@ -41,14 +26,14 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var usuario in Model)
+            @foreach (var item in Model)
             {
                 <tr>
-                    <td>@usuario.Nombres</td>
-                    <td>@usuario.Apellidos</td>
-                    <td>@usuario.Correo</td>
+                    <td>@item.Nombres</td>
+                    <td>@item.Apellidos</td>
+                    <td>@item.Correo</td>
                     <td>
-                        @if (usuario.Activo == true)
+                        @if (item.Activo)
                         {
                             <span class="badge bg-success">Activo</span>
                         }
@@ -58,8 +43,15 @@
                         }
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@usuario.IdUsuario" class="btn btn-sm btn-primary">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@usuario.IdUsuario" class="btn btn-sm btn-danger">Eliminar</a>
+                        <a asp-action="Edit" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil-fill"></i> Editar
+                        </a>
+
+                        <form asp-action="Delete" asp-route-id="@item.IdUsuario" method="post" class="d-inline form-eliminar">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash-fill"></i> Eliminar
+                            </button>
+                        </form>
                     </td>
                 </tr>
             }
@@ -71,7 +63,7 @@
     <!-- jQuery (requerido por DataTables) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- DataTables CSS & JS desde CDN oficial -->
+    <!-- DataTables CSS & JS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 

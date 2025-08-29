@@ -1,13 +1,8 @@
-﻿@model IEnumerable<eCommerceMVC.Models.Categorias>
+﻿@using eCommerce.Entities
+@model IEnumerable<Categoria>
 
 @{
     ViewData["Title"] = "Categorías";
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
-    </div>
 }
 
 <div class="container mt-4">
@@ -21,9 +16,9 @@
     <table class="table table-hover table-bordered align-middle">
         <thead class="table-dark text-center">
             <tr>
-                <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
-                <th>@Html.DisplayNameFor(model => model.Activo)</th>
-                <th>@Html.DisplayNameFor(model => model.FechaRegistro)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Descripcion)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Activo)</th>
+                <th>@Html.DisplayNameFor(model => model.First().FechaRegistro)</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -33,7 +28,7 @@
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
                     <td>
-                        @if (item.Activo == true)
+                        @if (item.Activo)
                         {
                             <span class="badge bg-success">Activo</span>
                         }
@@ -41,26 +36,54 @@
                         {
                             <span class="badge bg-secondary">Inactivo</span>
                         }
-                    </td>
-                    <td>
+                </td>
+                <td>
                     @(item.FechaRegistro.HasValue
                                         ? item.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm")
                                         : "—")
-
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-warning me-1">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <a asp-action="Details" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-info me-1 text-white">
-                            <i class="bi bi-eye"></i> Detalles
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-danger">
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-warning me-1">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-info me-1 text-white">
+                        <i class="bi bi-eye"></i> Detalles
+                    </a>
+                    <form asp-action="Delete" asp-route-id="@item.IdCategoria" method="post" class="d-inline form-eliminar">
+                        <button type="submit" class="btn btn-sm btn-danger">
                             <i class="bi bi-trash"></i> Eliminar
-                        </a>
-                    </td>
-                </tr>
-            }
+                        </button>
+                    </form>
+                </td>
+            </tr>
+                        }
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if (TempData["Error"] != null)
+        {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@TempData["Error"]'
+                });
+                </text>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@TempData["Success"]'
+                });
+                </text>
+        }
+    </script>
+}

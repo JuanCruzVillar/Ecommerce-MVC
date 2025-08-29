@@ -1,27 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using eCommerceMVC.Models;
+﻿using eCommerce.Entities;
+using eCommerce.Services.Interfaces;
 using eCommerceMVC.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace eCommerceMVC.Controllers
 {
     public class ProductosController : Controller
     {
-        private readonly DbecommerceContext _context;
+        private readonly IProductoService _productoService;
+        private readonly ICategoriaService _categoriaService;
+        private readonly IMarcaService _marcaService;
 
-        public ProductosController(DbecommerceContext context)
+        public ProductosController(
+            IProductoService productoService,
+            ICategoriaService categoriaService,
+            IMarcaService marcaService)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _productoService = productoService;
+            _categoriaService = categoriaService;
+            _marcaService = marcaService;
         }
 
         // GET: Productos
         public async Task<IActionResult> Index()
         {
-            var productos = _context.Productos
-                .Include(p => p.IdCategoriaNavigation)
-                .Include(p => p.IdMarcaNavigation);
-            return View(await productos.ToListAsync());
+            var productos = await _productoService.GetAllAsync();
+            return View(productos);
         }
 
         // GET: Productos/Details/5
@@ -29,20 +37,16 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var producto = await _context.Productos
-                .Include(p => p.IdCategoriaNavigation)
-                .Include(p => p.IdMarcaNavigation)
-                .FirstOrDefaultAsync(p => p.IdProducto == id);
-
+            var producto = await _productoService.GetByIdAsync(id.Value);
             if (producto == null) return NotFound();
 
             return View(producto);
         }
 
         // GET: Productos/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            CargarDropdowns();
+            await CargarDropdowns();
             return View();
         }
 
@@ -51,45 +55,42 @@ namespace eCommerceMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductoViewModel vm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var producto = new Productos
-                {
-                    Nombre = vm.Nombre,
-                    Descripcion = vm.Descripcion,
-                    IdMarca = vm.IdMarca,
-                    IdCategoria = vm.IdCategoria,
-                    Precio = vm.Precio,
-                    Stock = vm.Stock,
-                    Activo = true,
-                    FechaRegistro = DateTime.Now
-                };
-
-                // Guardar imagen si se subió
-                if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
-                {
-                    var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-                    if (!Directory.Exists(rutaCarpeta)) Directory.CreateDirectory(rutaCarpeta);
-
-                    var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(vm.ImagenArchivo.FileName);
-                    var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
-
-                    using (var stream = new FileStream(rutaArchivo, FileMode.Create))
-                    {
-                        await vm.ImagenArchivo.CopyToAsync(stream);
-                    }
-
-                    producto.RutaImagen = "/images/" + nombreArchivo;
-                    producto.NombreImagen = vm.ImagenArchivo.FileName;
-                }
-
-                _context.Productos.Add(producto);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await CargarDropdowns(vm);
+                return View(vm);
             }
 
-            CargarDropdowns(vm);
-            return View(vm);
+            var producto = new Producto
+            {
+                Nombre = vm.Nombre,
+                Descripcion = vm.Descripcion,
+                IdMarca = vm.IdMarca,
+                IdCategoria = vm.IdCategoria,
+                Precio = vm.Precio,
+                Stock = vm.Stock,
+                Activo = true,
+                FechaRegistro = DateTime.Now
+            };
+
+            if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
+            {
+                var nombreArchivo = Guid.NewGuid() + Path.GetExtension(vm.ImagenArchivo.FileName);
+                var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                if (!Directory.Exists(rutaCarpeta)) Directory.CreateDirectory(rutaCarpeta);
+                var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                using var stream = new FileStream(rutaArchivo, FileMode.Create);
+                await vm.ImagenArchivo.CopyToAsync(stream);
+
+                producto.RutaImagen = "/images/" + nombreArchivo;
+                producto.NombreImagen = vm.ImagenArchivo.FileName;
+            }
+
+            await _productoService.CreateAsync(producto);
+            TempData["Success"] = "Producto creado correctamente";
+            return RedirectToAction(nameof(Index));
+
         }
 
         // GET: Productos/Edit/5
@@ -97,7 +98,7 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var producto = await _context.Productos.FindAsync(id);
+            var producto = await _productoService.GetByIdAsync(id.Value);
             if (producto == null) return NotFound();
 
             var vm = new ProductoViewModel
@@ -109,14 +110,13 @@ namespace eCommerceMVC.Controllers
                 IdCategoria = producto.IdCategoria,
                 Precio = producto.Precio,
                 Stock = producto.Stock,
-                Activo = producto.Activo ?? true, // si es null, setear true
+                Activo = producto.Activo == true,
                 FechaRegistro = producto.FechaRegistro,
                 RutaImagen = producto.RutaImagen,
                 NombreImagen = producto.NombreImagen
             };
 
-
-            CargarDropdowns(vm);
+            await CargarDropdowns(vm);
             return View(vm);
         }
 
@@ -127,44 +127,41 @@ namespace eCommerceMVC.Controllers
         {
             if (id != vm.IdProducto) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var producto = await _context.Productos.FindAsync(id);
-                if (producto == null) return NotFound();
-
-                producto.Nombre = vm.Nombre;
-                producto.Descripcion = vm.Descripcion;
-                producto.IdMarca = vm.IdMarca;
-                producto.IdCategoria = vm.IdCategoria;
-                producto.Precio = vm.Precio;
-                producto.Stock = vm.Stock;
-                producto.Activo = vm.Activo;
-
-                // Guardar nueva imagen si se subió
-                if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
-                {
-                    var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-                    if (!Directory.Exists(rutaCarpeta)) Directory.CreateDirectory(rutaCarpeta);
-
-                    var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(vm.ImagenArchivo.FileName);
-                    var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
-
-                    using (var stream = new FileStream(rutaArchivo, FileMode.Create))
-                    {
-                        await vm.ImagenArchivo.CopyToAsync(stream);
-                    }
-
-                    producto.RutaImagen = "/images/" + nombreArchivo;
-                    producto.NombreImagen = vm.ImagenArchivo.FileName;
-                }
-
-                _context.Update(producto);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await CargarDropdowns(vm);
+                return View(vm);
             }
 
-            CargarDropdowns(vm);
-            return View(vm);
+            var producto = await _productoService.GetByIdAsync(id);
+            if (producto == null) return NotFound();
+
+            producto.Nombre = vm.Nombre;
+            producto.Descripcion = vm.Descripcion;
+            producto.IdMarca = vm.IdMarca;
+            producto.IdCategoria = vm.IdCategoria;
+            producto.Precio = vm.Precio;
+            producto.Stock = vm.Stock;
+            producto.Activo = vm.Activo;
+
+            if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
+            {
+                var nombreArchivo = Guid.NewGuid() + Path.GetExtension(vm.ImagenArchivo.FileName);
+                var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                if (!Directory.Exists(rutaCarpeta)) Directory.CreateDirectory(rutaCarpeta);
+                var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                using var stream = new FileStream(rutaArchivo, FileMode.Create);
+                await vm.ImagenArchivo.CopyToAsync(stream);
+
+                producto.RutaImagen = "/images/" + nombreArchivo;
+                producto.NombreImagen = vm.ImagenArchivo.FileName;
+            }
+
+            await _productoService.UpdateAsync(producto);
+            TempData["Success"] = "Producto modificado correctamente";
+            return RedirectToAction(nameof(Index));
+
         }
 
         // GET: Productos/Delete/5
@@ -172,11 +169,7 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var producto = await _context.Productos
-                .Include(p => p.IdCategoriaNavigation)
-                .Include(p => p.IdMarcaNavigation)
-                .FirstOrDefaultAsync(p => p.IdProducto == id);
-
+            var producto = await _productoService.GetByIdAsync(id.Value);
             if (producto == null) return NotFound();
 
             return View(producto);
@@ -187,28 +180,22 @@ namespace eCommerceMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var producto = await _context.Productos.FindAsync(id);
-            if (producto != null)
-            {
-                _context.Productos.Remove(producto);
-                await _context.SaveChangesAsync();
-            }
+            var result = await _productoService.DeleteAsync(id);
+            if (!result)
+                TempData["Error"] = "No se puede eliminar el producto.";
+            else
+                TempData["Success"] = "Producto eliminado correctamente.";
 
             return RedirectToAction(nameof(Index));
         }
 
-        private void CargarDropdowns(ProductoViewModel? vm = null)
+        private async Task CargarDropdowns(ProductoViewModel? vm = null)
         {
-            var marcas = _context.Marcas.ToList();
-            var categorias = _context.Categorias.ToList();
+            var marcas = await _marcaService.GetAllAsync();
+            var categorias = await _categoriaService.GetAllAsync();
 
             ViewBag.IdMarca = new SelectList(marcas, "IdMarca", "Descripcion", vm?.IdMarca);
             ViewBag.IdCategoria = new SelectList(categorias, "IdCategoria", "Descripcion", vm?.IdCategoria);
-        }
-
-        private bool ProductosExists(int id)
-        {
-            return _context.Productos.Any(e => e.IdProducto == id);
         }
     }
 }

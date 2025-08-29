@@ -1,33 +1,47 @@
-using eCommerceMVC.Models;
+using eCommerce.Data;
+using eCommerce.Repositories;
+using eCommerce.Repositories.Implementations;
+using eCommerce.Repositories.Interfaces;
+using eCommerce.Services.Implementations;
+using eCommerce.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// MVC
 builder.Services.AddControllersWithViews();
 
+// DbContext
 builder.Services.AddDbContext<DbecommerceContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("EcommerceContext")
-        );
-}
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EcommerceContext"))
 );
+
+// Repositories
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<IMarcaRepository, MarcaRepository>();
+builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
+
+// Services
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+builder.Services.AddScoped<IMarcaService, MarcaService>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(

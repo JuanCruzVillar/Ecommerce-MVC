@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eCommerceMVC.Models;
+namespace eCommerce.Entities;
 
 public partial class DetalleVentas
 {
@@ -15,7 +15,7 @@ public partial class DetalleVentas
 
     public decimal? Total { get; set; }
 
-    public virtual Productos? IdProductoNavigation { get; set; }
+    public virtual Producto? IdProductoNavigation { get; set; }
 
-    public virtual Ventas? IdVentaNavigation { get; set; }
+    public virtual Venta? IdVentaNavigation { get; set; }
 }

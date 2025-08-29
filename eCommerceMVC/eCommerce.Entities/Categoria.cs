@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eCommerceMVC.Models;
+namespace eCommerce.Entities;
 
-public partial class Categorias
+public partial class Categoria
 {
     public int IdCategoria { get; set; }
 
@@ -14,5 +14,5 @@ public partial class Categorias
     public DateTime? FechaRegistro { get; set; }
 
 
-    public virtual ICollection<Productos> Productos { get; set; } = new List<Productos>();
+    public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
 }

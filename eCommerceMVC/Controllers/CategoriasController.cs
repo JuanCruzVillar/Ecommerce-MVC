@@ -1,60 +1,59 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using eCommerceMVC.Models;
+using eCommerce.Entities;
+using eCommerce.Services.Interfaces; 
 
 namespace eCommerceMVC.Controllers
 {
     public class CategoriasController : Controller
     {
-        private readonly DbecommerceContext _context;
+        private readonly ICategoriaService _categoriaService;
 
-        public CategoriasController(DbecommerceContext context)
+        public CategoriasController(ICategoriaService categoriaService)
         {
-            _context = context;
+            _categoriaService = categoriaService;
         }
-
-       
 
         // GET: Categorias
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categorias.ToListAsync());
+            var categorias = await _categoriaService.GetAllAsync();
+            return View(categorias); // Index.cshtml sigue igual
         }
-
-
 
         // GET: Categorias/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
-            var categoria = await _context.Categorias
-                .FirstOrDefaultAsync(m => m.IdCategoria == id);
+            var categoria = await _categoriaService.GetByIdAsync(id.Value);
             if (categoria == null) return NotFound();
 
-            return View(categoria);
+            return View(categoria); // Details.cshtml
         }
 
         // GET: Categorias/Create
-        public IActionResult Create() => View();
+        public IActionResult Create() => View(); // Create.cshtml
 
         // POST: Categorias/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Categorias categoria)
+        public async Task<IActionResult> Create(Categoria categoria)
         {
             if (!ModelState.IsValid) return View(categoria);
 
-            categoria.FechaRegistro = DateTime.Now;
+            categoria.FechaRegistro = System.DateTime.Now;
             categoria.Activo = true;
 
+            var result = await _categoriaService.CreateAsync(categoria);
 
-            _context.Add(categoria);
-            await _context.SaveChangesAsync();
+            if (!result)
+            {
+                TempData["Error"] = "Ya existe una categoría con esa descripción.";
+                return View(categoria);
+            }
 
+            TempData["Success"] = "Categoría creada correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -63,38 +62,30 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var categoria = await _context.Categorias.FindAsync(id);
+            var categoria = await _categoriaService.GetByIdAsync(id.Value);
             if (categoria == null) return NotFound();
 
-            return View(categoria);
+            return View(categoria); // Edit.cshtml
         }
 
         // POST: Categorias/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Categorias categoria)
+        public async Task<IActionResult> Edit(int id, Categoria categoria)
         {
             if (id != categoria.IdCategoria) return NotFound();
+            if (!ModelState.IsValid) return View(categoria);
 
-            if (ModelState.IsValid)
+            var result = await _categoriaService.UpdateAsync(categoria);
+
+            if (!result)
             {
-                try
-                {
-                    _context.Update(categoria);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CategoriaExists(categoria.IdCategoria))
-                        return NotFound();
-                    else
-                        throw;
-                }
-
-                return RedirectToAction(nameof(Index));
+                TempData["Error"] = "Ya existe otra categoría con esa descripción.";
+                return View(categoria);
             }
 
-            return View(categoria);
+            TempData["Success"] = "Categoría actualizada correctamente.";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Categorias/Delete/5
@@ -102,11 +93,10 @@ namespace eCommerceMVC.Controllers
         {
             if (id == null) return NotFound();
 
-            var categoria = await _context.Categorias
-                .FirstOrDefaultAsync(m => m.IdCategoria == id);
+            var categoria = await _categoriaService.GetByIdAsync(id.Value);
             if (categoria == null) return NotFound();
 
-            return View(categoria);
+            return View(categoria); // Delete.cshtml
         }
 
         // POST: Categorias/Delete/5
@@ -114,30 +104,14 @@ namespace eCommerceMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var categoria = await _context.Categorias
-                .Include(c => c.Productos) // suponiendo que tenés la relación
-                .FirstOrDefaultAsync(c => c.IdCategoria == id);
+            var result = await _categoriaService.DeleteAsync(id);
 
-            if (categoria == null)
-                return NotFound();
-
-            if (categoria.Productos.Any())
-            {
-                // Podés usar TempData para mostrar un mensaje en la vista
+            if (!result)
                 TempData["Error"] = "No se puede eliminar esta categoría porque tiene productos asociados.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            _context.Categorias.Remove(categoria);
-            await _context.SaveChangesAsync();
+            else
+                TempData["Success"] = "La categoría se eliminó correctamente.";
 
             return RedirectToAction(nameof(Index));
-        }
-
-
-        private bool CategoriaExists(int id)
-        {
-            return _context.Categorias.Any(e => e.IdCategoria == id);
         }
     }
 }

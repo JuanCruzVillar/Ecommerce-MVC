@@ -1,4 +1,5 @@
-﻿@model eCommerceMVC.Models.Categorias
+﻿@using eCommerce.Entities
+@model Categoria
 
 @{
     ViewData["Title"] = "Detalles Categoría";
@@ -15,14 +16,13 @@
         <dt class="col-sm-3">Activo</dt>
         <dd class="col-sm-9">
             @if (Model.Activo == true)
-{
-    <i class="bi bi-check-circle-fill text-success"></i> <span>Activo</span>
-}
-else
-{
-    <i class="bi bi-x-circle-fill text-danger"></i> <span>Inactivo</span>
-}
-
+            {
+                <i class="bi bi-check-circle-fill text-success"></i> <span>Activo</span>
+            }
+            else
+            {
+                <i class="bi bi-x-circle-fill text-danger"></i> <span>Inactivo</span>
+            }
         </dd>
 
         <dt class="col-sm-3">Fecha de Registro</dt>
@@ -36,4 +36,3 @@ else
         <i class="bi bi-arrow-left"></i> Volver
     </a>
 </div>
- 

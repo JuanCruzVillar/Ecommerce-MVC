@@ -1,4 +1,5 @@
-﻿@model eCommerceMVC.Models.Productos
+﻿@using eCommerce.Entities
+@model Producto
 
 @{
     ViewData["Title"] = "Eliminar Producto";
@@ -43,8 +44,12 @@
     </dl>
 </div>
 
-<form asp-action="Delete">
+<form asp-action="Delete" method="post" class="form-eliminar">
     <input type="hidden" asp-for="IdProducto" />
-    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <button type="submit" class="btn btn-danger">
+        <i class="bi bi-trash-fill"></i> Eliminar
+    </button>
+
+
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>

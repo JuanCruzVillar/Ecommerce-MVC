@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eCommerceMVC.Models;
+namespace eCommerce.Entities;
 
-public partial class Ventas
+public partial class Venta
 {
     public int IdVenta { get; set; }
 

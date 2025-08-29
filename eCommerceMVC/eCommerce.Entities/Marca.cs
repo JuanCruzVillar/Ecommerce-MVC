@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eCommerceMVC.Models;
+namespace eCommerce.Entities;
 
 public partial class Marca
 {
@@ -10,5 +10,5 @@ public partial class Marca
     public bool Activo { get; set; }  // ⚠️ debe ser bool no bool?
     public DateTime FechaRegistro { get; set; }
 
-    public virtual ICollection<Productos> Productos { get; set; } = new List<Productos>();
+    public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace eCommerceMVC.Models;
+namespace eCommerce.Entities;
 
 public partial class Usuario
 {
