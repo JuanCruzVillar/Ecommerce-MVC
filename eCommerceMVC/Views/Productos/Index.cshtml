@@ -43,7 +43,7 @@
                     <td>@(item.Descripcion?.Length > 50 ? item.Descripcion.Substring(0, 50) + "..." : item.Descripcion)</td>
                     <td>@string.Format("${0:N2}", item.Precio)</td>
                     <td>@item.Stock</td>
-                    <td class="text-center">
+                    <td class="text-center"> 
                         @if (item.Activo == true)
                         {
                             <i class="bi bi-check-circle-fill text-success" title="Activo"></i>

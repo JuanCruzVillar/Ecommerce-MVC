@@ -1,8 +1,129 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model eCommerce.Entities.ViewModels.VentasViewModel
+
+@{
+    ViewData["Title"] = "Ventas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h2>Dashboard de Ventas</h2>
+
+<div class="row">
+    <!-- Total Ventas -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Ventas
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            @Model.Resumen.TotalVenta.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Clientes -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Total Clientes
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            @Model.Resumen.TotalCliente
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Productos -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Total Productos
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            @Model.Resumen.TotalProducto
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-box fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<h2>Listado de Ventas</h2>
+
+<div class="mb-3">
+    <a asp-action="ExportarTodasLasVentas" class="btn btn-danger">
+        <i class="bi bi-file-earmark-pdf"></i> Exportar todas las ventas
+    </a>
+</div>
+
+
+<table id="tablaVentas" class="display table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Fecha Venta</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Importe Total</th>
+            <th>ID Transacción</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var venta in Model.Detalles)
+        {
+            <tr>
+                <td>@venta.FechaVenta.ToString("dd/MM/yyyy")</td>
+                <td>@venta.ClienteNombre</td>
+                <td>@venta.ProductoNombre</td>
+                <td>@venta.Precio.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</td>
+                <td>@venta.TotalProductos</td>
+                <td>@venta.ImporteTotal.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</td>
+                <td>@venta.IdTransaccion</td>
+                <td>
+                    <a asp-action="ExportarVentaPdf" asp-route-id="@venta.IdVenta" class="btn btn-sm btn-primary">
+                        Exportar PDF
+                    </a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablaVentas').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
+                }
+            });
+        });
+    </script>
+}
