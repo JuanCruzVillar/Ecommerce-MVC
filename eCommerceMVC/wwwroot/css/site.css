@@ -11,6 +11,32 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
+.producto-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .producto-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+
+    .producto-card .card-body {
+        flex-grow: 1; 
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .producto-card .card-footer {
+        display: flex;
+        justify-content: center;
+    }
+
+
+
 
 :root {
     --blue: #4e73df;

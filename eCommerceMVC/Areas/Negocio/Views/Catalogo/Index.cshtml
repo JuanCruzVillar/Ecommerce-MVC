@@ -1,0 +1,72 @@
+﻿@model IEnumerable<eCommerce.Entities.ViewModels.DetalleProductoViewModel>
+
+@{
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Catálogo";
+}
+
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            @foreach (var producto in Model)
+            {
+                <div class="col mb-5">
+                    <div class="card h-100 producto-card">
+
+                        <!-- Imagen y hover clickeable -->
+                        <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })"
+                           class="text-decoration-none text-dark">
+                            <img class="card-img-top"
+                                 src="@(producto.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")"
+                                 alt="@producto.Nombre" />
+                        </a>
+
+                        <!-- Detalles del producto -->
+                        <div class="card-body p-4 text-center">
+                            <h5 class="fw-bolder">@producto.Nombre</h5>
+                            @if (producto.Precio.HasValue)
+                            {
+                                <p>$@producto.Precio.Value.ToString("F2")</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Precio no disponible</p>
+                            }
+                        </div>
+
+                        <!-- Botón agregar al carrito -->
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
+                            <button class="btn btn-outline-dark mt-auto">Agregar al carrito</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    .producto-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .producto-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .producto-card .card-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .producto-card .card-footer {
+            display: flex;
+            justify-content: center;
+        }
+</style>

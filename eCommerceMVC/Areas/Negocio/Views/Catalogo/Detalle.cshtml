@@ -1,0 +1,78 @@
+﻿@model eCommerce.Entities.ViewModels.DetalleProductoPaginaViewModel
+
+@{
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Detalle del Producto";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Imagen del producto -->
+        <div class="col-md-6 mb-4">
+            <img class="img-fluid rounded shadow"
+                 src="@(Model.Producto.RutaImagen ?? "https://dummyimage.com/600x400/dee2e6/6c757d.jpg")"
+                 alt="@Model.Producto.Nombre" />
+        </div>
+
+        <!-- Información del producto -->
+        <div class="col-md-6">
+            <h2 class="fw-bolder">@Model.Producto.Nombre</h2>
+            <p class="text-muted">@Model.Producto.Descripcion</p>
+
+            @if (Model.Producto.Precio.HasValue)
+            {
+                <h4 class="text-success">$@Model.Producto.Precio.Value.ToString("F2")</h4>
+            }
+            else
+            {
+                <h4 class="text-danger">Precio no disponible</h4>
+            }
+
+            <div class="mt-4">
+                <button class="btn btn-dark btn-lg">Agregar al carrito</button>
+                <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })"
+                   class="btn btn-outline-secondary btn-lg ms-2">
+                    Volver al catálogo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos relacionados -->
+    <section class="py-5 bg-light mt-5">
+        <div class="container">
+            <h2 class="fw-bolder mb-4">Productos relacionados</h2>
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                @foreach (var relacionado in Model.Relacionados)
+                {
+                    <div class="col mb-5">
+                        <div class="card h-100 producto-card">
+                            <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = relacionado.IdProducto })"
+                               class="text-decoration-none text-dark">
+                                <img class="card-img-top"
+                                     src="@(relacionado.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")"
+                                     alt="@relacionado.Nombre" />
+                            </a>
+
+                            <div class="card-body p-4 text-center">
+                                <h5 class="fw-bolder">@relacionado.Nombre</h5>
+                                @if (relacionado.Precio.HasValue)
+                                {
+                                    <p>$@relacionado.Precio.Value.ToString("F2")</p>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">Precio no disponible</p>
+                                }
+                            </div>
+
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
+                                <button class="btn btn-outline-dark mt-auto">Agregar al carrito</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>

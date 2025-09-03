@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using eCommerce.Entities;
+using System.Collections.Generic;
 
 namespace eCommerce.Entities.ViewModels
 {

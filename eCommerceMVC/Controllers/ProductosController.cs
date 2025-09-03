@@ -1,6 +1,6 @@
 ﻿using eCommerce.Entities;
 using eCommerce.Services.Interfaces;
-using eCommerceMVC.ViewModels;
+using eCommerce.Entities.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;

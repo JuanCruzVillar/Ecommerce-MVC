@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace eCommerceMVC.ViewModels
+namespace eCommerce.Entities.ViewModels
 {
     public class ProductoViewModel
     {

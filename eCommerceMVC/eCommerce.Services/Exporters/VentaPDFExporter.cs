@@ -1,9 +1,9 @@
-﻿using eCommerce.Entities.ViewModels;
-using QuestPDF.Fluent;
+﻿using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.IO;
 using System.Globalization;
+using eCommerce.Entities.ViewModels;
 
 namespace eCommerceMVC.Services.Exporters
 {
