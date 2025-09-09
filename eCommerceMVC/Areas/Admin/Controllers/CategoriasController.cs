@@ -1,10 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using eCommerce.Entities;
+using eCommerce.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using eCommerce.Entities;
-using eCommerce.Services.Interfaces; 
+using System.Threading.Tasks;
 
-namespace eCommerceMVC.Controllers
+namespace eCommerceMVC.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class CategoriasController : Controller
     {
         private readonly ICategoriaService _categoriaService;
@@ -42,7 +45,7 @@ namespace eCommerceMVC.Controllers
         {
             if (!ModelState.IsValid) return View(categoria);
 
-            categoria.FechaRegistro = System.DateTime.Now;
+            categoria.FechaRegistro = DateTime.Now;
             categoria.Activo = true;
 
             var result = await _categoriaService.CreateAsync(categoria);

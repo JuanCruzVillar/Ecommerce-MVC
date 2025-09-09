@@ -11,5 +11,9 @@ namespace eCommerce.Services.Interfaces
         Task<bool> CreateAsync(Usuario usuario);
         Task<bool> UpdateAsync(Usuario usuario);
         Task<bool> DeleteAsync(int id);
+        Task<Usuario> ValidarUsuario(string correo, string contraseña);
+
+        Task<Usuario> GetByCorreoAsync(string correo);
+
     }
 }

@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using eCommerce.Services.Interfaces;
-using eCommerce.Entities;
+﻿using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
+using eCommerce.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace eCommerceMVC.Areas.Negocio.Controllers
 {
     [Area("Negocio")]
+    [Authorize(Roles = "Cliente")]
     public class HomeController : Controller
     {
         private readonly IProductoService _productoService;

@@ -2,6 +2,7 @@
 using eCommerce.Repositories;
 using eCommerce.Repositories.Interfaces;
 using eCommerce.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,6 +57,18 @@ namespace eCommerce.Services.Implementations
 
             await _usuarioRepository.DeleteAsync(id);
             return true;
+        }
+
+        public async Task<Usuario> ValidarUsuario(string correo, string contraseña)
+        {
+            var usuarios = await _usuarioRepository.GetAllAsync();
+            return usuarios.FirstOrDefault(u =>
+                u.Correo == correo && u.Contraseña == contraseña && u.Activo);
+        }
+        public async Task<Usuario> GetByCorreoAsync(string correo)
+        {
+            var usuarios = await _usuarioRepository.GetAllAsync();
+            return usuarios.FirstOrDefault(u => u.Correo.ToLower() == correo.ToLower());
         }
     }
 }

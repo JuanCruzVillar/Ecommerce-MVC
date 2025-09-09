@@ -1,10 +1,13 @@
 ﻿using eCommerce.Entities;
 using eCommerce.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace eCommerceMVC.Controllers
+namespace eCommerceMVC.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class MarcasController : Controller
     {
         private readonly IMarcaService _marcaService;
@@ -41,7 +44,7 @@ namespace eCommerceMVC.Controllers
         {
             if (!ModelState.IsValid) return View(marca);
 
-            marca.FechaRegistro = System.DateTime.Now;
+            marca.FechaRegistro = DateTime.Now;
             marca.Activo = true;
 
             var result = await _marcaService.CreateAsync(marca);

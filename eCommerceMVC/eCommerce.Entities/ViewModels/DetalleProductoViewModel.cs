@@ -11,5 +11,7 @@ namespace eCommerce.Entities.ViewModels
         public string? Descripcion { get; set; }
         public decimal? Precio { get; set; }
         public string? RutaImagen { get; set; }
+
+        public int? IdCategoria { get; set; }
     }
 }

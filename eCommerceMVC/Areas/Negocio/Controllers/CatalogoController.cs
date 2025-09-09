@@ -1,30 +1,43 @@
 ﻿using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Area("Negocio")]
 public class CatalogoController : Controller
 {
     private readonly IProductoService _productoService;
+    private readonly ICategoriaService _categoriaService;
 
-    public CatalogoController(IProductoService productoService)
+    public CatalogoController(IProductoService productoService, ICategoriaService categoriaService)
     {
         _productoService = productoService;
+        _categoriaService = categoriaService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? categoriaId = null)
     {
         var productos = await _productoService.GetAllAsync();
 
-        // Mapeo de entidad a ViewModel (para listado)
+        // Filtrar por categoría si viene categoriaId
+        if (categoriaId.HasValue)
+        {
+            productos = productos.Where(p => p.IdCategoria == categoriaId.Value).ToList();
+        }
+
+        // Traer todas las categorías para el sidebar
+        var categorias = await _categoriaService.GetAllAsync();
+        ViewBag.Categorias = categorias;
+
+        // Mapeo de entidad a ViewModel
         var viewModels = productos.Select(p => new DetalleProductoViewModel
         {
             IdProducto = p.IdProducto,
             Nombre = p.Nombre ?? "Sin nombre",
             Descripcion = p.Descripcion,
             Precio = p.Precio,
-            RutaImagen = p.RutaImagen
+            RutaImagen = p.RutaImagen,
+            IdCategoria = p.IdCategoria
         }).ToList();
 
         return View(viewModels);
@@ -41,10 +54,11 @@ public class CatalogoController : Controller
             Nombre = producto.Nombre ?? "Sin nombre",
             Descripcion = producto.Descripcion,
             Precio = producto.Precio,
-            RutaImagen = producto.RutaImagen
+            RutaImagen = producto.RutaImagen,
+            IdCategoria = producto.IdCategoria
         };
 
-        // Productos relacionados 
+        // Productos relacionados (excluyendo el actual)
         var todos = await _productoService.GetAllAsync();
         var relacionados = todos
             .Where(p => p.IdProducto != id)

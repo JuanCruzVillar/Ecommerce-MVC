@@ -7,9 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eCommerceMVC.Services.Exporters;
+using Microsoft.AspNetCore.Authorization;
 
-namespace eCommerceMVC.Controllers
+namespace eCommerceMVC.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
         private readonly IUsuarioService _usuarioService;
@@ -21,7 +24,7 @@ namespace eCommerceMVC.Controllers
             _productoService = productoService;
         }
 
-        // 👉 Método para generar ventas de ejemplo con varios productos por venta
+       
         private List<VentaDetalleViewModel> GenerarVentasEjemplo(List<Usuario> usuarios, List<Producto> productos)
         {
             var ventas = new List<VentaDetalleViewModel>();
@@ -32,7 +35,7 @@ namespace eCommerceMVC.Controllers
                 var usuario = usuarios[i];
                 int numProductos = rnd.Next(2, 6); // 2 a 5 productos por venta
 
-                // Seleccionamos productos aleatorios sin repetir en la misma venta
+                // seleccionar productos aleatorios 
                 var productosVenta = productos.OrderBy(x => rnd.Next()).Take(numProductos).ToList();
 
                 foreach (var producto in productosVenta)
@@ -65,7 +68,7 @@ namespace eCommerceMVC.Controllers
 
             var ventas = GenerarVentasEjemplo(usuarios, productos);
 
-            var dashboard = new Dashbord
+            var dashboard = new Dashboard
             {
                 TotalVenta = ventas.Sum(v => v.ImporteTotal),
                 TotalCliente = usuarios.Count,

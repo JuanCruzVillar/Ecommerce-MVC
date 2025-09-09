@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Negocio\Views\Home\**" />
+    <Content Remove="Areas\Negocio\Views\Home\**" />
+    <EmbeddedResource Remove="Areas\Negocio\Views\Home\**" />
+    <None Remove="Areas\Negocio\Views\Home\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
@@ -19,9 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\Negocio\Data\" />
     <Folder Include="Areas\Negocio\Models\" />
-    <Folder Include="Areas\Negocio\Views\Home\" />
   </ItemGroup>
 
 </Project>

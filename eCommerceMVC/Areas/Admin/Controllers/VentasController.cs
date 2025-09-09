@@ -1,17 +1,20 @@
 ﻿using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace eCommerce.Controllers
+namespace eCommerceMVC.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class VentasController : Controller
     {
         public IActionResult Index()
         {
             // Dashboard ficticio
-            var dashboard = new Dashbord
+            var dashboard = new Dashboard
             {
                 TotalVenta = 120000,
                 TotalCliente = 15,

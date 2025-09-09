@@ -1,13 +1,16 @@
 ﻿using eCommerce.Entities;
 using eCommerce.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Threading.Tasks;
 
-namespace eCommerceMVC.Controllers
+namespace eCommerceMVC.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class UsuariosController : Controller
     {
         private readonly IUsuarioService _usuarioService;

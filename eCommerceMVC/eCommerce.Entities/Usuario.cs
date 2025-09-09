@@ -26,5 +26,7 @@ public partial class Usuario
 
     public DateTime? FechaRegistro { get; set; }
 
+    public string Rol { get; set; } = "Cliente";
+
     public virtual Cliente? IdClienteNavigation { get; set; }
 }

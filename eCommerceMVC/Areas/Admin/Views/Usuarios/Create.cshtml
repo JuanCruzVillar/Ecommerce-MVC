@@ -2,17 +2,16 @@
 @model Usuario
 
 @{
-    ViewData["Title"] = "Editar Usuario";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Crear Usuario";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
+
 <div class="container mt-4">
-    <h2>Editar Usuario</h2>
+    <h2>Crear Usuario</h2>
     <hr />
 
-    <form asp-action="Edit" method="post">
-        <input type="hidden" asp-for="IdUsuario" />
-
+    <form asp-action="Create" method="post">
         <div class="mb-3">
             <label asp-for="Nombres" class="form-label"></label>
             <input asp-for="Nombres" class="form-control" />
@@ -32,12 +31,13 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Nueva contraseña (opcional)</label>
-            <input name="NuevaContrasena" type="password" class="form-control" />
+            <label asp-for="Contraseña" class="form-label">Contraseña</label>
+            <input asp-for="Contraseña" type="password" class="form-control" />
+            <span asp-validation-for="Contraseña" class="text-danger"></span>
         </div>
 
-
-        <button type="submit" class="btn btn-primary">Guardar</button>
+      
+        <button type="submit" class="btn btn-success">Crear</button>
         <a asp-action="Index" class="btn btn-secondary">Volver</a>
     </form>
 </div>

@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Acceso denegado";
+}
+
+<h2>Acceso denegado</h2>
+<p>No tenés permisos para acceder a esta página.</p>
+@if (ViewBag.ReturnUrl != null)
+{
+    <p>Intentaste acceder a: @ViewBag.ReturnUrl</p>
+}
+<a href="@Url.Action("Index", "Home", new { area = "Negocio" })" class="btn btn-primary mt-3">
+    Volver al catálogo
+</a>

@@ -1,14 +1,17 @@
 ﻿using eCommerce.Entities;
-using eCommerce.Services.Interfaces;
 using eCommerce.Entities.ViewModels;
+using eCommerce.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace eCommerceMVC.Controllers
+namespace eCommerceMVC.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ProductosController : Controller
     {
         private readonly IProductoService _productoService;

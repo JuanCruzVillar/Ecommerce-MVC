@@ -31,7 +31,7 @@
                 <div class="sidebar-brand-text mx-3">Hardware Store</div>
             </a>
             <hr class="sidebar-divider my-0">
-            
+
             <hr class="sidebar-divider">
             <div class="sidebar-heading">Interfaz</div>
             <li class="nav-item">
@@ -51,7 +51,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="@Url.Action("Index", "Categorias")">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Categorias</span>
+                    <span>Categorías</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -80,20 +80,21 @@
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
+
+                    <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
+                        <!-- User Dropdown -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Nombre del usuario</span>
-                                <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                Hola, @User.Identity.Name
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>Perfil</a>
-                                <a class="dropdown-item" href="#"><i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>Configuracion</a>
+
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">Perfil</a>
+                                <a class="dropdown-item" href="#">Configuración</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Cerrar sesión
-                                </a>
+                                <a class="dropdown-item" href="@Url.Action("Logout", "Auth")" id="logoutLink">Cerrar sesión</a>
                             </div>
                         </li>
                     </ul>
@@ -119,25 +120,6 @@
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -162,6 +144,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Confirmación SweetAlert2 para eliminar
             document.body.addEventListener("submit", function (e) {
                 if (e.target.classList.contains("form-eliminar")) {
                     e.preventDefault();
@@ -180,6 +163,26 @@
                 }
             });
 
+            // Confirmación SweetAlert2 para logout
+            document.getElementById("logoutLink")?.addEventListener("click", function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Cerrar sesión',
+                    text: "¿Seguro que querés salir?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, cerrar sesión',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '@Url.Action("Logout", "Auth")';
+                    }
+                });
+            });
+
+            // Mensajes de éxito/error con SweetAlert2
             @if (TempData["Success"] != null)
             {
                     <text>

@@ -5,7 +5,7 @@ namespace eCommerce.Entities.ViewModels
 {
     public class VentasViewModel
     {
-        public Dashbord Resumen { get; set; }                       // Para las cards del dashboard
+        public Dashboard Resumen { get; set; }                       // Para las cards del dashboard
         public IEnumerable<VentaDetalleViewModel> Detalles { get; set; } // Para la tabla de ventas
     }
 }

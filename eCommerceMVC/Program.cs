@@ -4,6 +4,7 @@ using eCommerce.Repositories.Implementations;
 using eCommerce.Repositories.Interfaces;
 using eCommerce.Services.Implementations;
 using eCommerce.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,17 @@ builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IMarcaService, MarcaService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 
+// Autenticación y autorización
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login"; // Login para clientes
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(1);
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Pipeline
@@ -41,15 +53,28 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
+
+// Rutas por áreas (primero las áreas)
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+);
 
+// Ruta por defecto fuera de áreas (Negocio / Catálogo)
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Catalogo}/{action=Index}/{id?}"
+);
 
+// Redirigir raíz al catálogo
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/Negocio/Catalogo/Index");
+    return Task.CompletedTask;
+});
 
 app.Run();
