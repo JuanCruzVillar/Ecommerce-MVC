@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using eCommerceMVC.Services.Exporters;
 
-
 namespace eCommerceMVC.Controllers
 {
     public class HomeController : Controller
@@ -22,27 +21,37 @@ namespace eCommerceMVC.Controllers
             _productoService = productoService;
         }
 
-        // 👉 Método reutilizable para generar ventas de ejemplo
+        // 👉 Método para generar ventas de ejemplo con varios productos por venta
         private List<VentaDetalleViewModel> GenerarVentasEjemplo(List<Usuario> usuarios, List<Producto> productos)
         {
             var ventas = new List<VentaDetalleViewModel>();
+            var rnd = new Random();
 
             for (int i = 0; i < usuarios.Count; i++)
             {
-                var producto = productos[i % productos.Count];
                 var usuario = usuarios[i];
+                int numProductos = rnd.Next(2, 6); // 2 a 5 productos por venta
 
-                ventas.Add(new VentaDetalleViewModel
+                // Seleccionamos productos aleatorios sin repetir en la misma venta
+                var productosVenta = productos.OrderBy(x => rnd.Next()).Take(numProductos).ToList();
+
+                foreach (var producto in productosVenta)
                 {
-                    IdVenta = i + 1,
-                    FechaVenta = DateTime.Now.AddDays(-i),
-                    ClienteNombre = usuario.Nombres + " " + usuario.Apellidos,
-                    ProductoNombre = producto.Nombre,
-                    Precio = producto.Precio ?? 0m,
-                    TotalProductos = (i % 3) + 1,
-                    ImporteTotal = (producto.Precio ?? 0m) * ((i % 3) + 1),
-                    IdTransaccion = "TXN00" + (i + 1)
-                });
+                    int cantidad = rnd.Next(1, 4); // 1 a 3 unidades
+                    decimal importe = (producto.Precio ?? 0m) * cantidad;
+
+                    ventas.Add(new VentaDetalleViewModel
+                    {
+                        IdVenta = i + 1,
+                        FechaVenta = DateTime.Now.AddDays(-i),
+                        ClienteNombre = usuario.Nombres + " " + usuario.Apellidos,
+                        ProductoNombre = producto.Nombre,
+                        Precio = producto.Precio ?? 0m,
+                        TotalProductos = cantidad,
+                        ImporteTotal = importe,
+                        IdTransaccion = "TXN00" + (i + 1)
+                    });
+                }
             }
 
             return ventas;
@@ -72,7 +81,7 @@ namespace eCommerceMVC.Controllers
             return View(model);
         }
 
-        // Exportar UNA sola venta
+        // Exportar UNA sola venta (agrupando sus productos)
         public async Task<IActionResult> ExportarVentaPdf(int id)
         {
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
@@ -82,14 +91,18 @@ namespace eCommerceMVC.Controllers
 
             var ventas = GenerarVentasEjemplo(usuarios, productos);
 
-            var venta = ventas.FirstOrDefault(v => v.IdVenta == id);
-            if (venta == null)
+            // Agrupamos productos por venta
+            var ventaCompleta = ventas
+                .Where(v => v.IdVenta == id)
+                .ToList();
+
+            if (!ventaCompleta.Any())
                 return NotFound();
 
             var exporter = new VentaPdfExporter();
-            var pdfBytes = exporter.GenerarPdf(venta);
+            var pdfBytes = exporter.GenerarPdfVentaCompleta(ventaCompleta);
 
-            return File(pdfBytes, "application/pdf", $"Venta_{venta.IdVenta}.pdf");
+            return File(pdfBytes, "application/pdf", $"Venta_{id}.pdf");
         }
 
         // Exportar TODAS las ventas en un solo PDF
@@ -102,8 +115,14 @@ namespace eCommerceMVC.Controllers
 
             var ventas = GenerarVentasEjemplo(usuarios, productos);
 
+            // Agrupamos por IdVenta para que cada venta tenga sus productos
+            var ventasAgrupadas = ventas
+                .GroupBy(v => v.IdVenta)
+                .Select(g => g.ToList())
+                .ToList();
+
             var exporter = new VentaPdfExporter();
-            var pdfBytes = exporter.GenerarPdfTodas(ventas);
+            var pdfBytes = exporter.GenerarPdfTodasVentas(ventasAgrupadas);
 
             return File(pdfBytes, "application/pdf", "Reporte_Ventas.pdf");
         }
