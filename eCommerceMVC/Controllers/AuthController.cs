@@ -26,7 +26,7 @@ namespace eCommerceMVC.Controllers
         public IActionResult Login(string returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View(); // Vista: Views/Auth/Login.cshtml usando _LayoutAdmin.cshtml
+            return View(); // Vista Admin
         }
 
         // -------------------------------
@@ -34,9 +34,9 @@ namespace eCommerceMVC.Controllers
         // -------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string correo, string contraseña, string returnUrl = null)
+        public async Task<IActionResult> Login(string correo, string contrasena, string returnUrl = null)
         {
-            if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contraseña))
+            if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contrasena))
             {
                 ViewBag.Error = "Debés completar todos los campos";
                 return View();
@@ -50,7 +50,7 @@ namespace eCommerceMVC.Controllers
             }
 
             var hasher = new PasswordHasher<Usuario>();
-            var result = hasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
+            var result = hasher.VerifyHashedPassword(usuario, usuario.Contraseña, contrasena);
             if (result == PasswordVerificationResult.Failed)
             {
                 ViewBag.Error = "Usuario o contraseña incorrectos";
@@ -79,41 +79,35 @@ namespace eCommerceMVC.Controllers
         // LOGIN CLIENTE (POST desde modal)
         // -------------------------------
         [HttpPost]
-        public async Task<IActionResult> LoginCliente([FromForm] string correo, [FromForm] string contraseña)
+        public async Task<IActionResult> LoginCliente(string correo, string contrasena)
         {
-            if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contraseña))
-            {
-                return Json(new { success = false, message = "Debés completar todos los campos." });
-            }
+            if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contrasena))
+                return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
 
             var usuario = await _usuarioService.GetByCorreoAsync(correo);
             if (usuario == null || !usuario.Activo || usuario.Rol != "Cliente")
-            {
-                return Json(new { success = false, message = "Usuario o contraseña incorrectos." });
-            }
+                return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
 
             var hasher = new PasswordHasher<Usuario>();
-            var result = hasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
-            if (result == PasswordVerificationResult.Failed)
-            {
-                return Json(new { success = false, message = "Usuario o contraseña incorrectos." });
-            }
+            if (hasher.VerifyHashedPassword(usuario, usuario.Contraseña, contrasena) == PasswordVerificationResult.Failed)
+                return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
 
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, usuario.Nombres),
-                new Claim(ClaimTypes.Email, usuario.Correo),
-                new Claim(ClaimTypes.Role, usuario.Rol)
-            };
+    {
+        new Claim(ClaimTypes.Name, usuario.Nombres),
+        new Claim(ClaimTypes.Email, usuario.Correo),
+        new Claim(ClaimTypes.Role, usuario.Rol)
+    };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                                           new ClaimsPrincipal(claimsIdentity),
                                           new AuthenticationProperties { IsPersistent = true });
 
-            return Json(new { success = true, message = "Bienvenido " + usuario.Nombres });
+            // Redirige al catálogo del área negocio
+            return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
         }
+
 
         // -------------------------------
         // LOGOUT
@@ -123,13 +117,11 @@ namespace eCommerceMVC.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // Si viene vía AJAX (modal cliente) retorna JSON
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 return Json(new { success = true });
             }
 
-            // Redirige según rol si está logueado (fallback: catalogo)
             if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                 return RedirectToAction("Login", "Auth");
 

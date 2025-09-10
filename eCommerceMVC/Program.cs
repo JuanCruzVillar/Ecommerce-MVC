@@ -31,12 +31,12 @@ builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IMarcaService, MarcaService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 
-// Autenticación y autorización
+// Autenticación y autorización usando scheme por defecto "Cookies"
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login"; // Login para clientes
-        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.LoginPath = "/Negocio/Auth/Login"; // redirige al login de clientes
+        options.AccessDeniedPath = "/Negocio/Auth/Login";
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
     });
 
@@ -58,19 +58,20 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rutas por áreas (primero las áreas)
+// Rutas por áreas (Admin / Negocio)
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
 );
 
-// Ruta por defecto fuera de áreas (Negocio / Catálogo)
+// Ruta por defecto fuera de áreas
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Catalogo}/{action=Index}/{id?}"
+    pattern: "{controller=Catalogo}/{action=Index}/{id?}",
+    defaults: new { area = "Negocio" }
 );
 
-// Redirigir raíz al catálogo
+// Redirigir raíz al catálogo en área Negocio
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Negocio/Catalogo/Index");
