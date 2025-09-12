@@ -5,7 +5,6 @@
     ViewData["Title"] = "Catálogo";
 }
 
-<!-- Header -->
 <header class="bg-dark py-5">
     <div class="container px-4 px-lg-5 my-5">
         <div class="text-center text-white">
@@ -15,7 +14,6 @@
     </div>
 </header>
 
-<!-- Catálogo de productos -->
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
         <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
@@ -23,27 +21,26 @@
             {
                 <div class="col mb-5">
                     <div class="card h-100">
-                        <!-- Imagen del producto con link a detalle -->
                         <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
                             <img class="card-img-top" src="@(producto.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")" alt="@producto.Nombre" />
                         </a>
-                        <!-- Detalles -->
                         <div class="card-body p-4 text-center">
                             <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
                                 <h5 class="fw-bolder">@producto.Nombre</h5>
                             </a>
                             @if (producto.Precio.HasValue)
                             {
-                                <span>$@producto.Precio.Value.ToString("F2")</span>
+                                <span>$@producto.Precio.Value.ToString("N2")</span>
                             }
                             else
                             {
                                 <span class="text-muted">Precio no disponible</span>
                             }
                         </div>
-                        <!-- Acciones -->
                         <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
-                            <button class="btn btn-outline-dark mt-auto">Agregar al carrito</button>
+                            <button class="btn btn-outline-dark mt-auto agregar-carrito" data-producto="@producto.IdProducto">
+                                Agregar al carrito
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -58,3 +55,32 @@
         height: 200px;
     }
 </style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            function actualizarBadge(){
+                $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
+                    $('#carrito-badge').text(total);
+                });
+            }
+
+            $('.agregar-carrito').click(function(){
+                var productoId = $(this).data('producto');
+
+                $.post('@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
+                       { productoId: productoId, cantidad: 1 },
+                       function(){
+                           actualizarBadge();
+                           Swal.fire({
+                               position: 'top-end',
+                               icon: 'success',
+                               title: 'Producto agregado al carrito',
+                               showConfirmButton: false,
+                               timer: 1000
+                           });
+                       });
+            });
+        });
+    </script>
+}

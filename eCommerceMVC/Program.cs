@@ -1,4 +1,4 @@
-using eCommerce.Data;
+ï»¿using eCommerce.Data;
 using eCommerce.Repositories;
 using eCommerce.Repositories.Implementations;
 using eCommerce.Repositories.Interfaces;
@@ -31,7 +31,13 @@ builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IMarcaService, MarcaService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 
-// Autenticación y autorización usando scheme por defecto "Cookies"
+// <-- HttpContextAccessor necesario para Session -->
+builder.Services.AddHttpContextAccessor();
+
+// CarritoService (soporta usuario logueado o Session)
+builder.Services.AddScoped<ICarritoService, CarritoService>();
+
+// AutenticaciÃ³n y autorizaciÃ³n usando scheme por defecto "Cookies"
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -41,6 +47,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 builder.Services.AddAuthorization();
+
+// <-- Agregamos Session -->
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(1); // DuraciÃ³n de la sesiÃ³n
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -55,23 +70,26 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession(); // âœ… SOLO AQUÃ
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rutas por áreas (Admin / Negocio)
+// Rutas por Ã¡reas (Admin / Negocio)
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
 );
 
-// Ruta por defecto fuera de áreas
+// Ruta por defecto fuera de Ã¡reas
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Catalogo}/{action=Index}/{id?}",
     defaults: new { area = "Negocio" }
 );
 
-// Redirigir raíz al catálogo en área Negocio
+// Redirigir raÃ­z al catÃ¡logo en Ã¡rea Negocio
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Negocio/Catalogo/Index");
