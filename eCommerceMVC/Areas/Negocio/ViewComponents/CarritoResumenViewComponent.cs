@@ -14,7 +14,7 @@ namespace eCommerceMVC.Areas.Negocio.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            int clienteId = 1; // Por ahora cliente fijo
+            int clienteId = 1; 
             var carrito = await _carritoService.ObtenerCarritoAsync(clienteId);
             int totalProductos = 0;
             if (carrito != null)

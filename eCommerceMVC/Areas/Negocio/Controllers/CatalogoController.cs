@@ -1,7 +1,8 @@
 ﻿using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
 
 [Area("Negocio")]
 public class CatalogoController : Controller
@@ -15,21 +16,16 @@ public class CatalogoController : Controller
         _categoriaService = categoriaService;
     }
 
+    // Lista de productos, opcionalmente filtrados por categoría
     public async Task<IActionResult> Index(int? categoriaId = null)
     {
         var productos = await _productoService.GetAllAsync();
 
-        // Filtrar por categoría si viene categoriaId
         if (categoriaId.HasValue)
         {
             productos = productos.Where(p => p.IdCategoria == categoriaId.Value).ToList();
         }
 
-        // Traer todas las categorías para el sidebar
-        var categorias = await _categoriaService.GetAllAsync();
-        ViewBag.Categorias = categorias;
-
-        // Mapeo de entidad a ViewModel
         var viewModels = productos.Select(p => new DetalleProductoViewModel
         {
             IdProducto = p.IdProducto,
@@ -43,6 +39,7 @@ public class CatalogoController : Controller
         return View(viewModels);
     }
 
+    // Detalle de producto
     public async Task<IActionResult> Detalle(int id)
     {
         var producto = await _productoService.GetByIdAsync(id);
@@ -58,26 +55,6 @@ public class CatalogoController : Controller
             IdCategoria = producto.IdCategoria
         };
 
-        // Productos relacionados (excluyendo el actual)
-        var todos = await _productoService.GetAllAsync();
-        var relacionados = todos
-            .Where(p => p.IdProducto != id)
-            .Take(4)
-            .Select(p => new DetalleProductoViewModel
-            {
-                IdProducto = p.IdProducto,
-                Nombre = p.Nombre ?? "Sin nombre",
-                Descripcion = p.Descripcion,
-                Precio = p.Precio,
-                RutaImagen = p.RutaImagen
-            }).ToList();
-
-        var paginaVM = new DetalleProductoPaginaViewModel
-        {
-            Producto = productoVM,
-            Relacionados = relacionados
-        };
-
-        return View(paginaVM);
+        return View(productoVM);
     }
 }

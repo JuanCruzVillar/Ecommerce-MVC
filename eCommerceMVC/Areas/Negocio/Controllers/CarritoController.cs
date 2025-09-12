@@ -14,7 +14,7 @@ public class CarritoController : Controller
 
     public async Task<IActionResult> Index()
     {
-        int clienteId = 1; // temporal, luego usar usuario logueado
+        int clienteId = 1; // temporal, despues usar usuario logueado
         var carrito = await _carritoService.ObtenerCarritoAsync(clienteId);
 
         var model = carrito.Select(c => new CarritoViewModel

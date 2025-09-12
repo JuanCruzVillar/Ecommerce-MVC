@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
+ 
 builder.Services.AddControllersWithViews();
 
 // DbContext
@@ -31,7 +31,7 @@ builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IMarcaService, MarcaService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 
-// <-- HttpContextAccessor necesario para Session -->
+
 builder.Services.AddHttpContextAccessor();
 
 // CarritoService (soporta usuario logueado o Session)
@@ -48,11 +48,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-// <-- Agregamos Session -->
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(1); // Duración de la sesión
+    options.IdleTimeout = TimeSpan.FromHours(1); 
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -71,12 +71,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession(); // ✅ SOLO AQUÍ
+app.UseSession(); 
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rutas por áreas (Admin / Negocio)
+// Rutas por areas 
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
@@ -87,9 +87,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Catalogo}/{action=Index}/{id?}",
     defaults: new { area = "Negocio" }
-);
-
-// Redirigir raíz al catálogo en área Negocio
+); 
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Negocio/Catalogo/Index");
