@@ -2,37 +2,126 @@
 @model Categoria
 
 @{
-    ViewData["Title"] = "Detalles Categoría";
+    ViewData["Title"] = "Detalles de Categoría";
 }
 
 <div class="container mt-4">
-    <h2>Detalles de la Categoría</h2>
+    <h2>@ViewData["Title"]</h2>
     <hr />
 
     <dl class="row">
         <dt class="col-sm-3">Descripción</dt>
         <dd class="col-sm-9">@Model.Descripcion</dd>
 
-        <dt class="col-sm-3">Activo</dt>
+        <dt class="col-sm-3">Categoría Padre</dt>
         <dd class="col-sm-9">
-            @if (Model.Activo == true)
+            @(Model.CategoriaPadre != null ? Model.CategoriaPadre.Descripcion : "—")
+        </dd>
+
+        <dt class="col-sm-3">Subcategorías</dt>
+        <dd class="col-sm-9">
+            @if (Model.SubCategorias != null && Model.SubCategorias.Any())
             {
-                <i class="bi bi-check-circle-fill text-success"></i> <span>Activo</span>
+                <ul class="list-group">
+                    @foreach (var sub in Model.SubCategorias)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @sub.Descripcion
+                            <span>
+                                <a asp-action="Edit" asp-route-id="@sub.IdCategoria" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@sub.IdCategoria" method="post" class="d-inline form-eliminar">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </span>
+                        </li>
+                    }
+                </ul>
             }
             else
             {
-                <i class="bi bi-x-circle-fill text-danger"></i> <span>Inactivo</span>
+                <span class="text-muted">No tiene subcategorías</span>
             }
+        </dd>
+
+        <dt class="col-sm-3">Estado</dt>
+        <dd class="col-sm-9">
+            <span class="badge @(Model.Activo ? "bg-success" : "bg-secondary")">
+                @(Model.Activo ? "Activo" : "Inactivo")
+            </span>
         </dd>
 
         <dt class="col-sm-3">Fecha de Registro</dt>
         <dd class="col-sm-9">@Model.FechaRegistro?.ToString("dd/MM/yyyy HH:mm")</dd>
     </dl>
 
-    <a asp-action="Edit" asp-route-id="@Model.IdCategoria" class="btn btn-warning">
-        <i class="bi bi-pencil-fill"></i> Editar
-    </a>
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Volver
-    </a>
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.IdCategoria" class="btn btn-warning me-1">
+            <i class="bi bi-pencil-fill"></i> Editar Categoría
+        </a>
+        <form asp-action="Delete" asp-route-id="@Model.IdCategoria" method="post" class="d-inline form-eliminar">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Eliminar Categoría
+            </button>
+        </form>
+        <a asp-action="Index" class="btn btn-secondary ms-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Confirmación para eliminar
+            const forms = document.querySelectorAll(".form-eliminar");
+            forms.forEach(form => {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "Esta acción no se puede deshacer",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then(result => {
+                        if (result.isConfirmed) form.submit();
+                    });
+                });
+            });
+
+            // Alert de error
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                                text: '@Html.Raw(TempData["Error"])'
+                        });
+                    </text>
+            }
+
+            // Alert de éxito
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                                text: '@Html.Raw(TempData["Success"])'
+                        });
+                    </text>
+            }
+
+        });
+    </script>
+}

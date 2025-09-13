@@ -53,5 +53,15 @@ namespace eCommerce.Repositories.Implementations
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<Producto>> GetAllWithCategoriasAsync()
+        {
+            return await _context.Productos
+                                 .Include(p => p.IdCategoriaNavigation) 
+                                 .ThenInclude(c => c.CategoriaPadre)   
+                                 .Include(p => p.IdMarcaNavigation)
+                                 .ToListAsync();
+        }
+
     }
 }

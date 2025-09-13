@@ -2,6 +2,7 @@
 using eCommerce.Repositories;
 using eCommerce.Repositories.Interfaces;
 using eCommerce.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,6 +47,12 @@ namespace eCommerce.Services.Implementations
 
             await _productoRepository.DeleteAsync(id);
             return true;
+        }
+
+       
+        public async Task<IEnumerable<Producto>> GetAllWithCategoriasAsync()
+        {
+            return await _productoRepository.GetAllWithCategoriasAsync();
         }
     }
 }

@@ -16,9 +16,17 @@
             <span asp-validation-for="Descripcion" class="text-danger"></span>
         </div>
 
+        <div class="mb-3">
+            <label asp-for="IdCategoriaPadre" class="form-label">Categoría Padre (opcional)</label>
+            <select asp-for="IdCategoriaPadre" class="form-select"
+                    asp-items="@(ViewBag.Categorias as SelectList)">
+                <option value="">-- Ninguna --</option>
+            </select>
+        </div>
+
         <div class="form-check mb-3">
-            <input asp-for="Activo" class="form-check-input" type="checkbox" />
-            <label asp-for="Activo" class="form-check-label"></label>
+            <input asp-for="Activo" class="form-check-input" type="checkbox" checked />
+            <label asp-for="Activo" class="form-check-label">Activo</label>
         </div>
 
         <button type="submit" class="btn btn-success">
@@ -29,3 +37,36 @@
         </a>
     </form>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                            text: '@Html.Raw(TempData["Error"])'
+                    });
+                    </text>
+            }
+
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                            text: '@Html.Raw(TempData["Success"])'
+                    });
+                    </text>
+            }
+        });
+    </script>
+
+    @* Validaciones de jQuery *@
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+

@@ -42,17 +42,30 @@ namespace eCommerce.Data
             // Categoria
             modelBuilder.Entity<Categoria>(entity =>
             {
-                entity.HasKey(e => e.IdCategoria).HasName("PK__CATEGORI__A3C02A1004CB3D7C");
+                entity.HasKey(e => e.IdCategoria);
+
+                // Indicar tabla en singular
                 entity.ToTable("CATEGORIA");
 
-                entity.Property(e => e.Activo).HasDefaultValue(true);
                 entity.Property(e => e.Descripcion)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                      .HasMaxLength(100)
+                      .IsUnicode(false);
+
+                entity.Property(e => e.Activo)
+                      .HasDefaultValue(true);
+
                 entity.Property(e => e.FechaRegistro)
-                    .HasDefaultValueSql("(getdate())")
-                    .HasColumnType("datetime");
+                      .HasDefaultValueSql("(getdate())")
+                      .HasColumnType("datetime");
+
+                // Relación Padre-Subcategorías (self-reference)
+                entity.HasOne(e => e.CategoriaPadre)               
+                      .WithMany(e => e.SubCategorias)             
+                      .HasForeignKey(e => e.IdCategoriaPadre)     
+                      .OnDelete(DeleteBehavior.Restrict);        
             });
+
+
 
             // Cliente
             modelBuilder.Entity<Cliente>(entity =>

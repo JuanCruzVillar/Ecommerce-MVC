@@ -19,6 +19,7 @@ namespace eCommerce.Entities.ViewModels
         [Required]
         public int? IdCategoria { get; set; }
 
+        public int? IdCategoriaPadre { get; set; }
         public decimal? Precio { get; set; }
 
         public int? Stock { get; set; }

@@ -11,6 +11,22 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
+/* Submenu hacia la derecha del navbar secundario */
+.dropdown-submenu {
+    position: relative;
+}
+
+    .dropdown-submenu .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-left: 0.1rem;
+    }
+
+    /* abrir submenu al hover */
+    .dropdown-submenu:hover > .dropdown-menu {
+        display: block;
+    }
+
 
 :root {
     --blue: #4e73df;

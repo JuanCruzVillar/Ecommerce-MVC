@@ -4,8 +4,11 @@ using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace eCommerceMVC.Areas.Admin.Controllers
@@ -31,19 +34,8 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         // GET: Productos
         public async Task<IActionResult> Index()
         {
-            var productos = await _productoService.GetAllAsync();
+            var productos = await _productoService.GetAllWithCategoriasAsync();
             return View(productos);
-        }
-
-        // GET: Productos/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var producto = await _productoService.GetByIdAsync(id.Value);
-            if (producto == null) return NotFound();
-
-            return View(producto);
         }
 
         // GET: Productos/Create
@@ -72,7 +64,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 IdCategoria = vm.IdCategoria,
                 Precio = vm.Precio,
                 Stock = vm.Stock,
-                Activo = true,
+                Activo = vm.Activo,
                 FechaRegistro = DateTime.Now
             };
 
@@ -93,7 +85,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             await _productoService.CreateAsync(producto);
             TempData["Success"] = "Producto creado correctamente";
             return RedirectToAction(nameof(Index));
-
         }
 
         // GET: Productos/Edit/5
@@ -164,7 +155,51 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             await _productoService.UpdateAsync(producto);
             TempData["Success"] = "Producto modificado correctamente";
             return RedirectToAction(nameof(Index));
+        }
 
+        // Cargar dropdowns de marcas y categorías/subcategorías
+        private async Task CargarDropdowns(ProductoViewModel? vm = null)
+        {
+            var marcas = await _marcaService.GetAllAsync();
+            var categorias = await _categoriaService.GetCategoriasPrincipalesAsync();
+
+            var listaCategorias = new List<SelectListItem>();
+            foreach (var cat in categorias)
+            {
+                listaCategorias.Add(new SelectListItem
+                {
+                    Value = cat.IdCategoria.ToString(),
+                    Text = cat.Descripcion,
+                    Selected = vm?.IdCategoria == cat.IdCategoria
+                });
+
+                if (cat.SubCategorias != null && cat.SubCategorias.Any())
+                {
+                    foreach (var sub in cat.SubCategorias)
+                    {
+                        listaCategorias.Add(new SelectListItem
+                        {
+                            Value = sub.IdCategoria.ToString(),
+                            Text = "-- " + sub.Descripcion,
+                            Selected = vm?.IdCategoria == sub.IdCategoria
+                        });
+                    }
+                }
+            }
+
+            ViewBag.IdMarca = new SelectList(marcas, "IdMarca", "Descripcion", vm?.IdMarca);
+            ViewBag.IdCategoria = listaCategorias;
+        }
+
+        // GET: Productos/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var producto = await _productoService.GetByIdAsync(id.Value);
+            if (producto == null) return NotFound();
+
+            return View(producto);
         }
 
         // GET: Productos/Delete/5
@@ -179,26 +214,18 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         }
 
         // POST: Productos/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var result = await _productoService.DeleteAsync(id);
             if (!result)
-                TempData["Error"] = "No se puede eliminar el producto.";
+                TempData["Error"] = "No se pudo eliminar el producto.";
             else
                 TempData["Success"] = "Producto eliminado correctamente.";
 
+            
             return RedirectToAction(nameof(Index));
-        }
-
-        private async Task CargarDropdowns(ProductoViewModel? vm = null)
-        {
-            var marcas = await _marcaService.GetAllAsync();
-            var categorias = await _categoriaService.GetAllAsync();
-
-            ViewBag.IdMarca = new SelectList(marcas, "IdMarca", "Descripcion", vm?.IdMarca);
-            ViewBag.IdCategoria = new SelectList(categorias, "IdCategoria", "Descripcion", vm?.IdCategoria);
         }
     }
 }

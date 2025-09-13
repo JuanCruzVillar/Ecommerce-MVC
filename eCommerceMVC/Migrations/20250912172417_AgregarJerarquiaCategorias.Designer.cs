@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eCommerce.Data;
 
@@ -11,9 +12,11 @@ using eCommerce.Data;
 namespace eCommerceMVC.Migrations
 {
     [DbContext(typeof(DbecommerceContext))]
-    partial class DbecommerceContextModelSnapshot : ModelSnapshot
+    [Migration("20250912172417_AgregarJerarquiaCategorias")]
+    partial class AgregarJerarquiaCategorias
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

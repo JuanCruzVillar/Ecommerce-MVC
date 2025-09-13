@@ -24,7 +24,8 @@
                 <th>@Html.DisplayNameFor(m => m.Stock)</th>
                 <th style="width:60px;">Activo</th>
                 <th>@Html.DisplayNameFor(m => m.FechaRegistro)</th>
-                <th>@Html.DisplayNameFor(m => m.IdCategoriaNavigation)</th>
+                <th>Categoría</th>
+                <th>Subcategoría</th> 
                 <th>@Html.DisplayNameFor(m => m.IdMarcaNavigation)</th>
                 <th style="width:150px;">Acciones</th>
             </tr>
@@ -52,9 +53,24 @@
                         {
                             <i class="bi bi-x-circle-fill text-danger" title="Inactivo"></i>
                         }
-                    </td>
-                    <td>@item.FechaRegistro?.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@item.IdCategoriaNavigation?.Descripcion</td>
+                </td>
+                <td>@item.FechaRegistro?.ToString("dd/MM/yyyy HH:mm")</td>
+
+                <!-- Columna Categoría -->
+                <td>
+                    @(item.IdCategoriaNavigation?.CategoriaPadre != null
+                                        ? item.IdCategoriaNavigation.CategoriaPadre.Descripcion
+                                        : item.IdCategoriaNavigation?.Descripcion ?? "—")
+                                                                                     </td>
+
+                <!-- Columna Subcategoría -->
+                <td>
+                    @(item.IdCategoriaNavigation?.CategoriaPadre != null
+                                        ? item.IdCategoriaNavigation.Descripcion
+                                        : "—")
+                </td>
+
+
                     <td>@item.IdMarcaNavigation?.Descripcion</td>
                     <td class="text-nowrap">
                         <a asp-action="Edit" asp-route-id="@item.IdProducto" class="btn btn-warning me-1" data-bs-toggle="tooltip" title="Editar">
@@ -63,16 +79,18 @@
                         <a asp-action="Details" asp-route-id="@item.IdProducto" class="btn btn-info me-1 text-white" data-bs-toggle="tooltip" title="Ver Detalles">
                             <i class="bi bi-eye-fill"></i>
                         </a>
-                        <form asp-action="Delete" asp-route-id="@item.IdProducto" method="post" class="d-inline form-eliminar">
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Eliminar
+                        <form asp-area="Admin" asp-controller="Productos" asp-action="DeleteConfirmed" asp-route-id="@item.IdProducto" method="post" class="d-inline form-eliminar">
+                            <button type="submit" class="btn btn-danger" data-bs-toggle="tooltip" title="Eliminar">
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                         </form>
                     </td>
                 </tr>
-            }
+                        }
         </tbody>
+
     </table>
+
 </div>
 
 @section Scripts {

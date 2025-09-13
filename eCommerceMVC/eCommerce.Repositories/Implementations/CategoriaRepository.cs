@@ -28,8 +28,11 @@ namespace eCommerce.Repositories.Implementations
 
         public async Task<Categoria> GetByIdAsync(int id)
         {
-            return await _context.Categorias.Include(c => c.Productos)
-                                            .FirstOrDefaultAsync(c => c.IdCategoria == id);
+            return await _context.Categorias
+                .Include(c => c.Productos)          
+                .Include(c => c.SubCategorias)      
+                .Include(c => c.CategoriaPadre)     
+                .FirstOrDefaultAsync(c => c.IdCategoria == id);
         }
 
         public async Task AddAsync(Categoria categoria)
@@ -44,14 +47,35 @@ namespace eCommerce.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var categoria = await GetByIdAsync(id);
-            if (categoria != null)
+            var categoria = await _context.Categorias
+                                          .Include(c => c.SubCategorias)
+                                          .Include(c => c.Productos)
+                                          .FirstOrDefaultAsync(c => c.IdCategoria == id);
+
+            if (categoria == null)
+                return false;
+
+            // no borrar si tiene productos o subcategorías
+            if ((categoria.SubCategorias != null && categoria.SubCategorias.Any()) ||
+                (categoria.Productos != null && categoria.Productos.Any()))
             {
-                _context.Categorias.Remove(categoria);
-                await _context.SaveChangesAsync();
+                return false; 
             }
+
+            _context.Categorias.Remove(categoria);
+            await _context.SaveChangesAsync();
+            return true; 
+        }
+
+        public IQueryable<Categoria> Query()
+        {
+            return _context.Categorias.AsQueryable();
         }
     }
+
+
+
 }
+
