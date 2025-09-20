@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eCommerceMVC.eCommerce.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -29,4 +30,8 @@ public partial class Usuario
     public string Rol { get; set; } = "Cliente";
 
     public virtual Cliente? IdClienteNavigation { get; set; }
+
+    public virtual ICollection<HistorialPedido> HistorialPedidos { get; set; } = new List<HistorialPedido>();
+
+    public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
 }

@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using eCommerce.Entities;
+using eCommerceMVC.eCommerce.Entities;
 using Microsoft.EntityFrameworkCore;
-using eCommerce.Entities;
+using System;
+using System.Collections.Generic;
 
 namespace eCommerce.Data
 {
     public partial class DbecommerceContext : DbContext
     {
-        public DbecommerceContext() { }
+        
 
         public DbecommerceContext(DbContextOptions<DbecommerceContext> options)
             : base(options) { }
 
-        // DbSet en plural apuntando a entidades en singular
+       
         public virtual DbSet<Categoria> Categorias { get; set; }
         public virtual DbSet<Producto> Productos { get; set; }
         public virtual DbSet<Marca> Marcas { get; set; }
@@ -21,30 +22,48 @@ namespace eCommerce.Data
         public virtual DbSet<Usuario> Usuarios { get; set; }
         public virtual DbSet<Cliente> Clientes { get; set; }
         public virtual DbSet<Carrito> Carritos { get; set; }
+        public virtual DbSet<DireccionEnvio> DireccionesEnvio { get; set; }
+        public virtual DbSet<MetodoPago> MetodosPago { get; set; }
+        public virtual DbSet<EstadoPedido> EstadosPedido { get; set; }
+        public virtual DbSet<HistorialPedido> HistorialPedidos { get; set; }
+        public virtual DbSet<Cupon> Cupones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Carrito
+            
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
+
+            
             modelBuilder.Entity<Carrito>(entity =>
             {
-                entity.HasKey(e => e.IdCarrito).HasName("PK__CARRITO__8B4A618C50BBD072");
+                entity.HasKey(e => e.IdCarrito)
+                      .HasName("PK_CARRITO");
+
                 entity.ToTable("CARRITO");
 
-                entity.HasOne(d => d.IdClienteNavigation).WithMany(p => p.Carritos)
-                    .HasForeignKey(d => d.IdCliente)
-                    .HasConstraintName("FK__CARRITO__IdClien__49C3F6B7");
+                
+                entity.Property(e => e.IdCarrito).HasColumnName("IdCarrito");
+                entity.Property(e => e.IdUsuario).HasColumnName("IdUsuario");
+                entity.Property(e => e.IdProducto).HasColumnName("IdProducto");
+                entity.Property(e => e.Cantidad).HasColumnName("Cantidad");
 
-                entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.Carritos)
-                    .HasForeignKey(d => d.IdProducto)
-                    .HasConstraintName("FK__CARRITO__IdProdu__4AB81AF0");
+               
+                entity.HasOne(d => d.IdUsuarioNavigation)
+                      .WithMany(p => p.Carritos)
+                      .HasForeignKey(d => d.IdUsuario)
+                      .HasConstraintName("FK_CARRITO_USUARIO");
+
+                entity.HasOne(d => d.IdProductoNavigation)
+                      .WithMany(p => p.Carritos)
+                      .HasForeignKey(d => d.IdProducto)
+                      .HasConstraintName("FK_CARRITO_PRODUCTO_IdProducto");
             });
+
 
             // Categoria
             modelBuilder.Entity<Categoria>(entity =>
             {
                 entity.HasKey(e => e.IdCategoria);
-
-                // Indicar tabla en singular
                 entity.ToTable("CATEGORIA");
 
                 entity.Property(e => e.Descripcion)
@@ -58,14 +77,11 @@ namespace eCommerce.Data
                       .HasDefaultValueSql("(getdate())")
                       .HasColumnType("datetime");
 
-                // Relación Padre-Subcategorías (self-reference)
-                entity.HasOne(e => e.CategoriaPadre)               
-                      .WithMany(e => e.SubCategorias)             
-                      .HasForeignKey(e => e.IdCategoriaPadre)     
-                      .OnDelete(DeleteBehavior.Restrict);        
+                entity.HasOne(e => e.CategoriaPadre)
+                      .WithMany(e => e.SubCategorias)
+                      .HasForeignKey(e => e.IdCategoriaPadre)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
-
-
 
             // Cliente
             modelBuilder.Entity<Cliente>(entity =>
@@ -169,8 +185,8 @@ namespace eCommerce.Data
                     .HasMaxLength(50)
                     .IsUnicode(false);
                 entity.Property(e => e.Contraseña)
-                    .HasMaxLength(64)
-                    .IsUnicode(false);
+    .HasMaxLength(256)
+    .IsUnicode(false);
                 entity.Property(e => e.Correo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -213,9 +229,232 @@ namespace eCommerce.Data
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                // Relaciones existentes
                 entity.HasOne(d => d.IdClienteNavigation).WithMany(p => p.Venta)
                     .HasForeignKey(d => d.IdCliente)
                     .HasConstraintName("FK__VENTA__IdCliente__4D94879B");
+
+                // Nuevas relaciones
+                entity.HasOne(d => d.IdDireccionEnvioNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdDireccionEnvio)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("FK_VENTA_DIRECCION_ENVIO");
+
+                entity.HasOne(d => d.IdMetodoPagoNavigation)
+                    .WithMany(p => p.Ventas)
+                    .HasForeignKey(d => d.IdMetodoPago)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("FK_VENTA_METODO_PAGO");
+
+                entity.HasOne(d => d.IdEstadoPedidoNavigation)
+                    .WithMany(p => p.Ventas)
+                    .HasForeignKey(d => d.IdEstadoPedido)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("FK_VENTA_ESTADO_PEDIDO");
+
+                entity.HasOne(d => d.IdCuponNavigation)
+                    .WithMany(p => p.Ventas)
+                    .HasForeignKey(d => d.IdCupon)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("FK_VENTA_CUPON");
+
+                // Nuevas propiedades con valores por defecto corregidos
+                entity.Property(e => e.DescuentoAplicado)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.Property(e => e.CostoEnvio)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.Property(e => e.IdEstadoPedido)
+                    .HasDefaultValue(1);
+
+                entity.Property(e => e.NotasEspeciales)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FechaEstimadaEntrega)
+                    .HasColumnType("datetime");
+            });
+
+            // DireccionEnvio
+            modelBuilder.Entity<DireccionEnvio>(entity =>
+            {
+                entity.HasKey(e => e.IdDireccionEnvio);
+                entity.ToTable("DIRECCION_ENVIO");
+
+                entity.Property(e => e.NombreCompleto)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Direccion)
+                    .HasMaxLength(300)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Referencias)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Ciudad)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Provincia)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CodigoPostal)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Telefono)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EsDireccionPrincipal)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.FechaRegistro)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+
+                entity.HasOne(d => d.IdClienteNavigation)
+                    .WithMany(p => p.DireccionesEnvio)
+                    .HasForeignKey(d => d.IdCliente)
+                    .HasConstraintName("FK_DIRECCION_ENVIO_CLIENTE");
+            });
+
+            // MetodoPago
+            modelBuilder.Entity<MetodoPago>(entity =>
+            {
+                entity.HasKey(e => e.IdMetodoPago);
+                entity.ToTable("METODO_PAGO");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RequiereDatosAdicionales)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.FechaRegistro)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+            });
+
+            // EstadoPedido
+            modelBuilder.Entity<EstadoPedido>(entity =>
+            {
+                entity.HasKey(e => e.IdEstadoPedido);
+                entity.ToTable("ESTADO_PEDIDO");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.FechaRegistro)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+            });
+
+            // HistorialPedido
+            modelBuilder.Entity<HistorialPedido>(entity =>
+            {
+                entity.HasKey(e => e.IdHistorialPedido);
+                entity.ToTable("HISTORIAL_PEDIDO");
+
+                entity.Property(e => e.Comentarios)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FechaCambio)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+
+                entity.HasOne(d => d.IdVentaNavigation)
+                    .WithMany(p => p.HistorialPedidos)
+                    .HasForeignKey(d => d.IdVenta)
+                    .HasConstraintName("FK_HISTORIAL_PEDIDO_VENTA");
+
+                entity.HasOne(d => d.IdEstadoPedidoNavigation)
+                    .WithMany(p => p.HistorialPedidos)
+                    .HasForeignKey(d => d.IdEstadoPedido)
+                    .HasConstraintName("FK_HISTORIAL_PEDIDO_ESTADO");
+
+                entity.HasOne(d => d.IdUsuarioNavigation)
+                    .WithMany(p => p.HistorialPedidos)
+                    .HasForeignKey(d => d.IdUsuario)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("FK_HISTORIAL_PEDIDO_USUARIO");
+            });
+
+            // Cupon
+            modelBuilder.Entity<Cupon>(entity =>
+            {
+                entity.HasKey(e => e.IdCupon);
+                entity.ToTable("CUPON");
+
+                entity.Property(e => e.Codigo)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.HasIndex(e => e.Codigo)
+                    .IsUnique()
+                    .HasDatabaseName("UQ_CUPON_CODIGO");
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DescuentoFijo)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.Property(e => e.DescuentoPorcentaje)
+                    .HasColumnType("decimal(5, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.Property(e => e.MontoMinimo)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.Property(e => e.UsosMaximos)
+                    .HasDefaultValue(1);
+
+                entity.Property(e => e.UsosActuales)
+                    .HasDefaultValue(0);
+
+                entity.Property(e => e.FechaInicio)
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.FechaVencimiento)
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.FechaRegistro)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

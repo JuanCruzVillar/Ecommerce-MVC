@@ -1,0 +1,57 @@
+﻿@model eCommerce.Entities.ResumenPedidoViewModel
+
+<div class="productos-resumen mb-3">
+    @foreach (var item in Model.Items)
+    {
+        <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
+            <img src="@(!string.IsNullOrEmpty(item.RutaImagen) ? item.RutaImagen : "/images/no-image.png")"
+                 alt="@item.NombreProducto" class="producto-img me-3">
+            <div class="flex-grow-1">
+                <h6 class="mb-1">@item.NombreProducto</h6>
+                <small class="text-muted">@item.NombreMarca</small>
+                <div class="d-flex justify-content-between">
+                    <span>Cant: @item.Cantidad</span>
+                    <strong>$@item.Subtotal.ToString("N2")</strong>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="totales">
+    <div class="d-flex justify-content-between mb-2">
+        <span>Subtotal (@Model.TotalItems items):</span>
+        <span id="subtotal-valor">$@Model.Subtotal.ToString("N2")</span>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+        <span>Costo de envío:</span>
+        <span id="envio-valor">$@Model.CostoEnvio.ToString("N2")</span>
+    </div>
+    @if (Model.DescuentoAplicado > 0)
+    {
+        <div class="d-flex justify-content-between mb-2" id="descuento-row">
+            <span class="text-success">Descuento aplicado:</span>
+            <span class="text-success" id="descuento-valor">-$@Model.DescuentoAplicado.ToString("N2")</span>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.CodigoCupon))
+        {
+            <div class="d-flex justify-content-between mb-2">
+                <small class="text-muted">Cupón: @Model.CodigoCupon</small>
+            </div>
+        }
+    }
+    <hr>
+    <div class="d-flex justify-content-between">
+        <strong>Total:</strong>
+        <strong class="text-primary fs-5" id="total-valor">$@Model.Total.ToString("N2")</strong>
+    </div>
+</div>
+
+<style>
+    .producto-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+</style>

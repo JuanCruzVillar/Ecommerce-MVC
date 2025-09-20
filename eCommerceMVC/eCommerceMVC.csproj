@@ -28,8 +28,6 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Models\" />
-    <Folder Include="Areas\Negocio\Data\" />
-    <Folder Include="Areas\Negocio\Models\" />
   </ItemGroup>
 
 </Project>

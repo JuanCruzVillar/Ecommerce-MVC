@@ -24,7 +24,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            return View(); // Areas/Negocio/Views/Auth/Login.cshtml
+            return View(); 
         }
 
         // POST: Negocio/Auth/Login
@@ -54,10 +54,11 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, usuario.Nombres),
-                new Claim(ClaimTypes.Email, usuario.Correo),
-                new Claim(ClaimTypes.Role, usuario.Rol)
-            };
+             new Claim(ClaimTypes.Name, usuario.Nombres),
+             new Claim(ClaimTypes.Email, usuario.Correo),
+             new Claim(ClaimTypes.Role, usuario.Rol),
+            new Claim("IdUsuario", usuario.IdUsuario.ToString())
+             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -75,7 +76,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-           return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
+            return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
 
         }
     }

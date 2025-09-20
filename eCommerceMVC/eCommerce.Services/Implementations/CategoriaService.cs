@@ -17,9 +17,7 @@ namespace eCommerce.Services.Implementations
             _categoriaRepository = categoriaRepository;
         }
 
-        // ---------------------------
-        // MÉTODOS EXISTENTES
-        // ---------------------------
+      
         public async Task<IEnumerable<Categoria>> GetAllAsync()
         {
             return await _categoriaRepository.Query()
@@ -70,25 +68,20 @@ namespace eCommerce.Services.Implementations
             return true;
         }
 
-        // ---------------------------
-        // MÉTODOS NUEVOS PARA JERARQUÍA
-        // ---------------------------
-
-        // Devuelve categorías principales (padres)
+        
         public async Task<IEnumerable<Categoria>> GetCategoriasPrincipalesAsync()
         {
             var categorias = await _categoriaRepository.GetAllAsync();
             return categorias.Where(c => c.IdCategoriaPadre == null && c.Activo).ToList();
         }
 
-        // Devuelve subcategorías directas de un padre
         public async Task<IEnumerable<Categoria>> GetSubCategoriasAsync(int idCategoriaPadre)
         {
             var categorias = await _categoriaRepository.GetAllAsync();
             return categorias.Where(c => c.IdCategoriaPadre == idCategoriaPadre && c.Activo).ToList();
         }
 
-        // Devuelve IDs del padre + todos sus hijos recursivamente
+        
         public async Task<IEnumerable<int>> ObtenerIdsConSubcategoriasAsync(int idCategoria)
         {
             var categorias = await _categoriaRepository.GetAllAsync();

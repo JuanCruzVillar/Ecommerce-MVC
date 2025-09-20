@@ -30,12 +30,13 @@ builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IMarcaService, MarcaService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+builder.Services.AddScoped<ICarritoService, CarritoService>();
 
 
 builder.Services.AddHttpContextAccessor();
 
-// CarritoService (soporta usuario logueado o Session)
-builder.Services.AddScoped<ICarritoService, CarritoService>();
+
 
 // Autenticación y autorización usando scheme por defecto "Cookies"
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

@@ -19,9 +19,7 @@ namespace eCommerceMVC.Controllers
             _usuarioService = usuarioService;
         }
 
-        // -------------------------------
-        // LOGIN ADMIN (GET)
-        // -------------------------------
+        
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
@@ -29,9 +27,6 @@ namespace eCommerceMVC.Controllers
             return View(); // Vista Admin
         }
 
-        // -------------------------------
-        // LOGIN ADMIN (POST)
-        // -------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string correo, string contrasena, string returnUrl = null)

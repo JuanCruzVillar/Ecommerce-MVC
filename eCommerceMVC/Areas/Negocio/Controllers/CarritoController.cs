@@ -1,6 +1,7 @@
 ﻿using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 [Area("Negocio")]
 public class CarritoController : Controller
@@ -14,9 +15,14 @@ public class CarritoController : Controller
 
     public async Task<IActionResult> Index()
     {
-        int clienteId = 1; // temporal, despues usar usuario logueado
-        var carrito = await _carritoService.ObtenerCarritoAsync(clienteId);
+        var clienteId = GetClienteId();
+        if (clienteId == 0)
+        {
+            // Si no está logueado mostrar carrito vacío o redirigir al login
+            return View(new List<CarritoViewModel>());
+        }
 
+        var carrito = await _carritoService.ObtenerCarritoAsync(clienteId);
         var model = carrito.Select(c => new CarritoViewModel
         {
             IdProducto = c.IdProducto.Value,
@@ -32,32 +38,93 @@ public class CarritoController : Controller
     [HttpPost]
     public async Task<IActionResult> Agregar(int productoId, int cantidad = 1)
     {
-        int clienteId = 1;
-        await _carritoService.AgregarProductoAsync(clienteId, productoId, cantidad);
-        return Ok();
+        try
+        {
+            var clienteId = GetClienteId();
+            if (clienteId == 0)
+            {
+                return Json(new { success = false, message = "Debe iniciar sesión" });
+            }
+
+            await _carritoService.AgregarProductoAsync(clienteId, productoId, cantidad);
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Error al agregar producto" });
+        }
     }
 
     [HttpPost]
     public async Task<IActionResult> Eliminar(int productoId)
     {
-        int clienteId = 1;
-        await _carritoService.EliminarProductoAsync(clienteId, productoId);
-        return Ok();
+        try
+        {
+            var clienteId = GetClienteId();
+            if (clienteId == 0)
+            {
+                return Json(new { success = false, message = "Debe iniciar sesión" });
+            }
+
+            await _carritoService.EliminarProductoAsync(clienteId, productoId);
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Error al eliminar producto" });
+        }
     }
 
     [HttpPost]
     public async Task<IActionResult> Vaciar()
     {
-        int clienteId = 1;
-        await _carritoService.VaciarCarritoAsync(clienteId);
-        return Ok();
+        try
+        {
+            var clienteId = GetClienteId();
+            if (clienteId == 0)
+            {
+                return Json(new { success = false, message = "Debe iniciar sesión" });
+            }
+
+            await _carritoService.VaciarCarritoAsync(clienteId);
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Error al vaciar carrito" });
+        }
     }
 
     [HttpGet]
     public async Task<int> Cantidad()
     {
-        int clienteId = 1;
-        var carrito = await _carritoService.ObtenerCarritoAsync(clienteId);
-        return carrito.Sum(c => c.Cantidad ?? 1);
+        try
+        {
+            var clienteId = GetClienteId();
+            if (clienteId == 0) return 0;
+
+            
+            return await _carritoService.ObtenerCantidadItemsAsync(clienteId);
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
     }
+
+    
+    private int GetClienteId()
+    {
+        if (User.Identity.IsAuthenticated)
+        {
+
+            var clienteIdClaim = User.FindFirst("IdUsuario")?.Value;
+            if (!string.IsNullOrEmpty(clienteIdClaim) && int.TryParse(clienteIdClaim, out int clienteId))
+            {
+                return clienteId;
+            }
+        }
+        return 0;
+    }
+
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eCommerceMVC.eCommerce.Entities;
+using System;
 using System.Collections.Generic;
 
 namespace eCommerce.Entities;
@@ -24,4 +25,5 @@ public partial class Cliente
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 
     public virtual ICollection<Venta> Venta { get; set; } = new List<Venta>();
+    public virtual ICollection<DireccionEnvio> DireccionesEnvio { get; set; } = new List<DireccionEnvio>();
 }

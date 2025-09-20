@@ -95,7 +95,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Confirmación logout
+        // Confirmacion logout
         document.getElementById("logoutLink")?.addEventListener("click", function(e){
             e.preventDefault();
             Swal.fire({
@@ -116,7 +116,7 @@
     </script>
     <script>
         $(document).ready(function(){
-            // Función para actualizar la cantidad en el badge del carrito
+            // actualizar la cantidad en el badge del carrito
             function actualizarBadge(){
                 $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
                     $('#carrito-badge').text(total);
