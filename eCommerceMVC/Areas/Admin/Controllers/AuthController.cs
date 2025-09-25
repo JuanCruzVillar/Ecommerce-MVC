@@ -32,41 +32,55 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string correo, string contraseña)
         {
-            if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contraseña))
+            try
             {
-                ViewBag.Error = "Debés completar todos los campos";
+                if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contraseña))
+                {
+                    ViewBag.Error = "Debe completar todos los campos";
+                    return View();
+                }
+
+                var usuario = await _usuarioService.GetByCorreoAsync(correo);
+                if (usuario == null || usuario.Rol != "Admin" || !usuario.Activo)
+                {
+                    ViewBag.Error = "Usuario o contraseña incorrectos";
+                    return View();
+                }
+
+                var hasher = new PasswordHasher<Usuario>();
+                var result = hasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
+                if (result == PasswordVerificationResult.Failed)
+                {
+                    ViewBag.Error = "Usuario o contraseña incorrectos";
+                    return View();
+                }
+
+                // CORREGIDO: Agregar IdUsuario para consistencia
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, usuario.Nombres),
+                    new Claim(ClaimTypes.Email, usuario.Correo),
+                    new Claim(ClaimTypes.Role, usuario.Rol),
+                    new Claim("IdUsuario", usuario.IdUsuario.ToString()) // AGREGADO
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    new AuthenticationProperties { IsPersistent = true }
+                );
+
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
+            }
+            catch (System.Exception ex)
+            {
+                // Log del error (en producción usar ILogger)
+                ViewBag.Error = "Error interno del servidor. Intente nuevamente.";
+                // En desarrollo, podrías mostrar: ex.Message
                 return View();
             }
-
-            var usuario = await _usuarioService.GetByCorreoAsync(correo);
-            if (usuario == null || usuario.Rol != "Admin" || !usuario.Activo)
-            {
-                ViewBag.Error = "Usuario o contraseña incorrectos";
-                return View();
-            }
-
-            var hasher = new PasswordHasher<Usuario>();
-            var result = hasher.VerifyHashedPassword(usuario, usuario.Contraseña, contraseña);
-            if (result == PasswordVerificationResult.Failed)
-            {
-                ViewBag.Error = "Usuario o contraseña incorrectos";
-                return View();
-            }
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, usuario.Nombres),
-                new Claim(ClaimTypes.Email, usuario.Correo),
-                new Claim(ClaimTypes.Role, usuario.Rol)
-            };
-
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                                          new ClaimsPrincipal(claimsIdentity),
-                                          new AuthenticationProperties { IsPersistent = true });
-
-            return RedirectToAction("Index", "Home", new { area = "Admin" });
         }
 
         // GET: Admin/Auth/Logout

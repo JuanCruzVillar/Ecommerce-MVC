@@ -25,9 +25,4 @@
     <PackageReference Include="QuestPDF" Version="2025.7.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Models\" />
-  </ItemGroup>
-
 </Project>

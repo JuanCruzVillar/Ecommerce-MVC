@@ -1,72 +1,114 @@
-﻿@using eCommerce.Entities
-@model Categoria
+﻿@model eCommerce.Entities.Categoria
 
 @{
     ViewData["Title"] = "Crear Categoría";
 }
 
-<div class="container mt-4">
-    <h2>Crear Categoría</h2>
-    <hr />
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Crear Nueva Categoría
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="Descripcion" class="form-label">
+                                        Nombre de la Categoría *
+                                    </label>
+                                    <input asp-for="Descripcion" class="form-control"
+                                           placeholder="Ej: Periféricos, Componentes, etc."
+                                           maxlength="50" required />
+                                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                                </div>
+                            </div>
 
-    <form asp-action="Create" method="post">
-        <div class="mb-3">
-            <label asp-for="Descripcion" class="form-label"></label>
-            <input asp-for="Descripcion" class="form-control" />
-            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input asp-for="Activo" class="form-check-input" type="checkbox"
+                                               checked="checked" />
+                                        <label asp-for="Activo" class="form-check-label">
+                                            Categoría Activa
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="IdCategoriaPadre" class="form-label">
+                                Categoría Padre (Opcional)
+                            </label>
+                            <select asp-for="IdCategoriaPadre" asp-items="ViewBag.Categorias"
+                                    class="form-select">
+                            </select>
+                            <div class="form-text">
+                                Selecciona una categoría padre si esta será una subcategoría.
+                                Deja vacío para crear una categoría principal.
+                            </div>
+                            <span asp-validation-for="IdCategoriaPadre" class="text-danger"></span>
+                        </div>
+
+                          
+
+                       
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Volver al Listado
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>
+                                Crear Categoría
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label asp-for="IdCategoriaPadre" class="form-label">Categoría Padre (opcional)</label>
-            <select asp-for="IdCategoriaPadre" class="form-select"
-                    asp-items="@(ViewBag.Categorias as SelectList)">
-                <option value="">-- Ninguna --</option>
-            </select>
-        </div>
-
-        <div class="form-check mb-3">
-            <input asp-for="Activo" class="form-check-input" type="checkbox" checked />
-            <label asp-for="Activo" class="form-check-label">Activo</label>
-        </div>
-
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-save"></i> Guardar
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Volver
-        </a>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            @if (TempData["Error"] != null)
-            {
-                    <text>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                            text: '@Html.Raw(TempData["Error"])'
-                    });
-                    </text>
-            }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
-            @if (TempData["Success"] != null)
-            {
-                    <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                            text: '@Html.Raw(TempData["Success"])'
-                    });
-                    </text>
-            }
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+           
+            document.getElementById('Descripcion').focus();
+
+            // Validación en tiempo real de la descripción
+            document.getElementById('Descripcion').addEventListener('input', function() {
+                const valor = this.value.trim();
+                const contador = document.getElementById('contador-chars');
+
+                if (valor.length < 3 && valor.length > 0) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else if (valor.length >= 3) {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.remove('is-valid', 'is-invalid');
+                }
+            });
+
+            // Prevenir envío con Enter accidental
+            document.getElementById('Descripcion').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
-
-    @* Validaciones de jQuery *@
-    @await Html.PartialAsync("_ValidationScriptsPartial")
 }
-

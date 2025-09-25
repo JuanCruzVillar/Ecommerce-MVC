@@ -5,25 +5,128 @@
     ViewData["Title"] = "Detalles de Marca";
 }
 
-<div class="container mt-4">
-    <h2>Detalles de Marca</h2>
-    <hr />
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-eye"></i> Detalles de Marca</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
+        </a>
+    </div>
 
-    <dl class="row">
-        <dt class="col-sm-3">Descripción</dt>
-        <dd class="col-sm-9">@Model.Descripcion</dd>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-4">Descripción:</dt>
+                        <dd class="col-sm-8">
+                            <strong>@Model.Descripcion</strong>
+                        </dd>
 
-        <dt class="col-sm-3">Activo</dt>
-        <dd class="col-sm-9">@(Model.Activo == true ? "Sí" : "No")</dd>
+                        <dt class="col-sm-4">Estado:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge @(Model.Activo ? "bg-success" : "bg-secondary")">
+                                @(Model.Activo ? "Activo" : "Inactivo")
+                            </span>
+                        </dd>
 
-        <dt class="col-sm-3">Fecha Registro</dt>
-        <dd class="col-sm-9">@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
-    </dl>
+                        <dt class="col-sm-4">Fecha de Registro:</dt>
+                        <dd class="col-sm-8">
+                            @Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-end">
+                        <div class="btn-group-vertical" role="group">
+                            <a asp-action="Edit" asp-route-id="@Model.IdMarca" class="btn btn-warning mb-2">
+                                <i class="bi bi-pencil"></i> Editar Marca
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@Model.IdMarca" method="post"
+                                  class="form-eliminar" data-nombre="@Model.Descripcion">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="bi bi-trash"></i> Eliminar Marca
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <a asp-action="Edit" asp-route-id="@Model.IdMarca" class="btn btn-warning">
-        <i class="bi bi-pencil"></i> Editar
-    </a>
-    <a asp-action="Index" class="btn btn-secondary ms-2">
-        <i class="bi bi-arrow-left"></i> Volver
-    </a>
+           
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-12">
+                    <h5><i class="bi bi-box-seam text-primary"></i> Productos de esta Marca</h5>
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-box display-6"></i>
+                        <p class="mt-2">Los productos asociados aparecerán aquí cuando implementes la relación.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // SweetAlert de error
+            @if (TempData["Error"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: '@Html.Raw(TempData["Error"])',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        </text>
+            }
+
+            // SweetAlert de éxito
+            @if (TempData["Success"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: '@Html.Raw(TempData["Success"])',
+                                confirmButtonColor: '#198754',
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                        </text>
+            }
+
+            // Confirmación de eliminación
+            const formsEliminar = document.querySelectorAll(".form-eliminar");
+            formsEliminar.forEach(form => {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    const nombreMarca = this.dataset.nombre;
+
+                    Swal.fire({
+                        title: '¿Confirmar eliminación?',
+                        html: `¿Estás seguro de eliminar la marca <strong>"${nombreMarca}"</strong>?<br><small class="text-muted">Esta acción no se puede deshacer.</small>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        focusCancel: true,
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

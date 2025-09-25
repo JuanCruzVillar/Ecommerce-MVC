@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
- 
 builder.Services.AddControllersWithViews();
 
 // DbContext
@@ -33,27 +32,55 @@ builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<ICarritoService, CarritoService>();
 
-
 builder.Services.AddHttpContextAccessor();
 
-
-
-// Autenticación y autorización usando scheme por defecto "Cookies"
+// CORREGIDO: Autenticación y autorización con manejo dinámico de login
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Negocio/Auth/Login"; // redirige al login de clientes
-        options.AccessDeniedPath = "/Negocio/Auth/Login";
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
+        options.SlidingExpiration = true;
+
+        // MEJORADO: Manejo dinámico de rutas de login basado en el área
+        options.Events.OnRedirectToLogin = context =>
+        {
+            var request = context.Request;
+            var isAdminArea = request.Path.StartsWithSegments("/Admin");
+
+            if (isAdminArea)
+            {
+                context.Response.Redirect("/Admin/Auth/Login");
+            }
+            else
+            {
+                context.Response.Redirect("/Negocio/Auth/Login");
+            }
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            var request = context.Request;
+            var isAdminArea = request.Path.StartsWithSegments("/Admin");
+
+            if (isAdminArea)
+            {
+                context.Response.Redirect("/Admin/Auth/Login");
+            }
+            else
+            {
+                context.Response.Redirect("/Negocio/Auth/Login");
+            }
+            return Task.CompletedTask;
+        };
     });
 
 builder.Services.AddAuthorization();
 
-
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(1); 
+    options.IdleTimeout = TimeSpan.FromHours(1);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -66,18 +93,19 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.UseSession(); 
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rutas por areas 
+// Rutas por áreas 
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
@@ -88,7 +116,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Catalogo}/{action=Index}/{id?}",
     defaults: new { area = "Negocio" }
-); 
+);
+
+// MEJORADO: Redireccionamiento inicial
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Negocio/Catalogo/Index");

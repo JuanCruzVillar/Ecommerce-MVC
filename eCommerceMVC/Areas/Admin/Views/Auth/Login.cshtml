@@ -1,22 +1,200 @@
 ﻿@{
     Layout = "~/Areas/Admin/Views/Shared/_LayoutLoginAdmin.cshtml";
-    ViewData["Title"] = "Login Admin";
+    ViewData["Title"] = "Login Admin - Hardware Store";
 }
 
-<h3 class="text-center mb-4">Login Administrador</h3>
+<div class="login-container">
+    <div class="login-card">
+       
+        <div class="login-header">
+            <div class="brand-section">
+                <i class="bi bi-tools text-primary" style="font-size: 2.5rem;"></i>
+                <h2 class="brand-name">Hardware Store</h2>
+            </div>
+            <h4 class="login-title">Panel de Administración</h4>
+            <p class="login-subtitle text-muted">Ingrese sus credenciales para acceder</p>
+        </div>
 
-<form method="post" asp-action="Login">
-    <div class="mb-3">
-        <label>Correo</label>
-        <input type="email" name="correo" class="form-control" required />
-    </div>
-    <div class="mb-3">
-        <label>Contraseña</label>
-        <input type="password" name="contraseña" class="form-control" required />
-    </div>
-    @if (ViewBag.Error != null)
-    {
-        <div class="alert alert-danger">@ViewBag.Error</div>
+       
+        <form method="post" asp-action="Login" class="login-form">
+            <div class="mb-4">
+                <label for="correo" class="form-label">
+                    <i class="bi bi-envelope me-2"></i>Correo Electrónico
+                </label>
+                <input type="email"
+                       id="correo"
+                       name="correo"
+                       class="form-control form-control-lg"
+                       
+                       required />
+            </div>
+
+            <div class="mb-4">
+                <label for="contraseña" class="form-label">
+                    <i class="bi bi-lock me-2"></i>Contraseña
+                </label>
+                <input type="password"
+                       id="contraseña"
+                       name="contraseña"
+                       class="form-control form-control-lg"
+                      
+                       required />
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <div>@ViewBag.Error</div>
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary btn-lg w-100 login-btn">
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Iniciar Sesión
+            </button>
+        </form>
+
+        
+
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
     }
-    <button type="submit" class="btn btn-primary w-100">Entrar</button>
-</form>
+
+    .login-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .login-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .brand-section {
+        margin-bottom: 1rem;
+    }
+
+    .brand-name {
+        color: #2c3e50;
+        font-weight: 600;
+        margin: 0.5rem 0;
+        font-size: 1.8rem;
+    }
+
+    .login-title {
+        color: #495057;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 1.3rem;
+    }
+
+    .login-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+
+    .login-form .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-form .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .login-form .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+        }
+
+    .login-btn {
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: 500;
+        font-size: 1.1rem;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+            background: linear-gradient(45deg, #0056b3, #004085);
+        }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f1f3f4;
+    }
+
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+
+    /* Responsive */
+    @@media (max-width: 576px) {
+        .login-card {
+            padding: 2rem 1.5rem;
+            margin: 1rem;
+        }
+
+        .brand-name {
+            font-size: 1.6rem;
+        }
+
+        .login-title {
+            font-size: 1.2rem;
+        }
+    }
+
+    /* Animación sutil para el card */
+    .login-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

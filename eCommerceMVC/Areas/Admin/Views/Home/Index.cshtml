@@ -2,121 +2,269 @@
 @model VentasViewModel
 
 @{
-    ViewData["Title"] = "Ventas";
+    ViewData["Title"] = "Dashboard - Hardware Store";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
-
 }
 
-<h2>Dashboard de Ventas</h2>
+<div class="container-fluid">
+    <!-- Header del Dashboard -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="bi bi-speedometer2 text-primary me-2"></i>
+                Dashboard de Ventas
+            </h1>
+            <p class="text-muted mb-0">Panel de control - Hardware Store</p>
+        </div>
+        <div class="text-end">
+            <small class="text-muted">
+                <i class="bi bi-calendar3 me-1"></i>
+                @DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("es-ES"))
+            </small>
+        </div>
+    </div>
 
-<div class="row">
-    <!-- Total Ventas -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Total Ventas
+    <!-- Cards de Resumen -->
+    <div class="row g-3 mb-4">
+        <!-- Total Ventas -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Ventas
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-dark">
+                                @Model.Resumen.TotalVenta.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                            </div>
                         </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            @Model.Resumen.TotalVenta.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                        <div class="ms-3">
+                            <div class="icon-circle bg-primary">
+                                <i class="bi bi-currency-dollar text-white"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                </div>
+                <div class="card-footer bg-primary bg-opacity-10 border-0">
+                    <small class="text-primary">
+                        <i class="bi bi-graph-up me-1"></i>
+                        Ingresos totales
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Clientes -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Clientes
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-dark">
+                                @Model.Resumen.TotalCliente
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <div class="icon-circle bg-success">
+                                <i class="bi bi-people text-white"></i>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div class="card-footer bg-success bg-opacity-10 border-0">
+                    <small class="text-success">
+                        <i class="bi bi-person-plus me-1"></i>
+                        Clientes registrados
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Productos -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Productos
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-dark">
+                                @Model.Resumen.TotalProducto
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <div class="icon-circle bg-info">
+                                <i class="bi bi-box-seam text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-info bg-opacity-10 border-0">
+                    <small class="text-info">
+                        <i class="bi bi-boxes me-1"></i>
+                        En inventario
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card adicional para balance -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Ventas Hoy
+                            </div>
+                            <div class="h4 mb-0 font-weight-bold text-dark">
+                                @Model.Detalles.Count(v => v.FechaVenta.Date == DateTime.Today)
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <div class="icon-circle bg-warning">
+                                <i class="bi bi-calendar-day text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-warning bg-opacity-10 border-0">
+                    <small class="text-warning">
+                        <i class="bi bi-clock me-1"></i>
+                        Transacciones de hoy
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Total Clientes -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                            Total Clientes
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            @Model.Resumen.TotalCliente
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-user fa-2x text-gray-300"></i>
-                    </div>
+    <!-- Sección de Ventas -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="bi bi-table me-2"></i>
+                        Listado de Ventas
+                    </h5>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Total Productos -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-info shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                            Total Productos
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            @Model.Resumen.TotalProducto
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-box fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<h2>Listado de Ventas</h2>
-
-<div class="mb-3">
-    <a asp-action="ExportarTodasLasVentas" class="btn btn-danger">
-        <i class="bi bi-file-earmark-pdf"></i> Exportar todas las ventas
-    </a>
-</div>
-
-
-<table id="tablaVentas" class="display table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>Fecha Venta</th>
-            <th>Cliente</th>
-            <th>Producto</th>
-            <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Importe Total</th>
-            <th>ID Transacción</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var venta in Model.Detalles)
-        {
-            <tr>
-                <td>@venta.FechaVenta.ToString("dd/MM/yyyy")</td>
-                <td>@venta.ClienteNombre</td>
-                <td>@venta.ProductoNombre</td>
-                <td>@venta.Precio.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</td>
-                <td>@venta.TotalProductos</td>
-                <td>@venta.ImporteTotal.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</td>
-                <td>@venta.IdTransaccion</td>
-                <td>
-                    <a asp-action="ExportarVentaPdf" asp-route-id="@venta.IdVenta" class="btn btn-sm btn-primary">
+                <div>
+                    <a asp-action="ExportarTodasLasVentas" class="btn btn-outline-danger">
+                        <i class="bi bi-file-earmark-pdf me-1"></i>
                         Exportar PDF
                     </a>
-                </td>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tablaVentas" class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th class="text-center">Cantidad</th>
+                            <th>Total</th>
+                            <th>ID Transacción</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var venta in Model.Detalles)
+                        {
+                            <tr>
+                                <td>
+                                    <small class="text-muted">
+                                        @venta.FechaVenta.ToString("dd/MM/yyyy")
+                                    </small>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person me-1 text-muted"></i>
+                                    @venta.ClienteNombre
+                                </td>
+                                <td>
+                                    <i class="bi bi-box me-1 text-muted"></i>
+                                    @venta.ProductoNombre
+                                </td>
+                                <td>
+                                    <span class="text-muted">
+                                        @venta.Precio.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark">
+                                        @venta.TotalProductos
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong class="text-success">
+                                        @venta.ImporteTotal.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                                    </strong>
+                                </td>
+                                <td>
+                                    <small class="font-monospace text-muted">
+                                        @venta.IdTransaccion
+                                    </small>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="ExportarVentaPdf" asp-route-id="@venta.IdVenta"
+                                       class="btn btn-sm btn-outline-primary" title="Exportar PDF">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-            </tr>
+<style>
+    .icon-circle {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
         }
-    </tbody>
-</table>
+
+    .text-xs {
+        font-size: 0.75rem;
+    }
+
+    .font-monospace {
+        font-family: 'Courier New', monospace;
+    }
+
+    .table th {
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-top: none;
+    }
+
+    .bg-opacity-10 {
+        --bs-bg-opacity: 0.1;
+    }
+</style>
 
 @section Scripts {
     <script>
@@ -124,7 +272,13 @@
             $('#tablaVentas').DataTable({
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
-                }
+                },
+                "pageLength": 10,
+                "order": [[0, "desc"]], // Ordenar por fecha descendente
+                "responsive": true,
+                "columnDefs": [
+                    { "orderable": false, "targets": 7 } // Deshabilitar orden en columna Acciones
+                ]
             });
         });
     </script>

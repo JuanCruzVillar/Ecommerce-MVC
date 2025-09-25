@@ -5,71 +5,139 @@
     ViewData["Title"] = "Detalles de Categoría";
 }
 
-<div class="container mt-4">
-    <h2>@ViewData["Title"]</h2>
-    <hr />
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-eye"></i> Detalles de Categoría</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
+        </a>
+    </div>
 
-    <dl class="row">
-        <dt class="col-sm-3">Descripción</dt>
-        <dd class="col-sm-9">@Model.Descripcion</dd>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-4">Descripción:</dt>
+                        <dd class="col-sm-8">
+                            <strong>@Model.Descripcion</strong>
+                        </dd>
 
-        <dt class="col-sm-3">Categoría Padre</dt>
-        <dd class="col-sm-9">
-            @(Model.CategoriaPadre != null ? Model.CategoriaPadre.Descripcion : "—")
-        </dd>
+                        <dt class="col-sm-4">Categoría Padre:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.CategoriaPadre != null)
+                            {
+                                <span class="text-primary">@Model.CategoriaPadre.Descripcion</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Categoría Principal</span>
+                            }
+                        </dd>
 
-        <dt class="col-sm-3">Subcategorías</dt>
-        <dd class="col-sm-9">
+                        <dt class="col-sm-4">Estado:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge @(Model.Activo ? "bg-success" : "bg-secondary")">
+                                @(Model.Activo ? "Activo" : "Inactivo")
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-4">Fecha de Registro:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.FechaRegistro.HasValue)
+                            {
+                                @Model.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm")
+                            }
+                            else
+                            {
+                                <span class="text-muted">No disponible</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-end">
+                        <div class="btn-group-vertical" role="group">
+                            <a asp-action="Edit" asp-route-id="@Model.IdCategoria" class="btn btn-warning mb-2">
+                                <i class="bi bi-pencil"></i> Editar Categoría
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@Model.IdCategoria" method="post"
+                                  class="form-eliminar" data-nombre="@Model.Descripcion">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="bi bi-trash"></i> Eliminar Categoría
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @if (Model.SubCategorias != null && Model.SubCategorias.Any())
             {
-                <ul class="list-group">
-                    @foreach (var sub in Model.SubCategorias)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            @sub.Descripcion
-                            <span>
-                                <a asp-action="Edit" asp-route-id="@sub.IdCategoria" class="btn btn-sm btn-warning me-1">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                                <form asp-action="Delete" asp-route-id="@sub.IdCategoria" method="post" class="d-inline form-eliminar">
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
-                                </form>
-                            </span>
-                        </li>
-                    }
-                </ul>
+                <hr class="my-4">
+                <h5><i class="bi bi-folder-fill text-info"></i> Subcategorías (@Model.SubCategorias.Count())</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Fecha Registro</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var subcategoria in Model.SubCategorias.OrderBy(s => s.Descripcion))
+                            {
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-arrow-return-right text-muted me-2"></i>
+                                        @subcategoria.Descripcion
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @(subcategoria.Activo ? "bg-success" : "bg-secondary")">
+                                            @(subcategoria.Activo ? "Activo" : "Inactivo")
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <small class="text-muted">
+                                            @(subcategoria.FechaRegistro?.ToString("dd/MM/yyyy") ?? "—")
+                                        </small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@subcategoria.IdCategoria"
+                                               class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@subcategoria.IdCategoria"
+                                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form asp-action="Delete" asp-route-id="@subcategoria.IdCategoria" method="post"
+                                                  class="d-inline form-eliminar" data-nombre="@subcategoria.Descripcion">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
-            else
+            else if (Model.IdCategoriaPadre == null)
             {
-                <span class="text-muted">No tiene subcategorías</span>
+                <hr class="my-4">
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-folder-x display-6"></i>
+                    <p class="mt-2">Esta categoría no tiene subcategorías.</p>
+                </div>
             }
-        </dd>
-
-        <dt class="col-sm-3">Estado</dt>
-        <dd class="col-sm-9">
-            <span class="badge @(Model.Activo ? "bg-success" : "bg-secondary")">
-                @(Model.Activo ? "Activo" : "Inactivo")
-            </span>
-        </dd>
-
-        <dt class="col-sm-3">Fecha de Registro</dt>
-        <dd class="col-sm-9">@Model.FechaRegistro?.ToString("dd/MM/yyyy HH:mm")</dd>
-    </dl>
-
-    <div class="mt-3">
-        <a asp-action="Edit" asp-route-id="@Model.IdCategoria" class="btn btn-warning me-1">
-            <i class="bi bi-pencil-fill"></i> Editar Categoría
-        </a>
-        <form asp-action="Delete" asp-route-id="@Model.IdCategoria" method="post" class="d-inline form-eliminar">
-            <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Eliminar Categoría
-            </button>
-        </form>
-        <a asp-action="Index" class="btn btn-secondary ms-1">
-            <i class="bi bi-arrow-left"></i> Volver
-        </a>
+        </div>
     </div>
 </div>
 
@@ -78,50 +146,60 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // Confirmación para eliminar
-            const forms = document.querySelectorAll(".form-eliminar");
-            forms.forEach(form => {
+            // SweetAlert de error
+            @if (TempData["Error"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: '@Html.Raw(TempData["Error"])',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        </text>
+            }
+
+            // SweetAlert de éxito
+            @if (TempData["Success"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: '@Html.Raw(TempData["Success"])',
+                                confirmButtonColor: '#198754',
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                        </text>
+            }
+
+            // Confirmación de eliminación (igual que en Index)
+            const formsEliminar = document.querySelectorAll(".form-eliminar");
+            formsEliminar.forEach(form => {
                 form.addEventListener("submit", function (e) {
                     e.preventDefault();
+
+                    const nombreCategoria = this.dataset.nombre;
+
                     Swal.fire({
-                        title: '¿Estás seguro?',
-                        text: "Esta acción no se puede deshacer",
+                        title: '¿Confirmar eliminación?',
+                        html: `¿Estás seguro de eliminar la categoría <strong>"${nombreCategoria}"</strong>?<br><small class="text-muted">Esta acción no se puede deshacer.</small>`,
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
                         confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
-                    }).then(result => {
-                        if (result.isConfirmed) form.submit();
+                        cancelButtonText: 'Cancelar',
+                        focusCancel: true,
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
                     });
                 });
             });
-
-            // Alert de error
-            @if (TempData["Error"] != null)
-            {
-                    <text>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                                text: '@Html.Raw(TempData["Error"])'
-                        });
-                    </text>
-            }
-
-            // Alert de éxito
-            @if (TempData["Success"] != null)
-            {
-                    <text>
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Éxito!',
-                                text: '@Html.Raw(TempData["Success"])'
-                        });
-                    </text>
-            }
-
         });
     </script>
 }

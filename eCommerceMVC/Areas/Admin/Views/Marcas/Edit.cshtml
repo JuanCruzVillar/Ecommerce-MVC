@@ -5,41 +5,119 @@
     ViewData["Title"] = "Editar Marca";
 }
 
-<div class="container mt-4">
-    <h2>Editar Marca</h2>
-    <hr />
-
-    <form asp-action="Edit" method="post">
-        <input type="hidden" asp-for="IdMarca" />
-
-        <div class="mb-3">
-            <label asp-for="Descripcion" class="form-label"></label>
-            <input asp-for="Descripcion" class="form-control" />
-            <span asp-validation-for="Descripcion" class="text-danger"></span>
-        </div>
-
-        <div class="form-check mb-3">
-            <input asp-for="Activo" class="form-check-input" type="checkbox" />
-            <label asp-for="Activo" class="form-check-label">Activo</label>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Fecha de Registro</label>
-            <!-- 🔹 Solo mostramos la fecha, no se envía al servidor -->
-            <input value="@Model.FechaRegistro.ToString("dd/MM/yyyy")" class="form-control" readonly />
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save"></i> Guardar cambios
-        </button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">
-            <i class="bi bi-arrow-left"></i> Volver
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-pencil"></i> Editar Marca</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
         </a>
-    </form>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="IdMarca" />
+                        <input type="hidden" asp-for="FechaRegistro" />
+
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+                            <input asp-for="Descripcion" class="form-control" placeholder="Ingrese el nombre de la marca" />
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="Activo" class="form-check-input" type="checkbox" />
+                                <label asp-for="Activo" class="form-check-label">
+                                    Marca Activa
+                                </label>
+                            </div>
+                            <div class="form-text">Las marcas inactivas no aparecerán en el sitio web</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Registro</label>
+                            <input value="@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")"
+                                   class="form-control" readonly />
+                            <div class="form-text">Esta fecha no se puede modificar</div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                           
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // SweetAlert de error
+            @if (TempData["Error"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: '@Html.Raw(TempData["Error"])',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        </text>
+            }
+
+            // SweetAlert de éxito
+            @if (TempData["Success"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: '@Html.Raw(TempData["Success"])',
+                                confirmButtonColor: '#198754',
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                        </text>
+            }
+
+            // Validación adicional en el cliente
+            const form = document.querySelector('form');
+            const descripcionInput = document.querySelector('#Descripcion');
+
+            if (form && descripcionInput) {
+                form.addEventListener('submit', function(e) {
+                    const descripcion = descripcionInput.value.trim();
+                    if (!descripcion) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Campo requerido',
+                            text: 'La descripción de la marca es obligatoria.',
+                            confirmButtonColor: '#ffc107'
+                        });
+                        descripcionInput.focus();
+                    }
+                });
+
+                // Limpiar espacios al escribir
+                descripcionInput.addEventListener('blur', function() {
+                    this.value = this.value.trim();
+                });
+            }
+        });
+    </script>
 }
