@@ -4,6 +4,10 @@ using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +49,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Error al cargar los productos. Intente nuevamente.";
-                // En producción, log del error: _logger.LogError(ex, "Error al cargar productos");
+                
                 return View(new List<Producto>());
             }
         }
@@ -72,7 +76,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         {
             try
             {
-                // MEJORADO: Validación de imagen
+                
                 if (vm.ImagenArchivo != null)
                 {
                     var validationResult = ValidateImage(vm.ImagenArchivo);
@@ -176,7 +180,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
             try
             {
-                // MEJORADO: Validación de imagen en edición
+                
                 if (vm.ImagenArchivo != null)
                 {
                     var validationResult = ValidateImage(vm.ImagenArchivo);
@@ -204,13 +208,13 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 producto.Stock = vm.Stock;
                 producto.Activo = vm.Activo;
 
-                // Procesar nueva imagen si existe
+                
                 if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
                 {
                     var imagePath = await ProcessImageAsync(vm.ImagenArchivo);
                     if (!string.IsNullOrEmpty(imagePath))
                     {
-                        // TODO: Eliminar imagen anterior si existe
+                        // eliminar imagen anterior si existe
                         producto.RutaImagen = imagePath;
                         producto.NombreImagen = vm.ImagenArchivo.FileName;
                     }
@@ -323,12 +327,12 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return null; // Válido
         }
 
-        
+
         private async Task<string> ProcessImageAsync(IFormFile file)
         {
             try
             {
-                var nombreArchivo = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                var nombreArchivo = Guid.NewGuid() + ".jpg"; // 🔹 Siempre JPG
                 var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
 
                 if (!Directory.Exists(rutaCarpeta))
@@ -338,19 +342,34 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
                 var rutaArchivo = Path.Combine(rutaCarpeta, nombreArchivo);
 
-                using var stream = new FileStream(rutaArchivo, FileMode.Create);
-                await file.CopyToAsync(stream);
+                using var image = await Image.LoadAsync<Rgba32>(file.OpenReadStream());
+
+                // 🔹 Redimensionar a 800x800 con fondo blanco
+                image.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new Size(800, 800),
+                    Mode = ResizeMode.Pad,
+                    Position = AnchorPositionMode.Center,
+                    PadColor = Color.White
+                }));
+
+                // 🔹 Guardar siempre como JPG optimizado
+                var encoder = new JpegEncoder
+                {
+                    Quality = 85 // entre 70-90 es ideal: buena calidad y poco peso
+                };
+
+                await image.SaveAsync(rutaArchivo, encoder);
 
                 return "/images/" + nombreArchivo;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                
                 return null;
             }
         }
 
-        // Cargar dropdowns de marcas y categorías/subcategorías
+        // Cargar dropdowns de marcas y categorias/subcategorias
         private async Task CargarDropdowns(ProductoViewModel vm = null)
         {
             try

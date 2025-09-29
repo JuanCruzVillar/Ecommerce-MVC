@@ -1,0 +1,126 @@
+﻿@model eCommerce.Entities.Cliente
+
+@{
+    ViewData["Title"] = "Mi Perfil";
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+}
+  
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Sidebar de navegación -->
+            <div class="list-group">
+                <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-person me-2"></i>Mi Perfil
+                </a>
+                <a href="@Url.Action("MisCompras", "Perfil")" class="list-group-item list-group-item-action">
+                    <i class="bi bi-bag-check me-2"></i>Mis Compras
+                </a>
+                <a href="@Url.Action("MisDirecciones", "Perfil")" class="list-group-item list-group-item-action">
+                    <i class="bi bi-geo-alt me-2"></i>Mis Direcciones
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>Mi Perfil</h4>
+                    <a href="@Url.Action("Editar", "Perfil")" class="btn btn-light btn-sm">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5 class="border-bottom pb-2 mb-3">Información Personal</h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Nombres</label>
+                            <p class="fw-bold">@Model.Nombres</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Apellidos</label>
+                            <p class="fw-bold">@Model.Apellidos</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Correo Electrónico</label>
+                            <p class="fw-bold">@Model.Correo</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Fecha de Registro</label>
+                            <p class="fw-bold">@Model.FechaRegistro?.ToString("dd/MM/yyyy")</p>
+                        </div>
+                    </div>
+
+                    @if (Model.DireccionesEnvio.Any())
+                    {
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="border-bottom pb-2 mb-3">Dirección Principal</h5>
+                            </div>
+                            @{
+                                var direccionPrincipal = Model.DireccionesEnvio.FirstOrDefault(d => d.EsDireccionPrincipal == true && d.Activo == true)
+                                ?? Model.DireccionesEnvio.FirstOrDefault(d => d.Activo == true);
+                            }
+                            @if (direccionPrincipal != null)
+                            {
+                                <div class="col-md-12 mb-3">
+                                    <div class="alert alert-light">
+                                        <p class="mb-1"><strong>@direccionPrincipal.NombreCompleto</strong></p>
+                                        <p class="mb-1">@direccionPrincipal.Direccion</p>
+                                        <p class="mb-1">@direccionPrincipal.Ciudad, @direccionPrincipal.Provincia - CP: @direccionPrincipal.CodigoPostal</p>
+                                        <p class="mb-0"><i class="bi bi-telephone me-1"></i>@direccionPrincipal.Telefono</p>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-12">
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        No tienes direcciones registradas.
+                                        <a href="@Url.Action("MisDirecciones", "Perfil")" class="alert-link">Agregar dirección</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h5 class="border-bottom pb-2 mb-3">Estadísticas de Cuenta</h5>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h3 class="text-primary">@Model.Venta.Count()</h3>
+                                    <p class="text-muted mb-0">Compras Realizadas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h3 class="text-success">@Model.DireccionesEnvio.Count(d => d.Activo == true)</h3>
+                                    <p class="text-muted mb-0">Direcciones Guardadas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h3 class="text-info">
+                                        @Model.Venta.Where(v => v.FechaVenta >= DateTime.Now.AddMonths(-1)).Count()
+                                    </h3>
+                                    <p class="text-muted mb-0">Compras Este Mes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

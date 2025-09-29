@@ -1,0 +1,115 @@
+﻿@model IEnumerable<eCommerce.Entities.Venta>
+
+@{
+    ViewData["Title"] = "Mis Compras";
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Sidebar de navegación -->
+            <div class="list-group">
+                <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person me-2"></i>Mi Perfil
+                </a>
+                <a href="@Url.Action("MisCompras", "Perfil")" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-bag-check me-2"></i>Mis Compras
+                </a>
+                <a href="@Url.Action("MisDirecciones", "Perfil")" class="list-group-item list-group-item-action">
+                    <i class="bi bi-geo-alt me-2"></i>Mis Direcciones
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-bag-check me-2"></i>Mis Compras</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Pedido #</th>
+                                        <th>Fecha</th>
+                                        <th>Productos</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var venta in Model)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">#@venta.IdVenta</td>
+                                            <td>@venta.FechaVenta?.ToString("dd/MM/yyyy")</td>
+                                            <td>@venta.TotalProductos productos</td>
+                                            <td class="fw-bold text-success">$@venta.ImporteTotal?.ToString("N2")</td>
+                                            <td>
+                                                @{
+                                                    var estadoClase = "secondary";
+                                                    var estadoTexto = venta.IdEstadoPedidoNavigation?.Nombre ?? "Pendiente";
+
+                                                    switch (venta.IdEstadoPedido)
+                                                    {
+                                                        case 1: // Pendiente
+                                                            estadoClase = "warning";
+                                                            break;
+                                                        case 2: // Confirmado/Procesando
+                                                            estadoClase = "info";
+                                                            break;
+                                                        case 3: // Enviado
+                                                            estadoClase = "primary";
+                                                            break;
+                                                        case 4: // Entregado
+                                                            estadoClase = "success";
+                                                            break;
+                                                        case 5: // Cancelado
+                                                            estadoClase = "danger";
+                                                            break;
+                                                    }
+                                                }
+                                                <span class="badge bg-@estadoClase">@estadoTexto</span>
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("DetalleCompra", "Perfil", new { id = venta.IdVenta })"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye me-1"></i>Ver Detalle
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Total de compras realizadas:</strong> @Model.Count()
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-bag-x" style="font-size: 4rem; color: #ddd;"></i>
+                            <h4 class="mt-3">No hay compras realizadas</h4>
+                            <p class="text-muted">Aún no has realizado ninguna compra en nuestra tienda.</p>
+                            <a href="@Url.Action("Index", "Catalogo")" class="btn btn-primary mt-3">
+                                <i class="bi bi-shop me-2"></i>Comenzar a Comprar
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

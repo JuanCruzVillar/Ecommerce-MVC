@@ -27,7 +27,30 @@
         display: block;
     }
 
+/* Dropdown subcategorias  */
+.dropdown-menu .dropdown-toggle::after {
+    vertical-align: middle;
+    border-left: 0.3em solid;
+    border-bottom: 0.3em solid transparent;
+    border-top: 0.3em solid transparent;
+    margin-left: auto;
+}
 
+.dropend .dropdown-menu {
+    top: 0;
+    right: auto;
+    left: 100%;
+    margin-top: 0;
+}
+
+.dropdown-item.dropdown {
+    position: relative;
+}
+
+.dropdown-menu .dropdown-menu {
+    left: 100%;
+    top: 0;
+}
 :root {
     --blue: #4e73df;
     --indigo: #6610f2;

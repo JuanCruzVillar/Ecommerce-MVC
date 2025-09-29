@@ -1,0 +1,143 @@
+﻿@model IEnumerable<eCommerce.Entities.DireccionEnvio>
+
+@{
+    ViewData["Title"] = "Mis Direcciones";
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Sidebar de navegación -->
+            <div class="list-group">
+                <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person me-2"></i>Mi Perfil
+                </a>
+                <a href="@Url.Action("MisCompras", "Perfil")" class="list-group-item list-group-item-action">
+                    <i class="bi bi-bag-check me-2"></i>Mis Compras
+                </a>
+                <a href="@Url.Action("MisDirecciones", "Perfil")" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-geo-alt me-2"></i>Mis Direcciones
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Mis Direcciones de Envío</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="row">
+                            @foreach (var direccion in Model)
+                            {
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100 @(direccion.EsDireccionPrincipal == true ? "border-primary" : "")">
+                                        @if (direccion.EsDireccionPrincipal == true)
+                                        {
+                                            <div class="card-header bg-primary text-white">
+                                                <i class="bi bi-star-fill me-1"></i>Dirección Principal
+                                            </div>
+                                        }
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold">@direccion.NombreCompleto</h6>
+                                            <p class="card-text mb-1">
+                                                <i class="bi bi-geo-alt me-1"></i>@direccion.Direccion
+                                            </p>
+                                            <p class="card-text mb-1">
+                                                <i class="bi bi-building me-1"></i>@direccion.Ciudad, @direccion.Provincia
+                                            </p>
+                                            <p class="card-text mb-1">
+                                                <i class="bi bi-mailbox me-1"></i>CP: @direccion.CodigoPostal
+                                            </p>
+                                            <p class="card-text mb-2">
+                                                <i class="bi bi-telephone me-1"></i>@direccion.Telefono
+                                            </p>
+                                            @if (!string.IsNullOrEmpty(direccion.Referencias))
+                                            {
+                                                <p class="card-text text-muted small mb-2">
+                                                    <i class="bi bi-info-circle me-1"></i>@direccion.Referencias
+                                                </p>
+                                            }
+                                        </div>
+                                        <div class="card-footer bg-light">
+                                            <div class="d-flex justify-content-between">
+                                                @if (direccion.EsDireccionPrincipal != true)
+                                                {
+                                                    <form asp-action="EstablecerPredeterminada" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@direccion.IdDireccionEnvio" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-star me-1"></i>Principal
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-primary small">
+                                                        <i class="bi bi-check-circle me-1"></i>Predeterminada
+                                                    </span>
+                                                }
+                                                <form asp-action="EliminarDireccion" method="post" class="d-inline form-eliminar-direccion">
+                                                    <input type="hidden" name="id" value="@direccion.IdDireccionEnvio" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash me-1"></i>Eliminar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }            </div>
+                                       
+                            }
+                       
+
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Las direcciones guardadas se pueden usar en tus próximas compras para agilizar el proceso de checkout.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-geo-alt-fill" style="font-size: 4rem; color: #ddd;"></i>
+                            <h4 class="mt-3">No tienes direcciones guardadas</h4>
+                            <p class="text-muted">Agrega una dirección para facilitar tus compras futuras.</p>
+                            <div class="alert alert-warning mt-3">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                Las direcciones se pueden agregar durante el proceso de checkout y quedarán guardadas para futuras compras.
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Confirmación SweetAlert2 para eliminar dirección
+        document.querySelectorAll('.form-eliminar-direccion').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: '¿Eliminar dirección?',
+                    text: "Esta acción no se puede revertir",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

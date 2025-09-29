@@ -5,64 +5,226 @@
     ViewData["Title"] = "Editar Producto";
 }
 
-<h1>Editar Producto</h1>
-
-<form asp-action="Edit" enctype="multipart/form-data">
-    <input type="hidden" asp-for="IdProducto" />
-
-    <div class="form-group mb-2">
-        <label asp-for="Nombre"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-pencil"></i> Editar Producto</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
+        </a>
     </div>
 
-    <div class="form-group mb-2">
-        <label asp-for="Descripcion"></label>
-        <textarea asp-for="Descripcion" class="form-control"></textarea>
-    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="IdProducto" />
 
-    <div class="form-group mb-2">
-        <label asp-for="Precio"></label>
-        <input asp-for="Precio" class="form-control" />
-    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nombre" class="form-label">Nombre del Producto <span class="text-danger">*</span></label>
+                                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre del producto" />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Precio" class="form-label">Precio <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="Precio" class="form-control" placeholder="0.00" />
+                                    </div>
+                                    <span asp-validation-for="Precio" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
 
-    <div class="form-group mb-2">
-        <label asp-for="Stock"></label>
-        <input asp-for="Stock" class="form-control" />
-    </div>
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label">Descripción</label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="3"
+                                      placeholder="Descripción detallada del producto"></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
 
-    <div class="form-group mb-2">
-        <label>Marca</label>
-        <select asp-for="IdMarca" asp-items="ViewBag.IdMarca" class="form-control">
-            <option value="">-- Seleccione Marca --</option>
-        </select>
-    </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Stock" class="form-label">Stock <span class="text-danger">*</span></label>
+                                    <input asp-for="Stock" class="form-control" placeholder="Cantidad disponible" />
+                                    <span asp-validation-for="Stock" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Marca</label>
+                                    <select asp-for="IdMarca" asp-items="ViewBag.IdMarca" class="form-select">
+                                        <option value="">-- Seleccione Marca --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Categoría/Subcategoría</label>
+                                    <select asp-for="IdCategoria" asp-items="ViewBag.IdCategoria" class="form-select">
+                                        <option value="">-- Seleccione Categoría --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
-    <div class="form-group mb-2">
-        <label>Categoría / Subcategoría</label>
-        <select asp-for="IdCategoria" asp-items="ViewBag.IdCategoria" class="form-control">
-            <option value="">-- Seleccione Categoría --</option>
-        </select>
-    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nueva Imagen del Producto</label>
+                            <input type="file" asp-for="ImagenArchivo" class="form-control" accept="image/*" />
+                            <div class="form-text">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</div>
+                        </div>
 
-    @if (!string.IsNullOrEmpty(Model.RutaImagen))
-    {
-        <div class="mb-3">
-            <label>Imagen actual:</label><br />
-            <img src="@Model.RutaImagen" alt="@Model.Nombre" width="120" />
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="Activo" class="form-check-input" type="checkbox" />
+                                <label asp-for="Activo" class="form-check-label">
+                                    Producto Activo
+                                </label>
+                            </div>
+                            <div class="form-text">Los productos inactivos no aparecerán en el sitio web</div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <a asp-action="Details" asp-route-id="@Model.IdProducto" class="btn btn-info">
+                                <i class="bi bi-eye"></i> Ver Detalles
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    }
 
-    <div class="form-group mb-2">
-        <label>Nueva imagen (opcional)</label>
-        <input type="file" asp-for="ImagenArchivo" class="form-control" />
+        <!-- Panel lateral con imagen actual y ayuda -->
+        <div class="col-lg-4">
+            <!-- Imagen actual -->
+            @if (!string.IsNullOrEmpty(Model.RutaImagen))
+            {
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-image text-primary"></i> Imagen Actual
+                        </h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="@Model.RutaImagen" alt="@Model.Nombre"
+                             class="img-fluid rounded shadow" style="max-height: 200px;" />
+                        <p class="text-muted mt-2 mb-0 small">Selecciona una nueva imagen para reemplazar esta</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Panel de información -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-info-circle text-primary"></i> Información
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6><i class="bi bi-check-circle text-success"></i> Campos Obligatorios:</h6>
+                        <ul class="list-unstyled ms-3">
+                            <li>• Nombre del producto</li>
+                            <li>• Precio</li>
+                            <li>• Stock</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6><i class="bi bi-lightbulb text-warning"></i> Recordatorios:</h6>
+                        <ul class="list-unstyled ms-3 small text-muted">
+                            <li>• Los cambios se aplicarán inmediatamente</li>
+                            <li>• Si cambias la imagen, la anterior se eliminará</li>
+                            <li>• Productos inactivos no aparecen en la tienda</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-muted small">
+                        <i class="bi bi-clock me-1"></i>
+                        <strong>ID del Producto:</strong> #@Model.IdProducto
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group mb-2 form-check">
-        <input asp-for="Activo" class="form-check-input" />
-        <label asp-for="Activo" class="form-check-label">Activo</label>
-    </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // SweetAlert de error
+            @if (TempData["Error"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: '@Html.Raw(TempData["Error"])',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        </text>
+            }
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+            // SweetAlert de éxito
+            @if (TempData["Success"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: '@Html.Raw(TempData["Success"])',
+                                confirmButtonColor: '#198754',
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                        </text>
+            }
+
+            // Validación del formulario
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                let hasErrors = false;
+
+                // Validar nombre
+                const nombre = document.querySelector('#Nombre').value.trim();
+                if (!nombre) {
+                    hasErrors = true;
+                }
+
+                // Validar precio
+                const precio = parseFloat(document.querySelector('#Precio').value);
+                if (isNaN(precio) || precio <= 0) {
+                    hasErrors = true;
+                }
+
+                // Validar stock
+                const stock = parseInt(document.querySelector('#Stock').value);
+                if (isNaN(stock) || stock < 0) {
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos requeridos',
+                        text: 'Por favor complete todos los campos obligatorios correctamente.',
+                        confirmButtonColor: '#ffc107'
+                    });
+                }
+            });
+        });
+    </script>
+}

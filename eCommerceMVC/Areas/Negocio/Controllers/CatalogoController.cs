@@ -16,14 +16,23 @@ public class CatalogoController : Controller
         _categoriaService = categoriaService;
     }
 
-    // Lista de productos, opcionalmente filtrados por categoría
-    public async Task<IActionResult> Index(int? categoriaId = null)
+    // Lista de productos
+    public async Task<IActionResult> Index(int? categoria = null)
     {
         var productos = await _productoService.GetAllAsync();
 
-        if (categoriaId.HasValue)
+        if (categoria.HasValue)
         {
-            productos = productos.Where(p => p.IdCategoria == categoriaId.Value).ToList();
+            // Filtrar productos por categoría y  subcategorías
+            var categorias = await _categoriaService.GetAllAsync();
+            var categoriasHijas = categorias
+                .Where(c => c.IdCategoriaPadre == categoria.Value)
+                .Select(c => c.IdCategoria)
+                .ToList();
+
+            categoriasHijas.Add(categoria.Value); 
+
+            productos = productos.Where(p => categoriasHijas.Contains(p.IdCategoria ?? 0)).ToList();
         }
 
         var viewModels = productos.Select(p => new DetalleProductoViewModel
@@ -35,6 +44,13 @@ public class CatalogoController : Controller
             RutaImagen = p.RutaImagen,
             IdCategoria = p.IdCategoria
         }).ToList();
+
+        if (categoria.HasValue)
+        {
+            var categoriaActual = (await _categoriaService.GetAllAsync())
+                .FirstOrDefault(c => c.IdCategoria == categoria.Value);
+            ViewBag.CategoriaNombre = categoriaActual?.Descripcion;
+        }
 
         return View(viewModels);
     }
@@ -55,6 +71,29 @@ public class CatalogoController : Controller
             IdCategoria = producto.IdCategoria
         };
 
-        return View(productoVM);
+        
+        var todosProductos = await _productoService.GetAllAsync();
+        var relacionados = todosProductos
+            .Where(p => p.IdCategoria == producto.IdCategoria && p.IdProducto != producto.IdProducto)
+            .Take(4) // Mostrar 4 productos relacionados
+            .Select(p => new DetalleProductoViewModel
+            {
+                IdProducto = p.IdProducto,
+                Nombre = p.Nombre ?? "Sin nombre",
+                Descripcion = p.Descripcion,
+                Precio = p.Precio,
+                RutaImagen = p.RutaImagen,
+                IdCategoria = p.IdCategoria
+            })
+            .ToList();
+
+        // Crear el ViewModel de la página
+        var viewModel = new DetalleProductoPaginaViewModel
+        {
+            Producto = productoVM,
+            Relacionados = relacionados
+        };
+
+        return View(viewModel);
     }
 }

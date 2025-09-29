@@ -55,7 +55,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     return View();
                 }
 
-                // CORREGIDO: Agregar IdUsuario para consistencia
+                
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, usuario.Nombres),
@@ -76,9 +76,9 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
             catch (System.Exception ex)
             {
-                // Log del error (en producción usar ILogger)
+               
                 ViewBag.Error = "Error interno del servidor. Intente nuevamente.";
-                // En desarrollo, podrías mostrar: ex.Message
+                
                 return View();
             }
         }

@@ -16,36 +16,62 @@
 
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
-        <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            @foreach (var producto in Model)
-            {
-                <div class="col mb-5">
-                    <div class="card h-100">
-                        <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
-                            <img class="card-img-top" src="@(producto.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")" alt="@producto.Nombre" />
-                        </a>
-                        <div class="card-body p-4 text-center">
+        @if (ViewBag.CategoriaNombre != null)
+        {
+            <div class="mb-4">
+                <h3 class="mb-3">
+                    <i class="bi bi-filter-circle me-2"></i>@ViewBag.CategoriaNombre
+                </h3>
+                <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i>Ver todos los productos
+                </a>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle me-2"></i>
+                No se encontraron productos en esta categoría.
+                <br />
+                <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-primary mt-3">
+                    Ver todos los productos
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                @foreach (var producto in Model)
+                {
+                    <div class="col mb-5">
+                        <div class="card h-100">
                             <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
-                                <h5 class="fw-bolder">@producto.Nombre</h5>
+                                <img class="card-img-top" src="@(producto.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")" alt="@producto.Nombre" />
                             </a>
-                            @if (producto.Precio.HasValue)
-                            {
-                                <span>$@producto.Precio.Value.ToString("N2")</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted">Precio no disponible</span>
-                            }
-                        </div>
-                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
-                            <button class="btn btn-outline-dark mt-auto agregar-carrito" data-producto="@producto.IdProducto">
-                                Agregar al carrito
-                            </button>
+                            <div class="card-body p-4 text-center">
+                                <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
+                                    <h5 class="fw-bolder">@producto.Nombre</h5>
+                                </a>
+                                @if (producto.Precio.HasValue)
+                                {
+                                    <span class="fw-bold text-primary">$@producto.Precio.Value.ToString("N2")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Precio no disponible</span>
+                                }
+                            </div>
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
+                                <button class="btn btn-outline-dark mt-auto agregar-carrito" data-producto="@producto.IdProducto">
+                                    <i class="bi bi-cart-plus me-1"></i>Agregar al carrito
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
+        }
     </div>
 </section>
 
@@ -54,46 +80,63 @@
         object-fit: cover;
         height: 200px;
     }
+
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
 </style>
 
 @section Scripts {
     <script>
-                $('.agregar-carrito').click(function(){
-            var productoId = $(this).data('producto');
-            var boton = $(this);
+        $(document).ready(function(){
+            function actualizarBadge(){
+                $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
+                    $('#carrito-badge').text(total);
+                });
+            }
 
-            // Deshabilitar botón
-            boton.prop('disabled', true).text('Agregando...');
+            $('.agregar-carrito').click(function(){
+                var productoId = $(this).data('producto');
+                var boton = $(this);
 
-            $.post('@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
-                   { productoId: productoId, cantidad: 1 })
-            .done(function(response) {
-                if (response.success) {
-                    actualizarBadge();
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Producto agregado al carrito',
-                        showConfirmButton: false,
-                        timer: 1000
-                    });
-                } else {
+                // Deshabilitar botón
+                boton.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Agregando...');
+
+                $.post('@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
+                       { productoId: productoId, cantidad: 1 })
+                .done(function(response) {
+                    if (response.success) {
+                        actualizarBadge();
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Producto agregado al carrito',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'No se pudo agregar el producto'
+                        });
+                    }
+                })
+                .fail(function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: response.message || 'No se pudo agregar el producto'
+                        text: 'Error de conexión'
                     });
-                }
-            })
-            .fail(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Error de conexión'
+                })
+                .always(function() {
+                    boton.prop('disabled', false).html('<i class="bi bi-cart-plus me-1"></i>Agregar al carrito');
                 });
-            })
-            .always(function() {
-                boton.prop('disabled', false).text('Agregar al carrito');
             });
         });
     </script>

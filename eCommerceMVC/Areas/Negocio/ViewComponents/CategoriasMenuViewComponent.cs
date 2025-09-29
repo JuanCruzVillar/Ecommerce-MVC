@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using eCommerce.Services.Interfaces;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace eCommerceMVC.ViewComponents
 {
@@ -15,8 +16,22 @@ namespace eCommerceMVC.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var categorias = await _categoriaService.GetAllAsync();
-            return View(categorias);
+            var todasCategorias = await _categoriaService.GetAllAsync();
+
+            
+            var categoriasPrincipales = todasCategorias
+                .Where(c => c.IdCategoriaPadre == null || c.IdCategoriaPadre == 0)
+                .ToList();
+
+            
+            foreach (var categoria in categoriasPrincipales)
+            {
+                categoria.SubCategorias = todasCategorias
+                    .Where(c => c.IdCategoriaPadre == categoria.IdCategoria)
+                    .ToList();
+            }
+
+            return View(categoriasPrincipales);
         }
     }
 }

@@ -1,18 +1,42 @@
-﻿@model IEnumerable<eCommerce.Entities.Categoria> 
+﻿@model IEnumerable<eCommerce.Entities.Categoria>
 
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle text-dark" href="#" id="productosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Productos
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="productosDropdown">
-        @foreach (var categoria in Model)
-        {
-            <li>
-                <a class="dropdown-item" href="@Url.Action("Index", "Catalogo", new { area = "Negocio", categoriaId = categoria.IdCategoria })">
-                    @categoria.Descripcion
-                </a>
-            </li>
-        }
-    </ul>
-</li>
-
+@foreach (var categoria in Model)
+{
+    @if (categoria.SubCategorias != null && categoria.SubCategorias.Any())
+    {
+        
+        <li class="dropdown-item dropdown dropend">
+            <a class="dropdown-toggle d-flex justify-content-between align-items-center"
+               href="#"
+               id="dropdown@(categoria.IdCategoria)"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-expanded="false"
+               style="text-decoration: none; color: inherit;">
+                <span>@categoria.Descripcion</span>
+                <i class="bi bi-chevron-right ms-2"></i>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdown@(categoria.IdCategoria)">
+                @foreach (var subcategoria in categoria.SubCategorias)
+                {
+                    <li>
+                        <a class="dropdown-item"
+                           href="@Url.Action("Index", "Catalogo", new { area = "Negocio", categoria = subcategoria.IdCategoria })">
+                            @subcategoria.Descripcion
+                        </a>
+                    </li>
+                }
+            </ul>
+        </li>
+    }
+    else
+    {
+        
+        <li>
+            <a class="dropdown-item"
+               href="@Url.Action("Index", "Catalogo", new { area = "Negocio", categoria = categoria.IdCategoria })">
+                @categoria.Descripcion
+            </a>
+        </li>
+    }
+}
