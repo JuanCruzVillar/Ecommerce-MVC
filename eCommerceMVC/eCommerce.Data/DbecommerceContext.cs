@@ -28,6 +28,10 @@ namespace eCommerce.Data
         public virtual DbSet<HistorialPedido> HistorialPedidos { get; set; }
         public virtual DbSet<Cupon> Cupones { get; set; }
 
+        public virtual DbSet<ProductoEspecificacion> ProductoEspecificaciones { get; set; }
+
+        public virtual DbSet<ProductoImagen> ProductoImagenes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             
@@ -455,6 +459,69 @@ namespace eCommerce.Data
                 entity.Property(e => e.FechaRegistro)
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
+            });
+
+            // ProductoEspecificacion
+            modelBuilder.Entity<ProductoEspecificacion>(entity =>
+            {
+                entity.HasKey(e => e.IdEspecificacion);
+                entity.ToTable("PRODUCTO_ESPECIFICACION");
+
+                entity.Property(e => e.Clave)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Valor)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Orden)
+                    .HasDefaultValue(0);
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.FechaRegistro)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+
+                entity.HasOne(d => d.IdProductoNavigation)
+                    .WithMany(p => p.Especificaciones)
+                    .HasForeignKey(d => d.IdProducto)
+                    .HasConstraintName("FK_PRODUCTO_ESPECIFICACION_PRODUCTO");
+            });
+
+            // ProductoImagen
+            modelBuilder.Entity<ProductoImagen>(entity =>
+            {
+                entity.HasKey(e => e.IdImagen);
+                entity.ToTable("PRODUCTO_IMAGEN");
+
+                entity.Property(e => e.RutaImagen)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.NombreImagen)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Orden)
+                    .HasDefaultValue(0);
+
+                entity.Property(e => e.EsPrincipal)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.FechaRegistro)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+
+                entity.HasOne(d => d.IdProductoNavigation)
+                    .WithMany(p => p.Imagenes)
+                    .HasForeignKey(d => d.IdProducto)
+                    .HasConstraintName("FK_PRODUCTO_IMAGEN_PRODUCTO");
             });
 
             OnModelCreatingPartial(modelBuilder);

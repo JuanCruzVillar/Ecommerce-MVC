@@ -154,6 +154,10 @@
                                            class="btn btn-sm btn-outline-warning" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        <a asp-action="GestionarImagenes" asp-route-id="@item.IdProducto"
+                                           class="btn btn-sm btn-outline-primary" title="Gestionar imágenes">
+                                            <i class="bi bi-images"></i>
+                                        </a>
                                         <form asp-area="Admin" asp-controller="Productos" asp-action="DeleteConfirmed"
                                               asp-route-id="@item.IdProducto" method="post"
                                               class="d-inline form-eliminar" data-nombre="@item.Nombre">

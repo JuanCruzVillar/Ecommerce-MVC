@@ -24,7 +24,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         private readonly ICategoriaService _categoriaService;
         private readonly IMarcaService _marcaService;
 
-        // MEJORADO: Configuración para archivos
+        
         private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
         private readonly long _maxFileSize = 5 * 1024 * 1024; // 5MB
 
@@ -104,7 +104,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     FechaRegistro = DateTime.Now
                 };
 
-                // MEJORADO: Procesamiento de imagen con validaciones
+               
                 if (vm.ImagenArchivo != null && vm.ImagenArchivo.Length > 0)
                 {
                     var imagePath = await ProcessImageAsync(vm.ImagenArchivo);
@@ -304,14 +304,166 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Productos/GestionarImagenes/5
+        public async Task<IActionResult> GestionarImagenes(int? id)
+        {
+            if (id == null) return NotFound();
+
+            try
+            {
+                var producto = await _productoService.GetByIdWithImagenesAsync(id.Value);
+                if (producto == null) return NotFound();
+
+                var viewModel = new GestionImagenesViewModel
+                {
+                    IdProducto = producto.IdProducto,
+                    NombreProducto = producto.Nombre,
+                    Imagenes = producto.Imagenes
+                        .OrderBy(i => i.Orden)
+                        .Select(i => new ImagenViewModel
+                        {
+                            IdImagen = i.IdImagen,
+                            RutaImagen = i.RutaImagen,
+                            NombreImagen = i.NombreImagen,
+                            Orden = i.Orden ?? 0,
+                            EsPrincipal = i.EsPrincipal ?? false
+                        }).ToList()
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar las imágenes del producto.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // POST: Productos/SubirImagenes
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubirImagenes(int idProducto, List<IFormFile> imagenes)
+        {
+            try
+            {
+                if (imagenes == null || !imagenes.Any())
+                {
+                    return Json(new { success = false, message = "No se seleccionaron imágenes" });
+                }
+
+                var producto = await _productoService.GetByIdWithImagenesAsync(idProducto);
+                if (producto == null)
+                {
+                    return Json(new { success = false, message = "Producto no encontrado" });
+                }
+
+                var imagenesSubidas = 0;
+                var maxOrden = producto.Imagenes.Any() ? producto.Imagenes.Max(i => i.Orden ?? 0) : 0;
+
+                foreach (var archivo in imagenes)
+                {
+                    // Validar imagen
+                    var validationResult = ValidateImage(archivo);
+                    if (!string.IsNullOrEmpty(validationResult))
+                        continue;
+
+                    // Procesar imagen
+                    var rutaImagen = await ProcessImageAsync(archivo);
+                    if (string.IsNullOrEmpty(rutaImagen))
+                        continue;
+
+                    // Crear registro
+                    var nuevaImagen = new ProductoImagen
+                    {
+                        IdProducto = idProducto,
+                        RutaImagen = rutaImagen,
+                        NombreImagen = archivo.FileName,
+                        Orden = ++maxOrden,
+                        EsPrincipal = !producto.Imagenes.Any(), // Primera imagen es principal
+                        Activo = true,
+                        FechaRegistro = DateTime.Now
+                    };
+
+                    await _productoService.AgregarImagenAsync(nuevaImagen);
+                    imagenesSubidas++;
+                }
+
+                return Json(new { success = true, message = $"{imagenesSubidas} imagen(es) subida(s) correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al subir las imágenes" });
+            }
+        }
+
+        // POST: Productos/EliminarImagen
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarImagen(int id)
+        {
+            try
+            {
+                var result = await _productoService.EliminarImagenAsync(id);
+                if (result)
+                {
+                    return Json(new { success = true, message = "Imagen eliminada correctamente" });
+                }
+                return Json(new { success = false, message = "No se pudo eliminar la imagen" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al eliminar la imagen" });
+            }
+        }
+
+        // POST: Productos/MarcarImagenPrincipal
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarcarImagenPrincipal(int idImagen, int idProducto)
+        {
+            try
+            {
+                var result = await _productoService.MarcarImagenPrincipalAsync(idImagen, idProducto);
+                if (result)
+                {
+                    return Json(new { success = true, message = "Imagen marcada como principal" });
+                }
+                return Json(new { success = false, message = "No se pudo marcar la imagen" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al actualizar la imagen" });
+            }
+        }
+
+        // POST: Productos/ReordenarImagenes
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReordenarImagenes([FromBody] List<OrdenImagenDto> orden)
+        {
+            try
+            {
+                var result = await _productoService.ReordenarImagenesAsync(orden);
+                if (result)
+                {
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false });
+            }
+        }
+
         #region Métodos Auxiliares
 
-       
+
         private string ValidateImage(IFormFile file)
         {
             if (file == null) return null;
 
-            // Validar tamaño
+            
             if (file.Length > _maxFileSize)
             {
                 return "El archivo no puede superar los 5MB.";
@@ -324,7 +476,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 return "Solo se permiten archivos de imagen (.jpg, .jpeg, .png, .gif, .webp).";
             }
 
-            return null; // Válido
+            return null; 
         }
 
 
@@ -332,7 +484,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         {
             try
             {
-                var nombreArchivo = Guid.NewGuid() + ".jpg"; // 🔹 Siempre JPG
+                var nombreArchivo = Guid.NewGuid() + ".jpg"; 
                 var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
 
                 if (!Directory.Exists(rutaCarpeta))
@@ -344,7 +496,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
                 using var image = await Image.LoadAsync<Rgba32>(file.OpenReadStream());
 
-                // 🔹 Redimensionar a 800x800 con fondo blanco
+                // Redimensionar a 800x800 con fondo blanco
                 image.Mutate(x => x.Resize(new ResizeOptions
                 {
                     Size = new Size(800, 800),
@@ -353,10 +505,10 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     PadColor = Color.White
                 }));
 
-                // 🔹 Guardar siempre como JPG optimizado
+                // Guardar siempre como JPG 
                 var encoder = new JpegEncoder
                 {
-                    Quality = 85 // entre 70-90 es ideal: buena calidad y poco peso
+                    Quality = 85 
                 };
 
                 await image.SaveAsync(rutaArchivo, encoder);
@@ -369,7 +521,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-        // Cargar dropdowns de marcas y categorias/subcategorias
+       
         private async Task CargarDropdowns(ProductoViewModel vm = null)
         {
             try
@@ -411,6 +563,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 ViewBag.IdCategoria = new List<SelectListItem>();
             }
         }
+
 
         #endregion
     }

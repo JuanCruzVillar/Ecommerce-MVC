@@ -1,0 +1,228 @@
+﻿@model eCommerce.Entities.ViewModels.GestionImagenesViewModel
+
+@{
+    ViewData["Title"] = "Gestionar Imágenes";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-images"></i> Gestionar Imágenes</h2>
+            <p class="text-muted mb-0">Producto: <strong>@Model.NombreProducto</strong></p>
+        </div>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <!-- Subir nuevas imágenes -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Subir Imágenes</h5>
+        </div>
+        <div class="card-body">
+            <form id="formSubirImagenes" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="idProducto" value="@Model.IdProducto" />
+
+                <div class="mb-3">
+                    <label class="form-label">Seleccionar imágenes (máx. 5MB cada una)</label>
+                    <input type="file" class="form-control" name="imagenes" id="inputImagenes"
+                           multiple accept=".jpg,.jpeg,.png,.gif,.webp" />
+                    <div class="form-text">Formatos permitidos: JPG, PNG, GIF, WEBP</div>
+                </div>
+
+                <div id="previewContainer" class="row g-2 mb-3"></div>
+
+                <button type="submit" class="btn btn-primary" id="btnSubir">
+                    <i class="bi bi-upload"></i> Subir Imágenes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Imágenes actuales -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-image"></i> Imágenes del Producto (@Model.Imagenes.Count)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Imagenes.Any())
+            {
+                <div id="imagenesContainer" class="row g-3">
+                    @foreach (var imagen in Model.Imagenes)
+                    {
+                        <div class="col-md-3" data-id="@imagen.IdImagen">
+                            <div class="card h-100 imagen-card">
+                                <img src="@imagen.RutaImagen" class="card-img-top" alt="@imagen.NombreImagen"
+                                     style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    @if (imagen.EsPrincipal)
+                                    {
+                                        <span class="badge bg-success mb-2">
+                                            <i class="bi bi-star-fill"></i> Principal
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-outline-success mb-2 btn-marcar-principal"
+                                                data-id="@imagen.IdImagen">
+                                            <i class="bi bi-star"></i> Marcar como principal
+                                        </button>
+                                    }
+                                    <p class="small text-muted mb-0">Orden: @imagen.Orden</p>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-sm btn-danger w-100 btn-eliminar"
+                                            data-id="@imagen.IdImagen">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No hay imágenes cargadas para este producto.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <script>
+        const idProducto = @Model.IdProducto;
+
+        // Preview de imágenes antes de subir
+        $('#inputImagenes').on('change', function(e) {
+            const files = e.target.files;
+            $('#previewContainer').empty();
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#previewContainer').append(`
+                        <div class="col-md-2">
+                            <img src="${e.target.result}" class="img-thumbnail" style="height: 100px; object-fit: cover;">
+                        </div>
+                    `);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Subir imágenes
+        $('#formSubirImagenes').on('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const archivos = $('#inputImagenes')[0].files;
+
+            if (archivos.length === 0) {
+                Swal.fire('Atención', 'Selecciona al menos una imagen', 'warning');
+                return;
+            }
+
+            $('#btnSubir').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Subiendo...');
+
+            $.ajax({
+                url: '@Url.Action("SubirImagenes", "Productos", new { area = "Admin" })',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('¡Éxito!', response.message, 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Error al subir las imágenes', 'error');
+                },
+                complete: function() {
+                    $('#btnSubir').prop('disabled', false).html('<i class="bi bi-upload"></i> Subir Imágenes');
+                }
+            });
+        });
+
+        // Eliminar imagen
+        $(document).on('click', '.btn-eliminar', function() {
+            const idImagen = $(this).data('id');
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            Swal.fire({
+                title: '¿Eliminar imagen?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("EliminarImagen", "Productos", new { area = "Admin" })',
+                        type: 'POST',
+                        data: {
+                            __RequestVerificationToken: token,
+                            id: idImagen
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Eliminada', response.message, 'success').then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Error al eliminar la imagen', 'error');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Marcar como principal
+        $(document).on('click', '.btn-marcar-principal', function() {
+            const idImagen = $(this).data('id');
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: '@Url.Action("MarcarImagenPrincipal", "Productos", new { area = "Admin" })',
+                type: 'POST',
+                data: {
+                    __RequestVerificationToken: token,
+                    idImagen: idImagen,
+                    idProducto: idProducto
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Error al marcar la imagen', 'error');
+                }
+            });
+        });
+    </script>
+
+ } 
+
+                    

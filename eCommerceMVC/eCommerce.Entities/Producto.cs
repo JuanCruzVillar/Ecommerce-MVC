@@ -37,5 +37,9 @@ namespace eCommerce.Entities
         public virtual Categoria? IdCategoriaNavigation { get; set; }
 
         public virtual Marca? IdMarcaNavigation { get; set; }
+
+        public virtual ICollection<ProductoEspecificacion> Especificaciones { get; set; } = new List<ProductoEspecificacion>();
+
+        public virtual ICollection<ProductoImagen> Imagenes { get; set; } = new List<ProductoImagen>();
     }
 }

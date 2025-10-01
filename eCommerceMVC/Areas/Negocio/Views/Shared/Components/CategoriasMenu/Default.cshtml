@@ -4,17 +4,14 @@
 {
     @if (categoria.SubCategorias != null && categoria.SubCategorias.Any())
     {
-        
-        <li class="dropdown-item dropdown dropend">
-            <a class="dropdown-toggle d-flex justify-content-between align-items-center"
+        <li class="nav-item dropend">
+            <a class="dropdown-item dropdown-toggle"
                href="#"
                id="dropdown@(categoria.IdCategoria)"
-               role="button"
                data-bs-toggle="dropdown"
-               aria-expanded="false"
-               style="text-decoration: none; color: inherit;">
-                <span>@categoria.Descripcion</span>
-                <i class="bi bi-chevron-right ms-2"></i>
+               data-bs-auto-close="outside"
+               aria-expanded="false">
+                @categoria.Descripcion
             </a>
             <ul class="dropdown-menu" aria-labelledby="dropdown@(categoria.IdCategoria)">
                 @foreach (var subcategoria in categoria.SubCategorias)
@@ -31,7 +28,6 @@
     }
     else
     {
-        
         <li>
             <a class="dropdown-item"
                href="@Url.Action("Index", "Catalogo", new { area = "Negocio", categoria = categoria.IdCategoria })">
@@ -40,3 +36,71 @@
         </li>
     }
 }
+
+<style>
+    
+    .dropdown-item {
+        transition: background-color 0.2s ease, padding-left 0.2s ease;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            padding-left: 1.5rem;
+        }
+
+    
+    .dropend > .dropdown-item:hover {
+        background-color: #e9ecef;
+        font-weight: 500;
+    }
+
+    /* Submenu a la derecha */
+    .dropend > .dropdown-menu {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        margin-top: 0;
+        margin-left: 0.125rem;
+    }
+
+    /* Para pantallas pequeñas, el submenu aparece abajo */
+    @@media (max-width: 768px) {
+        .dropend > .dropdown-menu {
+            position: static !important;
+            margin-left: 1rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hover para mostrar submenu
+        const dropendItems = document.querySelectorAll('.dropdown-menu .dropend');
+
+        dropendItems.forEach(function(dropend) {
+            const toggle = dropend.querySelector('[data-bs-toggle="dropdown"]');
+            const menu = dropend.querySelector('.dropdown-menu');
+
+            if (toggle && menu) {
+                // Mostrar con hover
+                dropend.addEventListener('mouseenter', function() {
+                    menu.classList.add('show');
+                    toggle.setAttribute('aria-expanded', 'true');
+                });
+
+                // Ocultar 
+                dropend.addEventListener('mouseleave', function() {
+                    menu.classList.remove('show');
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+
+                
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    menu.classList.toggle('show');
+                });
+            }
+        });
+    });
+</script>

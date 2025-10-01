@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eCommerce.Data;
 
@@ -11,9 +12,11 @@ using eCommerce.Data;
 namespace eCommerceMVC.Migrations
 {
     [DbContext(typeof(DbecommerceContext))]
-    partial class DbecommerceContextModelSnapshot : ModelSnapshot
+    [Migration("20250930193442_AgregarProductoEspecificaciones")]
+    partial class AgregarProductoEspecificaciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -558,54 +561,6 @@ namespace eCommerceMVC.Migrations
                     b.ToTable("PRODUCTO_ESPECIFICACION", (string)null);
                 });
 
-            modelBuilder.Entity("eCommerce.Entities.ProductoImagen", b =>
-                {
-                    b.Property<int>("IdImagen")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdImagen"));
-
-                    b.Property<bool?>("Activo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool?>("EsPrincipal")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("FechaRegistro")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<int>("IdProducto")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NombreImagen")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<int?>("Orden")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.Property<string>("RutaImagen")
-                        .HasMaxLength(200)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("IdImagen");
-
-                    b.HasIndex("IdProducto");
-
-                    b.ToTable("PRODUCTO_IMAGEN", (string)null);
-                });
-
             modelBuilder.Entity("eCommerce.Entities.Usuario", b =>
                 {
                     b.Property<int>("IdUsuario")
@@ -883,18 +838,6 @@ namespace eCommerceMVC.Migrations
                     b.Navigation("IdProductoNavigation");
                 });
 
-            modelBuilder.Entity("eCommerce.Entities.ProductoImagen", b =>
-                {
-                    b.HasOne("eCommerce.Entities.Producto", "IdProductoNavigation")
-                        .WithMany("Imagenes")
-                        .HasForeignKey("IdProducto")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_PRODUCTO_IMAGEN_PRODUCTO");
-
-                    b.Navigation("IdProductoNavigation");
-                });
-
             modelBuilder.Entity("eCommerce.Entities.Usuario", b =>
                 {
                     b.HasOne("eCommerce.Entities.Cliente", "IdClienteNavigation")
@@ -994,8 +937,6 @@ namespace eCommerceMVC.Migrations
                     b.Navigation("DetalleVenta");
 
                     b.Navigation("Especificaciones");
-
-                    b.Navigation("Imagenes");
                 });
 
             modelBuilder.Entity("eCommerce.Entities.Usuario", b =>

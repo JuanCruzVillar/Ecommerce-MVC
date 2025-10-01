@@ -25,6 +25,20 @@
                     <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
                 </ul>
 
+                <!-- Buscador -->
+                <form class="d-flex me-3 position-relative" style="flex: 1; max-width: 500px;" method="get"
+                      asp-area="Negocio" asp-controller="Catalogo" asp-action="Index">
+                    <div class="input-group">
+                        <input class="form-control" type="search" name="busqueda" id="navbarBusqueda"
+                               placeholder="Buscar productos..." aria-label="Buscar">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    <div id="navbarSugerencias" class="list-group position-absolute w-100"
+                         style="top: 100%; z-index: 1050; display: none; max-height: 400px; overflow-y: auto;"></div>
+                </form>
+
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     @if (User.Identity.IsAuthenticated)
                     {
@@ -75,6 +89,23 @@
         </div>
     </nav>
 
+    <style>
+        #navbarSugerencias .list-group-item {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            #navbarSugerencias .list-group-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        #navbarSugerencias {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+
+   
+
 
     <!-- Navbar secundario -->
     <nav class="bg-white border-top border-bottom">
@@ -116,7 +147,9 @@
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 
     <script>
         // Confirmacion logout
@@ -148,7 +181,7 @@
 
             actualizarBadge();
 
-            // Actualizar cada 30 segundos (opcional)
+            // Actualizar cada 30 segundos 
             setInterval(actualizarBadge, 30000);
         });
 
@@ -198,6 +231,69 @@
                         menu.classList.remove('show');
                     }
                 });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
+            // Búsqueda con sugerencias en navbar
+            let timeoutId;
+            $('#navbarBusqueda').on('keyup', function(e) {
+                // Si presiona Enter, enviar el formulario
+                if (e.key === 'Enter') {
+                    return;
+                }
+
+                clearTimeout(timeoutId);
+                const termino = $(this).val();
+
+                if (termino.length < 2) {
+                    $('#navbarSugerencias').hide().empty();
+                    return;
+                }
+
+                timeoutId = setTimeout(function() {
+                    $.get('@Url.Action("BuscarAjax", "Catalogo", new { area = "Negocio" })',
+                        { termino: termino },
+                        function(data) {
+                            if (data.success && data.resultados.length > 0) {
+                                let html = '';
+                                data.resultados.forEach(function(p) {
+                                    html += `
+                                        <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio" })?id=${p.id}"
+                                           class="list-group-item list-group-item-action bg-white">
+                                            <div class="d-flex align-items-center">
+                                                <img src="${p.imagen || 'https://dummyimage.com/50x50/dee2e6/6c757d.jpg'}"
+                                                     class="me-2 rounded" style="width:50px;height:50px;object-fit:cover;">
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-bold">${p.nombre}</div>
+                                                    <small class="text-success fw-bold">$${p.precio}</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                                $('#navbarSugerencias').html(html).show();
+                            } else {
+                                $('#navbarSugerencias').hide().empty();
+                            }
+                        }
+                    );
+                }, 300);
+            });
+
+            // Ocultar sugerencias al hacer clic fuera
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#navbarBusqueda, #navbarSugerencias').length) {
+                    $('#navbarSugerencias').hide();
+                }
+            });
+
+            // Mostrar sugerencias al hacer foco si hay texto
+            $('#navbarBusqueda').on('focus', function() {
+                if ($(this).val().length >= 2 && $('#navbarSugerencias').children().length > 0) {
+                    $('#navbarSugerencias').show();
+                }
             });
         });
     </script>

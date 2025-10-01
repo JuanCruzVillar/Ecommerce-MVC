@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using eCommerce.Entities;
+using eCommerce.Entities.ViewModels;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using eCommerce.Entities;
 
 namespace eCommerce.Services.Interfaces
 {
@@ -12,5 +13,23 @@ namespace eCommerce.Services.Interfaces
         Task<bool> CreateAsync(Producto producto);
         Task<bool> UpdateAsync(Producto producto);
         Task<bool> DeleteAsync(int id);
+
+        Task<Producto> GetByIdWithEspecificacionesAsync(int id);
+
+        Task<Producto> GetByIdWithImagenesAsync(int id);
+
+        Task<bool> AgregarImagenAsync(ProductoImagen imagen);
+        Task<bool> EliminarImagenAsync(int idImagen);
+        Task<bool> MarcarImagenPrincipalAsync(int idImagen, int idProducto);
+        Task<bool> ReordenarImagenesAsync(List<OrdenImagenDto> orden);
+
+        Task<CatalogoFiltrosViewModel> BuscarProductosConFiltrosAsync(
+    string busqueda,
+    int? categoriaId,
+    int? marcaId,
+    decimal? precioMin,
+    decimal? precioMax,
+    string ordenamiento
+);
     }
 }

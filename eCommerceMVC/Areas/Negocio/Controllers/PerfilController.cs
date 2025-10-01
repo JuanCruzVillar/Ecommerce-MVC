@@ -25,6 +25,12 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
+
                 var cliente = await _context.Clientes
                     .Include(c => c.DireccionesEnvio.Where(d => d.Activo == true))
                     .Include(c => c.Venta)
@@ -52,7 +58,14 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
+
                 var cliente = await _context.Clientes
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.IdCliente == idCliente);
 
                 if (cliente == null)
@@ -69,14 +82,31 @@ namespace eCommerce.Areas.Negocio.Controllers
                 return RedirectToAction("Index");
             }
         }
+
         // POST: Perfil/Editar
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Editar(eCommerce.Entities.Cliente cliente)
+        public async Task<IActionResult> Editar(Entities.Cliente cliente)
         {
             try
             {
                 var idCliente = GetClienteId();
+
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
+
+                // Remover validaciones de campos que no se están editando
+                ModelState.Remove("Clave");
+                ModelState.Remove("FechaRegistro");
+
+                if (!ModelState.IsValid)
+                {
+                    TempData["Error"] = "Por favor verifica los campos del formulario";
+                    return View(cliente);
+                }
 
                 var clienteExistente = await _context.Clientes
                     .FirstOrDefaultAsync(c => c.IdCliente == idCliente);
@@ -87,24 +117,26 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // Actualizar los campos permitidos 
-                clienteExistente.Nombres = cliente.Nombres;
-                clienteExistente.Apellidos = cliente.Apellidos;
-                clienteExistente.Correo = cliente.Correo;
+                // Actualizar solo los campos permitidos
+                clienteExistente.Nombres = cliente.Nombres?.Trim();
+                clienteExistente.Apellidos = cliente.Apellidos?.Trim();
+                clienteExistente.Correo = cliente.Correo?.Trim();
 
+                _context.Update(clienteExistente);
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Perfil actualizado exitosamente";
                 return RedirectToAction("Index");
             }
+            catch (DbUpdateException dbEx)
+            {
+                TempData["Error"] = "Error al actualizar la base de datos: " + dbEx.InnerException?.Message;
+                return View(cliente);
+            }
             catch (Exception ex)
             {
                 TempData["Error"] = "Error al actualizar el perfil: " + ex.Message;
-
-               
-                var idCliente = GetClienteId();
-                var clienteReload = await _context.Clientes.FirstOrDefaultAsync(c => c.IdCliente == idCliente);
-                return View(clienteReload ?? cliente);
+                return View(cliente);
             }
         }
 
@@ -114,6 +146,12 @@ namespace eCommerce.Areas.Negocio.Controllers
             try
             {
                 var idCliente = GetClienteId();
+
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
 
                 var compras = await _context.Ventas
                     .Include(v => v.DetalleVenta)
@@ -139,6 +177,12 @@ namespace eCommerce.Areas.Negocio.Controllers
             try
             {
                 var idCliente = GetClienteId();
+
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
 
                 var venta = await _context.Ventas
                     .Include(v => v.DetalleVenta)
@@ -174,6 +218,12 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
+
                 var direcciones = await _context.DireccionesEnvio
                     .Where(d => d.IdCliente == idCliente && d.Activo == true)
                     .OrderByDescending(d => d.EsDireccionPrincipal)
@@ -198,6 +248,12 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
+
                 var direccion = await _context.DireccionesEnvio
                     .FirstOrDefaultAsync(d => d.IdDireccionEnvio == id && d.IdCliente == idCliente);
 
@@ -207,8 +263,9 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("MisDirecciones");
                 }
 
-                
+                // Soft delete
                 direccion.Activo = false;
+                _context.Update(direccion);
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Dirección eliminada exitosamente";
@@ -230,11 +287,18 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
-                
+                if (idCliente == 0)
+                {
+                    TempData["Error"] = "No se pudo identificar el cliente";
+                    return RedirectToAction("Index", "Catalogo");
+                }
+
+                // Obtener todas las direcciones del cliente
                 var direccionesCliente = await _context.DireccionesEnvio
                     .Where(d => d.IdCliente == idCliente && d.Activo == true)
                     .ToListAsync();
 
+                // Desmarcar todas como predeterminadas
                 foreach (var dir in direccionesCliente)
                 {
                     dir.EsDireccionPrincipal = false;
@@ -266,17 +330,43 @@ namespace eCommerce.Areas.Negocio.Controllers
 
         private int GetClienteId()
         {
-            var usuarioIdClaim = User.FindFirst("IdUsuario")?.Value;
-            if (int.TryParse(usuarioIdClaim, out int usuarioId))
+            try
             {
-                
-                var usuario = _context.Usuarios
-                    .AsNoTracking()
-                    .FirstOrDefault(u => u.IdUsuario == usuarioId);
+                // Primero intentar obtener directamente el IdCliente del claim
+                var clienteIdClaim = User.FindFirst("IdCliente")?.Value;
+                if (!string.IsNullOrEmpty(clienteIdClaim) && int.TryParse(clienteIdClaim, out int clienteIdDirect))
+                {
+                    return clienteIdDirect;
+                }
 
-                return usuario?.IdCliente ?? 0;
+                // Si no existe, buscar por IdUsuario
+                var usuarioIdClaim = User.FindFirst("IdUsuario")?.Value;
+                if (!string.IsNullOrEmpty(usuarioIdClaim) && int.TryParse(usuarioIdClaim, out int usuarioId))
+                {
+                    var usuario = _context.Usuarios
+                        .AsNoTracking()
+                        .FirstOrDefault(u => u.IdUsuario == usuarioId);
+
+                    return usuario?.IdCliente ?? 0;
+                }
+
+                // Como último recurso, intentar con el NameIdentifier
+                var nameIdentifier = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(nameIdentifier) && int.TryParse(nameIdentifier, out int userId))
+                {
+                    var usuario = _context.Usuarios
+                        .AsNoTracking()
+                        .FirstOrDefault(u => u.IdUsuario == userId);
+
+                    return usuario?.IdCliente ?? 0;
+                }
+
+                return 0;
             }
-            return 0;
+            catch (Exception)
+            {
+                return 0;
+            }
         }
 
         #endregion

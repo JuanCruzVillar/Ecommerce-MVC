@@ -5,7 +5,27 @@
     Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
 }
 
+@* DIAGNÓSTICO TEMPORAL - ELIMINAR EN PRODUCCIÓN *@
+@if (Model == null)
+{
+    <div class="alert alert-danger m-5">
+        <h3>ERROR: El modelo es NULL</h3>
+        <p><strong>Usuario autenticado:</strong> @User.Identity.IsAuthenticated</p>
+        <p><strong>Claims:</strong></p>
+        <ul>
+            @foreach (var claim in User.Claims)
+            {
+                <li><strong>@claim.Type:</strong> @claim.Value</li>
+            }
+        </ul>
+        <p><strong>TempData Error:</strong> @TempData["Error"]</p>
+    </div>
+    return;
+}
+@* FIN DIAGNÓSTICO *@
+
 <div class="container my-5">
+   
     <div class="row">
         <div class="col-md-3">
             <!-- Sidebar de navegación -->
@@ -31,7 +51,7 @@
                     <form asp-action="Editar" method="post">
                         @Html.AntiForgeryToken()
 
-                        <!-- Campo oculto para mantener el ID -->
+                        
                         <input type="hidden" asp-for="IdCliente" />
 
                         <div class="alert alert-info">

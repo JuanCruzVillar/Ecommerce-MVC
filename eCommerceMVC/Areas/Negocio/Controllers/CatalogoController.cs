@@ -17,21 +17,27 @@ public class CatalogoController : Controller
     }
 
     // Lista de productos
-    public async Task<IActionResult> Index(int? categoria = null)
+    public async Task<IActionResult> Index(int? categoria = null, string busqueda = null)
     {
         var productos = await _productoService.GetAllAsync();
 
+        // Filtro por búsqueda
+        if (!string.IsNullOrWhiteSpace(busqueda))
+        {
+            productos = productos.Where(p =>
+                p.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+                (p.Descripcion != null && p.Descripcion.Contains(busqueda, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+        }
+
         if (categoria.HasValue)
         {
-            // Filtrar productos por categoría y  subcategorías
             var categorias = await _categoriaService.GetAllAsync();
             var categoriasHijas = categorias
                 .Where(c => c.IdCategoriaPadre == categoria.Value)
                 .Select(c => c.IdCategoria)
                 .ToList();
-
-            categoriasHijas.Add(categoria.Value); 
-
+            categoriasHijas.Add(categoria.Value);
             productos = productos.Where(p => categoriasHijas.Contains(p.IdCategoria ?? 0)).ToList();
         }
 
@@ -55,11 +61,47 @@ public class CatalogoController : Controller
         return View(viewModels);
     }
 
-    // Detalle de producto
+
+    [HttpGet]
+    public async Task<IActionResult> BuscarAjax(string termino)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(termino) || termino.Length < 2)
+            {
+                return Json(new { success = false, message = "Mínimo 2 caracteres" });
+            }
+
+            var productos = await _productoService.GetAllAsync();
+            var resultados = productos
+                .Where(p => p.Activo == true &&
+                       (p.Nombre.ToLower().Contains(termino.ToLower()) ||
+                        p.Descripcion.ToLower().Contains(termino.ToLower())))
+                .Take(5)
+                .Select(p => new
+                {
+                    id = p.IdProducto,
+                    nombre = p.Nombre,
+                    precio = p.Precio?.ToString("N2"),
+                    imagen = p.RutaImagen
+                })
+                .ToList();
+
+            return Json(new { success = true, resultados });
+        }
+        catch
+        {
+            return Json(new { success = false, message = "Error en la búsqueda" });
+        }
+    }
+
     public async Task<IActionResult> Detalle(int id)
     {
-        var producto = await _productoService.GetByIdAsync(id);
-        if (producto == null) return NotFound();
+        // Usar el nuevo método que incluye imágenes
+        var producto = await _productoService.GetByIdWithImagenesAsync(id);
+
+        if (producto == null)
+            return NotFound();
 
         var productoVM = new DetalleProductoViewModel
         {
@@ -71,11 +113,10 @@ public class CatalogoController : Controller
             IdCategoria = producto.IdCategoria
         };
 
-        
         var todosProductos = await _productoService.GetAllAsync();
         var relacionados = todosProductos
             .Where(p => p.IdCategoria == producto.IdCategoria && p.IdProducto != producto.IdProducto)
-            .Take(4) // Mostrar 4 productos relacionados
+            .Take(4)
             .Select(p => new DetalleProductoViewModel
             {
                 IdProducto = p.IdProducto,
@@ -87,13 +128,39 @@ public class CatalogoController : Controller
             })
             .ToList();
 
-        // Crear el ViewModel de la página
+        // Mapear especificaciones
+        var especificaciones = producto.Especificaciones
+            .OrderBy(e => e.Orden)
+            .Select(e => new ProductoEspecificacionViewModel
+            {
+                Clave = e.Clave,
+                Valor = e.Valor,
+                Orden = e.Orden ?? 0
+            })
+            .ToList();
+
+        // Mapear imágenes
+        var imagenes = producto.Imagenes
+            .OrderBy(i => i.Orden)
+            .Select(i => new ProductoImagenViewModel
+            {
+                IdImagen = i.IdImagen,
+                RutaImagen = i.RutaImagen,
+                EsPrincipal = i.EsPrincipal ?? false,
+                Orden = i.Orden ?? 0
+            })
+            .ToList();
+
         var viewModel = new DetalleProductoPaginaViewModel
         {
             Producto = productoVM,
-            Relacionados = relacionados
+            Relacionados = relacionados,
+            Especificaciones = especificaciones,
+            Imagenes = imagenes
         };
 
         return View(viewModel);
     }
+
+
 }

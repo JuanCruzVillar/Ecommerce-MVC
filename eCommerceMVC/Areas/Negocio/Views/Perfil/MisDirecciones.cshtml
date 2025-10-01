@@ -28,7 +28,7 @@
                     <h4 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Mis Direcciones de Envío</h4>
                 </div>
                 <div class="card-body">
-                    @if (Model.Any())
+                    @if (Model != null && Model.Any())
                     {
                         <div class="row">
                             @foreach (var direccion in Model)
@@ -67,6 +67,7 @@
                                                 @if (direccion.EsDireccionPrincipal != true)
                                                 {
                                                     <form asp-action="EstablecerPredeterminada" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
                                                         <input type="hidden" name="id" value="@direccion.IdDireccionEnvio" />
                                                         <button type="submit" class="btn btn-sm btn-outline-primary">
                                                             <i class="bi bi-star me-1"></i>Principal
@@ -80,6 +81,7 @@
                                                     </span>
                                                 }
                                                 <form asp-action="EliminarDireccion" method="post" class="d-inline form-eliminar-direccion">
+                                                    @Html.AntiForgeryToken()
                                                     <input type="hidden" name="id" value="@direccion.IdDireccionEnvio" />
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">
                                                         <i class="bi bi-trash me-1"></i>Eliminar
@@ -89,10 +91,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            }            </div>
-                                       
                             }
-                       
+                        </div>
 
                         <div class="alert alert-info mt-3">
                             <i class="bi bi-info-circle me-2"></i>

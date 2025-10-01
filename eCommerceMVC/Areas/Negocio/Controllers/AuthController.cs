@@ -57,6 +57,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
              new Claim(ClaimTypes.Name, usuario.Nombres),
              new Claim(ClaimTypes.Email, usuario.Correo),
              new Claim(ClaimTypes.Role, usuario.Rol),
+              new Claim("IdCliente", usuario.IdCliente.ToString()),
             new Claim("IdUsuario", usuario.IdUsuario.ToString())
              };
 
