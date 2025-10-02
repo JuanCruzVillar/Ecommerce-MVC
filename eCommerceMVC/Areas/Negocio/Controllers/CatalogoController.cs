@@ -141,15 +141,16 @@ public class CatalogoController : Controller
 
         // Mapear imágenes
         var imagenes = producto.Imagenes
-            .OrderBy(i => i.Orden)
-            .Select(i => new ProductoImagenViewModel
-            {
-                IdImagen = i.IdImagen,
-                RutaImagen = i.RutaImagen,
-                EsPrincipal = i.EsPrincipal ?? false,
-                Orden = i.Orden ?? 0
-            })
-            .ToList();
+     .OrderByDescending(i => i.EsPrincipal ?? false) // Principal primero
+     .ThenBy(i => i.Orden) // Luego por orden
+     .Select(i => new ProductoImagenViewModel
+     {
+         IdImagen = i.IdImagen,
+         RutaImagen = i.RutaImagen,
+         EsPrincipal = i.EsPrincipal ?? false,
+         Orden = i.Orden ?? 0
+     })
+     .ToList();
 
         var viewModel = new DetalleProductoPaginaViewModel
         {

@@ -484,7 +484,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         {
             try
             {
-                var nombreArchivo = Guid.NewGuid() + ".jpg"; 
+                var nombreArchivo = Guid.NewGuid() + ".jpg";
                 var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
 
                 if (!Directory.Exists(rutaCarpeta))
@@ -496,22 +496,30 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
                 using var image = await Image.LoadAsync<Rgba32>(file.OpenReadStream());
 
-                // Redimensionar a 800x800 con fondo blanco
+                // Crear imagen base con fondo blanco
+                using var outputImage = new Image<Rgba32>(800, 800, Color.White);
+
+                // Redimensionar manteniendo aspecto
                 image.Mutate(x => x.Resize(new ResizeOptions
                 {
                     Size = new Size(800, 800),
-                    Mode = ResizeMode.Pad,
-                    Position = AnchorPositionMode.Center,
-                    PadColor = Color.White
+                    Mode = ResizeMode.Max // Mantiene aspecto, no recorta
                 }));
 
-                // Guardar siempre como JPG 
+                // Calcular posición para centrar
+                var x = (800 - image.Width) / 2;
+                var y = (800 - image.Height) / 2;
+
+                // Dibujar imagen sobre fondo blanco
+                outputImage.Mutate(ctx => ctx.DrawImage(image, new Point(x, y), 1f));
+
+                // Guardar como JPG con calidad 85
                 var encoder = new JpegEncoder
                 {
-                    Quality = 85 
+                    Quality = 95
                 };
 
-                await image.SaveAsync(rutaArchivo, encoder);
+                await outputImage.SaveAsync(rutaArchivo, encoder);
 
                 return "/images/" + nombreArchivo;
             }
@@ -521,7 +529,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-       
+
         private async Task CargarDropdowns(ProductoViewModel vm = null)
         {
             try

@@ -5,32 +5,11 @@
     Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
 }
 
-@* DIAGNÓSTICO TEMPORAL - ELIMINAR EN PRODUCCIÓN *@
-@if (Model == null)
-{
-    <div class="alert alert-danger m-5">
-        <h3>ERROR: El modelo es NULL</h3>
-        <p><strong>Usuario autenticado:</strong> @User.Identity.IsAuthenticated</p>
-        <p><strong>Claims:</strong></p>
-        <ul>
-            @foreach (var claim in User.Claims)
-            {
-                <li><strong>@claim.Type:</strong> @claim.Value</li>
-            }
-        </ul>
-        <p><strong>TempData Error:</strong> @TempData["Error"]</p>
-    </div>
-    return;
-}
-@* FIN DIAGNÓSTICO *@
-
 <div class="container my-5">
-   
     <div class="row">
         <div class="col-md-3">
-            <!-- Sidebar de navegación -->
             <div class="list-group">
-                <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action active">
+                <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action">
                     <i class="bi bi-person me-2"></i>Mi Perfil
                 </a>
                 <a href="@Url.Action("MisCompras", "Perfil")" class="list-group-item list-group-item-action">
@@ -51,39 +30,44 @@
                     <form asp-action="Editar" method="post">
                         @Html.AntiForgeryToken()
 
-                        
-                        <input type="hidden" asp-for="IdCliente" />
-
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            Actualiza tu información personal. Los cambios se verán reflejados inmediatamente.
+                            Actualiza tu información personal.
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
-                                <input asp-for="Nombres" class="form-control" placeholder="Ingrese sus nombres" required value="@Model.Nombres" />
-                                <span asp-validation-for="Nombres" class="text-danger"></span>
+                                <label for="Nombres" class="form-label">Nombres <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="Nombres"
+                                       name="Nombres"
+                                       class="form-control"
+                                       value="@Model.Nombres"
+                                       placeholder="Ingrese sus nombres"
+                                       required />
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
-                                <input asp-for="Apellidos" class="form-control" placeholder="Ingrese sus apellidos" required value="@Model.Apellidos" />
-                                <span asp-validation-for="Apellidos" class="text-danger"></span>
+                                <label for="Apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="Apellidos"
+                                       name="Apellidos"
+                                       class="form-control"
+                                       value="@Model.Apellidos"
+                                       placeholder="Ingrese sus apellidos"
+                                       required />
                             </div>
 
                             <div class="col-md-12 mb-3">
-                                <label asp-for="Correo" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
-                                <input asp-for="Correo" type="email" class="form-control" placeholder="correo@ejemplo.com" required value="@Model.Correo" />
-                                <span asp-validation-for="Correo" class="text-danger"></span>
-                                <small class="text-muted">Este correo se usará para notificaciones de tus pedidos</small>
-                            </div>
-
-                            <div class="col-md-12 mb-3">
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-shield-lock me-2"></i>
-                                    <strong>Cambio de contraseña:</strong> Si deseas cambiar tu contraseña, por favor usa la opción "Olvidé mi contraseña" en el inicio de sesión.
-                                </div>
+                                <label for="Correo" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                                <input type="email"
+                                       id="Correo"
+                                       name="Correo"
+                                       class="form-control"
+                                       value="@Model.Correo"
+                                       placeholder="correo@ejemplo.com"
+                                       required />
+                                <small class="text-muted">Este correo se usará para notificaciones</small>
                             </div>
                         </div>
 
@@ -99,18 +83,13 @@
                 </div>
             </div>
 
-            <!-- Información adicional -->
             <div class="card shadow mt-4">
                 <div class="card-header bg-light">
                     <h6 class="mb-0"><i class="bi bi-shield-check me-2"></i>Seguridad de la Cuenta</h6>
                 </div>
                 <div class="card-body">
                     <p class="mb-2"><strong>Fecha de registro:</strong> @Model.FechaRegistro?.ToString("dd/MM/yyyy")</p>
-                    <p class="mb-3 text-muted small">Tu cuenta está protegida. Nunca compartas tu contraseña con nadie.</p>
-                    <div class="alert alert-light mb-0">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <small>Para mayor seguridad, te recomendamos usar una contraseña fuerte que contenga letras, números y caracteres especiales.</small>
-                    </div>
+                    <p class="mb-0 text-muted small">Tu cuenta está protegida.</p>
                 </div>
             </div>
         </div>

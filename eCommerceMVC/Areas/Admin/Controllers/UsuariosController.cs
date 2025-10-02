@@ -119,6 +119,19 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
             await _usuarioService.UpdateAsync(usuarioDb);
 
+            // NUEVO: Sincronizar con el Cliente si existe
+            if (usuario.IdCliente.HasValue)
+            {
+                var cliente = await _clienteService.GetByIdAsync(usuario.IdCliente.Value);
+                if (cliente != null)
+                {
+                    cliente.Nombres = usuario.Nombres;
+                    cliente.Apellidos = usuario.Apellidos;
+                    cliente.Correo = usuario.Correo;
+                    await _clienteService.UpdateAsync(cliente);
+                }
+            }
+
             TempData["Success"] = "Usuario actualizado correctamente.";
             return RedirectToAction(nameof(Index));
         }

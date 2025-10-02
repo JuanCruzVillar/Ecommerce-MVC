@@ -149,8 +149,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-
     <script>
         // Confirmacion logout
         document.getElementById("logoutLink")?.addEventListener("click", function(e){
@@ -180,66 +178,11 @@
             }
 
             actualizarBadge();
-
-            // Actualizar cada 30 segundos 
             setInterval(actualizarBadge, 30000);
-        });
 
-        // Mensajes de éxito/error con SweetAlert2
-        @if (TempData["Success"] != null)
-        {
-                <text>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: '@TempData["Success"]',
-                    confirmButtonColor: '#3085d6'
-                });
-                </text>
-        }
-
-        @if (TempData["Error"] != null)
-        {
-                <text>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '@TempData["Error"]',
-                    confirmButtonColor: '#3085d6'
-                });
-                </text>
-        }
-    </script>
-    <script>
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            var dropdowns = document.querySelectorAll('.dropdown-item.dropdown');
-
-            dropdowns.forEach(function(dropdown) {
-                dropdown.addEventListener('mouseenter', function() {
-                    var toggle = this.querySelector('.dropdown-toggle');
-                    var menu = this.querySelector('.dropdown-menu');
-
-                    if (toggle && menu) {
-                        menu.classList.add('show');
-                    }
-                });
-
-                dropdown.addEventListener('mouseleave', function() {
-                    var menu = this.querySelector('.dropdown-menu');
-                    if (menu) {
-                        menu.classList.remove('show');
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function(){
             // Búsqueda con sugerencias en navbar
             let timeoutId;
             $('#navbarBusqueda').on('keyup', function(e) {
-                // Si presiona Enter, enviar el formulario
                 if (e.key === 'Enter') {
                     return;
                 }
@@ -296,7 +239,67 @@
                 }
             });
         });
+
+        // Mensajes de éxito/error con SweetAlert2
+        @if (TempData["Success"] != null)
+        {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: '@TempData["Success"]',
+                    confirmButtonColor: '#3085d6'
+                });
+                </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@TempData["Error"]',
+                    confirmButtonColor: '#3085d6'
+                });
+                </text>
+        }
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Para submenús de categorías (dropend) - solo hover adicional
+            const dropendItems = document.querySelectorAll('.dropdown-menu .dropend');
+
+            dropendItems.forEach(function(dropend) {
+                const toggle = dropend.querySelector('[data-bs-toggle="dropdown"]');
+                const menu = dropend.querySelector('.dropdown-menu');
+
+                if (toggle && menu) {
+                    // Hover para mostrar
+                    dropend.addEventListener('mouseenter', function() {
+                        menu.classList.add('show');
+                        toggle.setAttribute('aria-expanded', 'true');
+                    });
+
+                    // Hover para ocultar
+                    dropend.addEventListener('mouseleave', function() {
+                        menu.classList.remove('show');
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+
+                    // Click también funciona
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        menu.classList.toggle('show');
+                    });
+                }
+            });
+        });
+    </script>
+
     @RenderSection("Scripts", required: false)
+   
 </body>
 </html>

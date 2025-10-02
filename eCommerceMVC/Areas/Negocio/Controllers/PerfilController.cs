@@ -25,6 +25,8 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
+                Console.WriteLine($"DEBUG - IdCliente obtenido: {idCliente}");
+
                 if (idCliente == 0)
                 {
                     TempData["Error"] = "No se pudo identificar el cliente";
@@ -36,6 +38,13 @@ namespace eCommerce.Areas.Negocio.Controllers
                     .Include(c => c.Venta)
                     .FirstOrDefaultAsync(c => c.IdCliente == idCliente);
 
+                Console.WriteLine($"DEBUG - Cliente encontrado: {cliente != null}");
+
+                if (cliente != null)
+                {
+                    Console.WriteLine($"DEBUG - Nombres: {cliente.Nombres}, Apellidos: {cliente.Apellidos}");
+                }
+
                 if (cliente == null)
                 {
                     TempData["Error"] = "No se encontró el perfil del usuario";
@@ -46,7 +55,8 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Error al cargar el perfil: " + ex.Message;
+                Console.WriteLine($"DEBUG - Error en Index: {ex.Message}");
+                TempData["Error"] = $"Error al cargar el perfil: {ex.Message}";
                 return RedirectToAction("Index", "Catalogo");
             }
         }
@@ -90,6 +100,9 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
+                // DEBUG: Ver qué datos llegan
+                Console.WriteLine($"DEBUG - Datos recibidos: Nombres={cliente.Nombres}, Apellidos={cliente.Apellidos}, Correo={cliente.Correo}");
+
                 var idCliente = GetClienteId();
 
                 if (idCliente == 0)
@@ -98,15 +111,8 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("Index", "Catalogo");
                 }
 
-                // Remover validaciones de campos que no se están editando
-                ModelState.Remove("Clave");
+                ModelState.Remove("Contraseña");
                 ModelState.Remove("FechaRegistro");
-
-                if (!ModelState.IsValid)
-                {
-                    TempData["Error"] = "Por favor verifica los campos del formulario";
-                    return View(cliente);
-                }
 
                 var clienteExistente = await _context.Clientes
                     .FirstOrDefaultAsync(c => c.IdCliente == idCliente);
@@ -117,25 +123,24 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // Actualizar solo los campos permitidos
+                Console.WriteLine($"DEBUG - Datos antes: Nombres={clienteExistente.Nombres}, Apellidos={clienteExistente.Apellidos}");
+
+                // Actualizar
                 clienteExistente.Nombres = cliente.Nombres?.Trim();
                 clienteExistente.Apellidos = cliente.Apellidos?.Trim();
                 clienteExistente.Correo = cliente.Correo?.Trim();
 
-                _context.Update(clienteExistente);
+                Console.WriteLine($"DEBUG - Datos después: Nombres={clienteExistente.Nombres}, Apellidos={clienteExistente.Apellidos}");
+
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Perfil actualizado exitosamente";
                 return RedirectToAction("Index");
             }
-            catch (DbUpdateException dbEx)
-            {
-                TempData["Error"] = "Error al actualizar la base de datos: " + dbEx.InnerException?.Message;
-                return View(cliente);
-            }
             catch (Exception ex)
             {
-                TempData["Error"] = "Error al actualizar el perfil: " + ex.Message;
+                var errorMsg = ex.InnerException?.Message ?? ex.Message;
+                TempData["Error"] = $"Error: {errorMsg}";
                 return View(cliente);
             }
         }
