@@ -42,13 +42,26 @@ namespace eCommerce.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var usuario = await GetByIdAsync(id);
-            if (usuario != null)
+            try
             {
+                var usuario = await GetByIdAsync(id);
+                if (usuario == null) return false;
+
+                // Eliminar registros relacionados en CARRITO
+                var carritos = _context.Carritos.Where(c => c.IdUsuario == id);
+                _context.Carritos.RemoveRange(carritos);
+
+                // Eliminar el usuario
                 _context.Usuarios.Remove(usuario);
                 await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

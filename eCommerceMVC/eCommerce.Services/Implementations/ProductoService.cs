@@ -86,6 +86,15 @@ namespace eCommerce.Services.Implementations
             return await _productoRepository.ReordenarImagenesAsync(orden);
         }
 
+        
+
+          public async Task<int> GetCantidadPorMarcaAsync(int idMarca)
+            {
+                var productos = await _productoRepository.GetAllAsync();
+                return productos.Count(p => p.IdMarca == idMarca);
+            }
+        
+
         public async Task<CatalogoFiltrosViewModel> BuscarProductosConFiltrosAsync(
     string busqueda,
     int? categoriaId,

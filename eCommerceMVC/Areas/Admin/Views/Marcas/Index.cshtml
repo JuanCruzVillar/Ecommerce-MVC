@@ -1,56 +1,87 @@
 ﻿@using eCommerce.Entities
 @model IEnumerable<Marca>
-
 @{
-    ViewData["Title"] = "Gestión de Marcas";
+    ViewData["Title"] = "Marcas";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-award"></i> Gestión de Marcas</h2>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Nueva Marca
-        </a>
-    </div>
-
-    
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h6>Total Marcas</h6>
-                    <h4>@Model.Count()</h4>
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">
+                        <i class="bi bi-award text-primary me-2"></i>Gestión de Marcas
+                    </h2>
+                    <p class="text-muted mb-0">Administra las marcas de productos</p>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h6>Marcas Activas</h6>
-                    <h4>@Model.Count(m => m.Activo)</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-secondary text-white">
-                <div class="card-body">
-                    <h6>Marcas Inactivas</h6>
-                    <h4>@Model.Count(m => !m.Activo)</h4>
-                </div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Nueva Marca
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
+    <!-- Estadísticas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-white-50 mb-1">Total Marcas</h6>
+                    <h3 class="mb-0 fw-bold">@Model.Count()</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-white-50 mb-1">Marcas Activas</h6>
+                    <h3 class="mb-0 fw-bold">@Model.Count(m => m.Activo == true)</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-secondary text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-white-50 mb-1">Marcas Inactivas</h6>
+                    <h3 class="mb-0 fw-bold">@Model.Count(m => m.Activo == false)</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null || TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@(TempData["Error"] ?? TempData["ErrorMessage"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Tabla -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-table me-2"></i>Listado de Marcas
+            </h5>
+        </div>
+        <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
+                    <thead class="table-light">
                         <tr>
                             <th>Marca</th>
                             <th class="text-center">Estado</th>
-                            <th class="text-center">Fecha Registro</th>
-                            <th class="text-center">Productos</th>
+                            <th>Fecha Registro</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -61,39 +92,21 @@
                             {
                                 <tr>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-award text-primary me-2"></i>
-                                            <strong>@marca.Descripcion</strong>
-                                        </div>
+                                        <i class="bi bi-award text-primary me-2"></i>
+                                        <strong>@marca.Descripcion</strong>
                                     </td>
                                     <td class="text-center">
                                         <span class="badge @(marca.Activo ? "bg-success" : "bg-secondary")">
                                             @(marca.Activo ? "Activo" : "Inactivo")
                                         </span>
                                     </td>
+                                    <td><small class="text-muted">@(marca.FechaRegistro.ToString("dd/MM/yyyy") ?? "—")</small></td>
                                     <td class="text-center">
-                                        <small class="text-muted">
-                                            @(marca.FechaRegistro.ToString("dd/MM/yyyy") ?? "—")
-                                        </small>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="text-muted">—</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="Details" asp-route-id="@marca.IdMarca"
-                                               class="btn btn-sm btn-outline-info" title="Ver detalles">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a asp-action="Edit" asp-route-id="@marca.IdMarca"
-                                               class="btn btn-sm btn-outline-warning" title="Editar">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <form asp-action="Delete" asp-route-id="@marca.IdMarca" method="post"
-                                                  class="d-inline form-eliminar" data-nombre="@marca.Descripcion">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Details" asp-route-id="@marca.IdMarca" class="btn btn-outline-info" title="Ver"><i class="bi bi-eye"></i></a>
+                                            <a asp-action="Edit" asp-route-id="@marca.IdMarca" class="btn btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                            <form asp-action="Delete" asp-route-id="@marca.IdMarca" method="post" class="d-inline form-eliminar" data-nombre="@marca.Descripcion">
+                                                <button type="submit" class="btn btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
                                             </form>
                                         </div>
                                     </td>
@@ -103,14 +116,11 @@
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    <i class="bi bi-award-fill display-4"></i>
-                                    <br>
+                                <td colspan="4" class="text-center text-muted py-5">
+                                    <i class="bi bi-award display-4 d-block mb-3"></i>
                                     No hay marcas registradas.
                                     <br>
-                                    <a asp-action="Create" class="btn btn-primary btn-sm mt-2">
-                                        Crear primera marca
-                                    </a>
+                                    <a asp-action="Create" class="btn btn-primary btn-sm mt-3">Crear primera marca</a>
                                 </td>
                             </tr>
                         }
@@ -124,91 +134,61 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            // SweetAlert de error
-            @if (TempData["Error"] != null)
-            {
-                        <text>
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: '@Html.Raw(TempData["Error"])',
-                                confirmButtonColor: '#dc3545'
-                            });
-                        </text>
-            }
-
-            // SweetAlert de exito
+        $(document).ready(function () {
             @if (TempData["Success"] != null)
             {
-                        <text>
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Éxito!',
-                                text: '@Html.Raw(TempData["Success"])',
-                                confirmButtonColor: '#198754',
-                                timer: 3000,
-                                timerProgressBar: true
-                            });
-                        </text>
+                    <text>
+                    Swal.fire({ icon: 'success', title: '¡Éxito!', text: '@Html.Raw(TempData["Success"])', timer: 3000, showConfirmButton: false });
+                    </text>
             }
-
-            
-            @if (TempData["ErrorMessage"] != null)
+            @if (TempData["Error"] != null || TempData["ErrorMessage"] != null)
             {
-                        <text>
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: '@Html.Raw(TempData["ErrorMessage"])',
-                                confirmButtonColor: '#dc3545'
-                            });
-                        </text>
+                    <text>
+                    Swal.fire({ icon: 'error', title: 'Error', text: '@Html.Raw(TempData["Error"] ?? TempData["ErrorMessage"])' });
+                    </text>
             }
-
-            // Confirmacion eliminacion
-            const formsEliminar = document.querySelectorAll(".form-eliminar");
-            formsEliminar.forEach(form => {
-                form.addEventListener("submit", function (e) {
-                    e.preventDefault();
-
-                    const nombreMarca = this.dataset.nombre;
-
-                    Swal.fire({
-                        title: '¿Confirmar eliminación?',
-                        html: `¿Estás seguro de eliminar la marca <strong>"${nombreMarca}"</strong>?<br><small class="text-muted">Esta acción no se puede deshacer.</small>`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#dc3545',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar',
-                        focusCancel: true,
-                        reverseButtons: true
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            this.submit();
-                        }
-                    });
-                });
+            $('.form-eliminar').on('submit', function (e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: '¿Confirmar eliminación?',
+                    text: `¿Eliminar la marca "${$(this).data('nombre')}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => { if (result.isConfirmed) form.submit(); });
             });
+            setTimeout(function () { $('.alert').fadeOut('slow'); }, 5000);
         });
     </script>
+    <style>
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            padding: 0.4em 0.7em;
+            font-weight: 500;
+        }
+
+        .card {
+            border-radius: 0.5rem;
+        }
+    </style>
 }
-
-<style>
-    .btn-group .btn {
-        border-radius: 0.25rem;
-        margin: 0 1px;
-    }
-
-    .table-responsive {
-        border-radius: 0.375rem;
-    }
-
-    
-    .btn-group form {
-        display: inline-block;
-    }
-</style>

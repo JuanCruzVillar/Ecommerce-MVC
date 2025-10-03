@@ -1,7 +1,9 @@
 ﻿using eCommerce.Entities;
+using eCommerce.Services.Implementations;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace eCommerceMVC.Areas.Admin.Controllers
@@ -11,10 +13,13 @@ namespace eCommerceMVC.Areas.Admin.Controllers
     public class MarcasController : Controller
     {
         private readonly IMarcaService _marcaService;
+        private readonly IProductoService _productoService;
 
-        public MarcasController(IMarcaService marcaService)
+        public MarcasController(IMarcaService marcaService, IProductoService productoService)
         {
             _marcaService = marcaService;
+            _productoService = productoService;
+           
         }
         // GET: Marcas
         public async Task<IActionResult> Index()
@@ -30,6 +35,13 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
             var marca = await _marcaService.GetByIdAsync(id.Value);
             if (marca == null) return NotFound();
+
+            // Obtener productos asociados
+            var todosLosProductos = await _productoService.GetAllAsync();
+            var productosAsociados = todosLosProductos.Where(p => p.IdMarca == id.Value).ToList();
+
+            ViewBag.CantidadProductos = productosAsociados.Count;
+            ViewBag.ProductosAsociados = productosAsociados;
 
             return View(marca);
         }

@@ -1,94 +1,209 @@
 ﻿@using eCommerce.Entities
 @model IEnumerable<Usuario>
-
 @{
     ViewData["Title"] = "Usuarios";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
-
 }
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Listado de Usuarios</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Nuevo Usuario
-        </a>
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">
+                        <i class="bi bi-people-fill text-primary me-2"></i>Gestión de Usuarios
+                    </h2>
+                    <p class="text-muted mb-0">Administra los usuarios del sistema</p>
+                </div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Nuevo Usuario
+                </a>
+            </div>
+        </div>
     </div>
-    <hr />
 
-    <table id="tablaUsuarios" class="display table table-striped" style="width:100%">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Correo</th>
-                <th>Rol</th>       
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Nombres</td>
-                    <td>@item.Apellidos</td>
-                    <td>@item.Correo</td>
-                    <td>
-                        @if (item.Rol == "Admin")
-                        {
-                            <span class="badge bg-primary">Administrador</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">Cliente</span>
-                        }
-                    </td>
-                    <td>
-                        @if (item.Activo)
-                        {
-                            <span class="badge bg-success">Activo</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger">Inactivo</span>
-                        }
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-primary">
-                            <i class="bi bi-pencil-fill"></i> Editar
-                        </a>
-                        <form asp-action="Delete" asp-route-id="@item.IdUsuario" method="post" class="d-inline form-eliminar">
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash-fill"></i> Eliminar
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <!-- Estadísticas -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6>Total Usuarios</h6>
+                    <h4>@Model.Count()</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6>Usuarios Activos</h6>
+                    <h4>@Model.Count(u => u.Activo == true)</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6>Administradores</h6>
+                    <h4>@Model.Count(u => u.Rol == "Admin")</h4>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Alertas -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Tabla -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-table me-2"></i>Listado de Usuarios
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="tablaUsuarios" class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th class="text-center">Estado</th>
+                            <th>Fecha Registro</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-primary fw-semibold">#@item.IdUsuario</td>
+                                <td>@item.Nombres</td>
+                                <td>@item.Apellidos</td>
+                                <td><small class="text-muted">@item.Correo</small></td>
+                                <td>
+                                    @if (item.Rol == "Admin")
+                                    {
+                                        <span class="badge bg-primary">Administrador</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Cliente</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (item.Activo)
+                                    {
+                                        <span class="badge bg-success">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    }
+                                </td>
+                                <td><small class="text-muted">@(item.FechaRegistro?.ToString("dd/MM/yyyy") ?? "N/A")</small></td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Details" asp-route-id="@item.IdUsuario" class="btn btn-outline-info" title="Ver"><i class="bi bi-eye"></i></a>
+                                        <a asp-action="Edit" asp-route-id="@item.IdUsuario" class="btn btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                        <button type="button" class="btn btn-outline-danger btn-eliminar" data-id="@item.IdUsuario" data-nombre="@item.Nombres @item.Apellidos" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-trash text-danger mb-3" style="font-size: 3rem;"></i>
+                <p class="mb-0">¿Está seguro que desea eliminar al usuario <strong id="nombreUsuario"></strong>?</p>
+                <p class="text-muted small mt-2">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    <!-- jQuery (requerido por DataTables) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- DataTables CSS & JS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function () {
             $('#tablaUsuarios').DataTable({
-                paging: true,
-                searching: true,
-                ordering: true,
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                }
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
+                order: [[0, 'desc']],
+                pageLength: 10,
+                columnDefs: [{ targets: -1, orderable: false }]
             });
+            var modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
+            $(document).on('click', '.btn-eliminar', function () {
+                $('#nombreUsuario').text($(this).data('nombre'));
+                $('#formEliminar').attr('action', '/Admin/Usuarios/Delete/' + $(this).data('id'));
+                modalEliminar.show();
+            });
+            setTimeout(function () { $('.alert').fadeOut('slow'); }, 5000);
         });
     </script>
+    <style>
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            padding: 0.4em 0.7em;
+            font-weight: 500;
+        }
+
+        .card {
+            border-radius: 0.5rem;
+        }
+    </style>
 }

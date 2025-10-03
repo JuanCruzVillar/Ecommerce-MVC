@@ -1,47 +1,203 @@
 ﻿@using eCommerce.Entities
 @model Usuario
-
 @{
     ViewData["Title"] = "Crear Usuario";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-
-<div class="container mt-4">
-    <h2>Crear Usuario</h2>
-    <hr />
-
-    <form asp-action="Create" method="post">
-        <div class="mb-3">
-            <label asp-for="Nombres" class="form-label"></label>
-            <input asp-for="Nombres" class="form-control" />
-            <span asp-validation-for="Nombres" class="text-danger"></span>
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 text-gray-800 fw-bold">
+                        <i class="bi bi-person-plus-fill text-success me-2"></i>Nuevo Usuario
+                    </h1>
+                    <p class="text-muted mb-0">Completa los datos para crear un nuevo usuario</p>
+                </div>
+                <a asp-action="Index" class="btn btn-secondary shadow-sm">
+                    <i class="bi bi-arrow-left me-2"></i>Volver
+                </a>
+            </div>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <label asp-for="Apellidos" class="form-label"></label>
-            <input asp-for="Apellidos" class="form-control" />
-            <span asp-validation-for="Apellidos" class="text-danger"></span>
+    <!-- Mensajes de alerta -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Error:</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    }
 
-        <div class="mb-3">
-            <label asp-for="Correo" class="form-label"></label>
-            <input asp-for="Correo" class="form-control" />
-            <span asp-validation-for="Correo" class="text-danger"></span>
+    <!-- Card del formulario -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text me-2"></i>Datos del Usuario
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Información Personal -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="bi bi-person-circle me-2"></i>Información Personal
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nombres" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Nombres <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Nombres" class="form-control" placeholder="Ingrese los nombres" />
+                                <span asp-validation-for="Nombres" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Apellidos" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Apellidos <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Apellidos" class="form-control" placeholder="Ingrese los apellidos" />
+                                <span asp-validation-for="Apellidos" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Credenciales -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="bi bi-shield-lock me-2"></i>Credenciales de Acceso
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Correo" class="form-label">
+                                    <i class="bi bi-envelope me-1"></i>Correo Electrónico <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Correo" type="email" class="form-control" placeholder="usuario@ejemplo.com" />
+                                <span asp-validation-for="Correo" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Contraseña" class="form-label">
+                                    <i class="bi bi-key me-1"></i>Contraseña <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="Contraseña" type="password" class="form-control" id="passwordInput" placeholder="Ingrese la contraseña" />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="Contraseña" class="text-danger small"></span>
+                                <small class="text-muted">Mínimo 6 caracteres</small>
+                            </div>
+                        </div>
+
+                        <!-- Rol y Cliente -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="bi bi-gear me-2"></i>Configuración
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Rol" class="form-label">
+                                    <i class="bi bi-shield-check me-1"></i>Rol <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Rol" class="form-select">
+                                    <option value="">Seleccione un rol</option>
+                                    <option value="Admin">Administrador</option>
+                                    <option value="Cliente">Cliente</option>
+                                </select>
+                                <span asp-validation-for="Rol" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IdCliente" class="form-label">
+                                    <i class="bi bi-person-badge me-1"></i>Cliente Asociado
+                                </label>
+                                <select asp-for="IdCliente" class="form-select" asp-items="@ViewBag.IdCliente">
+                                    <option value="">-- Ninguno --</option>
+                                </select>
+                                <small class="text-muted">Opcional: vincular con un cliente existente</small>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4" />
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-check-circle me-2"></i>Crear Usuario
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label asp-for="Contraseña" class="form-label">Contraseña</label>
-            <input asp-for="Contraseña" type="password" class="form-control" />
-            <span asp-validation-for="Contraseña" class="text-danger"></span>
-        </div>
-
-      
-        <button type="submit" class="btn btn-success">Crear</button>
-        <a asp-action="Index" class="btn btn-secondary">Volver</a>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // Toggle password visibility
+            $('#togglePassword').on('click', function () {
+                const passwordInput = $('#passwordInput');
+                const toggleIcon = $('#toggleIcon');
+
+                if (passwordInput.attr('type') === 'password') {
+                    passwordInput.attr('type', 'text');
+                    toggleIcon.removeClass('bi-eye').addClass('bi-eye-slash');
+                } else {
+                    passwordInput.attr('type', 'password');
+                    toggleIcon.removeClass('bi-eye-slash').addClass('bi-eye');
+                }
+            });
+
+            // Auto-cerrar alertas
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+
+    <style>
+        .card {
+            border-radius: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+
+        .input-group .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        h6.text-primary {
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 0.5rem;
+        }
+    </style>
 }

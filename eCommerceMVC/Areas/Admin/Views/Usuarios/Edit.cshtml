@@ -1,48 +1,247 @@
 ﻿@using eCommerce.Entities
 @model Usuario
-
 @{
     ViewData["Title"] = "Editar Usuario";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="container mt-4">
-    <h2>Editar Usuario</h2>
-    <hr />
-
-    <form asp-action="Edit" method="post">
-        @Html.AntiForgeryToken() 
-        <input type="hidden" asp-for="IdUsuario" />
-
-        <div class="mb-3">
-            <label asp-for="Nombres" class="form-label"></label>
-            <input asp-for="Nombres" class="form-control" />
-            <span asp-validation-for="Nombres" class="text-danger"></span>
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 text-gray-800 fw-bold">
+                        <i class="bi bi-pencil-square text-warning me-2"></i>Editar Usuario
+                    </h1>
+                    <p class="text-muted mb-0">Modifica la información del usuario</p>
+                </div>
+                <a asp-action="Index" class="btn btn-secondary shadow-sm">
+                    <i class="bi bi-arrow-left me-2"></i>Volver
+                </a>
+            </div>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <label asp-for="Apellidos" class="form-label"></label>
-            <input asp-for="Apellidos" class="form-control" />
-            <span asp-validation-for="Apellidos" class="text-danger"></span>
+    <!-- Mensajes de alerta -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Error:</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    }
 
-        <div class="mb-3">
-            <label asp-for="Correo" class="form-label"></label>
-            <input asp-for="Correo" class="form-control" />
-            <span asp-validation-for="Correo" class="text-danger"></span>
+    <!-- Card del formulario -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text me-2"></i>Datos del Usuario
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" asp-controller="Usuarios" asp-area="Admin" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdUsuario" />
+                        <input type="hidden" asp-for="FechaRegistro" />
+
+                        <!-- Info del Usuario -->
+                        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                            <div>
+                                <strong>ID Usuario:</strong> @Model.IdUsuario |
+                                <strong>Fecha Registro:</strong> @(Model.FechaRegistro?.ToString("dd/MM/yyyy") ?? "N/A")
+                            </div>
+                        </div>
+
+                        <!-- Información Personal -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="bi bi-person-circle me-2"></i>Información Personal
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nombres" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Nombres <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Nombres" class="form-control" placeholder="Ingrese los nombres" />
+                                <span asp-validation-for="Nombres" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Apellidos" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Apellidos <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Apellidos" class="form-control" placeholder="Ingrese los apellidos" />
+                                <span asp-validation-for="Apellidos" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Credenciales -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="bi bi-shield-lock me-2"></i>Credenciales de Acceso
+                                </h6>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Correo" class="form-label">
+                                    <i class="bi bi-envelope me-1"></i>Correo Electrónico <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Correo" type="email" class="form-control" placeholder="usuario@ejemplo.com" />
+                                <span asp-validation-for="Correo" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-key me-1"></i>Nueva Contraseña
+                                </label>
+                                <div class="input-group">
+                                    <input name="NuevaContrasena" type="password" class="form-control" id="passwordInput" placeholder="Dejar en blanco para mantener la contraseña actual" />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>Solo completa este campo si deseas cambiar la contraseña
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Configuración -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="bi bi-gear me-2"></i>Configuración
+                                </h6>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Rol" class="form-label">
+                                    <i class="bi bi-shield-check me-1"></i>Rol <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Rol" class="form-select">
+                                    <option value="">Seleccione un rol</option>
+                                    <option value="Admin">Administrador</option>
+                                    <option value="Cliente">Cliente</option>
+                                </select>
+                                <span asp-validation-for="Rol" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="IdCliente" class="form-label">
+                                    <i class="bi bi-person-badge me-1"></i>Cliente Asociado
+                                </label>
+                                <select asp-for="IdCliente" class="form-select" asp-items="@ViewBag.IdCliente">
+                                    <option value="">-- Ninguno --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-toggle-on me-1"></i>Estado
+                                </label>
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="Activo" class="form-check-input" type="checkbox" role="switch" id="switchActivo" style="width: 3em; height: 1.5em;">
+                                    <label class="form-check-label ms-2" for="switchActivo">
+                                        <span id="labelActivo">@((Model.Activo == true) ? "Activo" : "Inactivo")</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4" />
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-warning text-white">
+                                        <i class="bi bi-save me-2"></i>Guardar Cambios
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label class="form-label">Nueva contraseña (opcional)</label>
-            <input name="NuevaContrasena" type="password" class="form-control" />
-        </div>
-
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a asp-action="Index" class="btn btn-secondary">Volver</a>
-    </form>
-
+    </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // Toggle password visibility
+            $('#togglePassword').on('click', function () {
+                const passwordInput = $('#passwordInput');
+                const toggleIcon = $('#toggleIcon');
+
+                if (passwordInput.attr('type') === 'password') {
+                    passwordInput.attr('type', 'text');
+                    toggleIcon.removeClass('bi-eye').addClass('bi-eye-slash');
+                } else {
+                    passwordInput.attr('type', 'password');
+                    toggleIcon.removeClass('bi-eye-slash').addClass('bi-eye');
+                }
+            });
+
+            // Actualizar label del switch de estado
+            $('#switchActivo').on('change', function () {
+                const label = $(this).is(':checked') ? 'Activo' : 'Inactivo';
+                $('#labelActivo').text(label);
+            });
+
+            // Auto-cerrar alertas
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+
+    <style>
+        .card {
+            border-radius: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+
+        .form-check-input:checked {
+            background-color: #198754;
+            border-color: #198754;
+        }
+
+        .form-check-input:focus {
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+
+        .input-group .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        h6.text-primary {
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 0.5rem;
+        }
+
+        .alert-info {
+            background-color: #cfe2ff;
+            border: none;
+            border-left: 4px solid #0d6efd;
+        }
+    </style>
 }

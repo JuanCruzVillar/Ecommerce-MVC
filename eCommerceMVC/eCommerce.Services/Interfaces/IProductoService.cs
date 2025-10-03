@@ -18,6 +18,8 @@ namespace eCommerce.Services.Interfaces
 
         Task<Producto> GetByIdWithImagenesAsync(int id);
 
+        Task<int> GetCantidadPorMarcaAsync(int idMarca);
+
         Task<bool> AgregarImagenAsync(ProductoImagen imagen);
         Task<bool> EliminarImagenAsync(int idImagen);
         Task<bool> MarcarImagenPrincipalAsync(int idImagen, int idProducto);

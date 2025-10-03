@@ -25,8 +25,6 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
-                Console.WriteLine($"DEBUG - IdCliente obtenido: {idCliente}");
-
                 if (idCliente == 0)
                 {
                     TempData["Error"] = "No se pudo identificar el cliente";
@@ -38,13 +36,6 @@ namespace eCommerce.Areas.Negocio.Controllers
                     .Include(c => c.Venta)
                     .FirstOrDefaultAsync(c => c.IdCliente == idCliente);
 
-                Console.WriteLine($"DEBUG - Cliente encontrado: {cliente != null}");
-
-                if (cliente != null)
-                {
-                    Console.WriteLine($"DEBUG - Nombres: {cliente.Nombres}, Apellidos: {cliente.Apellidos}");
-                }
-
                 if (cliente == null)
                 {
                     TempData["Error"] = "No se encontró el perfil del usuario";
@@ -55,7 +46,6 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG - Error en Index: {ex.Message}");
                 TempData["Error"] = $"Error al cargar el perfil: {ex.Message}";
                 return RedirectToAction("Index", "Catalogo");
             }
@@ -100,9 +90,6 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                // DEBUG: Ver qué datos llegan
-                Console.WriteLine($"DEBUG - Datos recibidos: Nombres={cliente.Nombres}, Apellidos={cliente.Apellidos}, Correo={cliente.Correo}");
-
                 var idCliente = GetClienteId();
 
                 if (idCliente == 0)
@@ -123,16 +110,26 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("Index");
                 }
 
-                Console.WriteLine($"DEBUG - Datos antes: Nombres={clienteExistente.Nombres}, Apellidos={clienteExistente.Apellidos}");
-
-                // Actualizar
+                // Actualizar datos del cliente
                 clienteExistente.Nombres = cliente.Nombres?.Trim();
                 clienteExistente.Apellidos = cliente.Apellidos?.Trim();
                 clienteExistente.Correo = cliente.Correo?.Trim();
 
-                Console.WriteLine($"DEBUG - Datos después: Nombres={clienteExistente.Nombres}, Apellidos={clienteExistente.Apellidos}");
-
                 await _context.SaveChangesAsync();
+
+                // Sincronizar con Usuario si existe
+                var usuarioAsociado = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.IdCliente == idCliente);
+
+                if (usuarioAsociado != null)
+                {
+                    usuarioAsociado.Nombres = clienteExistente.Nombres;
+                    usuarioAsociado.Apellidos = clienteExistente.Apellidos;
+                    usuarioAsociado.Correo = clienteExistente.Correo;
+
+                    _context.Update(usuarioAsociado);
+                    await _context.SaveChangesAsync();
+                }
 
                 TempData["Success"] = "Perfil actualizado exitosamente";
                 return RedirectToAction("Index");
