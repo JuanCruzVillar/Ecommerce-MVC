@@ -465,7 +465,7 @@ namespace eCommerce.Areas.Cliente.Controllers
 
         private int GetClienteId()
         {
-            var clienteIdClaim = User.FindFirst("IdUsuario")?.Value; 
+            var clienteIdClaim = User.FindFirst("IdCliente")?.Value; 
             if (int.TryParse(clienteIdClaim, out int clienteId))
             {
                 return clienteId;

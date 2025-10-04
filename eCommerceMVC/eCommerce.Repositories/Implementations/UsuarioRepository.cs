@@ -38,8 +38,28 @@ namespace eCommerce.Repositories.Implementations
 
         public async Task UpdateAsync(Usuario usuario)
         {
-            _context.Usuarios.Update(usuario);
-            await _context.SaveChangesAsync();
+            System.Diagnostics.Debug.WriteLine("=== REPOSITORY UPDATE ===");
+            System.Diagnostics.Debug.WriteLine($"Usuario a actualizar - ID: {usuario.IdUsuario}");
+            System.Diagnostics.Debug.WriteLine($"Nombres: '{usuario.Nombres}'");
+            System.Diagnostics.Debug.WriteLine($"Apellidos: '{usuario.Apellidos}'");
+            System.Diagnostics.Debug.WriteLine($"Rol: '{usuario.Rol}'");
+
+            // Detach cualquier instancia trackeada
+            var local = _context.Set<Usuario>()
+                .Local
+                .FirstOrDefault(u => u.IdUsuario == usuario.IdUsuario);
+
+            if (local != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Entidad local encontrada, haciendo detach");
+                _context.Entry(local).State = EntityState.Detached;
+            }
+
+            _context.Entry(usuario).State = EntityState.Modified;
+
+            System.Diagnostics.Debug.WriteLine("Llamando a SaveChangesAsync...");
+            var changes = await _context.SaveChangesAsync();
+            System.Diagnostics.Debug.WriteLine($"Cambios guardados: {changes}");
         }
 
         public async Task<bool> DeleteAsync(int id)

@@ -52,17 +52,23 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 return View();
             }
 
-            var claims = new List<Claim>
+            // Verificar que el usuario tenga un IdCliente asociado
+            if (!usuario.IdCliente.HasValue)
             {
-             new Claim(ClaimTypes.Name, usuario.Nombres),
-             new Claim(ClaimTypes.Email, usuario.Correo),
-             new Claim(ClaimTypes.Role, usuario.Rol),
-              new Claim("IdCliente", usuario.IdCliente.ToString()),
-            new Claim("IdUsuario", usuario.IdUsuario.ToString())
-             };
+                ViewBag.Error = "Este usuario no tiene un cliente asociado. Contacte al administrador.";
+                return View();
+            }
+
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, usuario.Nombres),
+        new Claim(ClaimTypes.Email, usuario.Correo),
+        new Claim(ClaimTypes.Role, usuario.Rol),
+        new Claim("IdCliente", usuario.IdCliente.Value.ToString()),
+        new Claim("IdUsuario", usuario.IdUsuario.ToString())
+    };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),

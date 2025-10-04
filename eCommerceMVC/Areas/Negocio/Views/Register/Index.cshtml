@@ -1,0 +1,254 @@
+﻿@{
+    ViewData["Title"] = "Crear Cuenta";
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+}
+
+<div class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+            <div class="col-md-10 col-lg-8">
+                <div class="row bg-white rounded-4 shadow-lg overflow-hidden">
+                    <!-- Columna izquierda - Información -->
+                    <div class="col-md-6 d-none d-md-flex flex-column justify-content-center p-5"
+                         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="text-white">
+                            <h2 class="fw-bold mb-4">¡Únete a nosotros!</h2>
+                            <p class="lead mb-4">Creá tu cuenta y empezá a disfrutar de todos los beneficios.</p>
+
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Registro rápido y sencillo</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Compra segura y protegida</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Seguimiento de tus pedidos</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Ofertas y descuentos exclusivos</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Historial de compras</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha - Formulario -->
+                    <div class="col-md-6 p-5">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-dark mb-2">Crear Cuenta</h3>
+                            <p class="text-muted">Completá tus datos para registrarte</p>
+                        </div>
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                @ViewBag.Error
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <form asp-action="Index" asp-controller="Register" asp-area="Negocio" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person me-1"></i>Nombres <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       name="nombres"
+                                       class="form-control form-control-lg"
+                                       placeholder="Juan"
+                                       required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person me-1"></i>Apellidos <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       name="apellidos"
+                                       class="form-control form-control-lg"
+                                       placeholder="Pérez"
+                                       required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-envelope me-1"></i>Correo Electrónico <span class="text-danger">*</span>
+                                </label>
+                                <input type="email"
+                                       name="correo"
+                                       class="form-control form-control-lg"
+                                       placeholder="correo@ejemplo.com"
+                                       required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-lock me-1"></i>Contraseña <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           name="contrasena"
+                                           class="form-control form-control-lg"
+                                           id="contrasena"
+                                           placeholder="Mínimo 6 caracteres"
+                                           required />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Debe tener al menos 6 caracteres</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-lock-fill me-1"></i>Confirmar Contraseña <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           name="confirmarContrasena"
+                                           class="form-control form-control-lg"
+                                           id="confirmarContrasena"
+                                           placeholder="Repetí tu contraseña"
+                                           required />
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirm">
+                                        <i class="bi bi-eye" id="toggleConfirmIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-lg text-white fw-semibold"
+                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                    <i class="bi bi-person-plus me-2"></i>Crear Cuenta
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="text-muted mb-3">¿Ya tenés cuenta?</p>
+                                <a asp-action="Login"
+                                   asp-controller="Auth"
+                                   asp-area="Negocio"
+                                   class="btn btn-outline-primary btn-lg w-100">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciá Sesión
+                                </a>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Tus datos están protegidos
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link para volver al catálogo -->
+                <div class="text-center mt-4">
+                    <a asp-action="Index" asp-controller="Catalogo" asp-area="Negocio"
+                       class="text-white text-decoration-none">
+                        <i class="bi bi-arrow-left me-2"></i>Volver al catálogo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('contrasena');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        });
+
+        // Toggle confirm password visibility
+        document.getElementById('toggleConfirm').addEventListener('click', function () {
+            const confirmInput = document.getElementById('confirmarContrasena');
+            const toggleIcon = document.getElementById('toggleConfirmIcon');
+
+            if (confirmInput.type === 'password') {
+                confirmInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                confirmInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        });
+
+        // Auto-dismiss alerts
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Validación en tiempo real de contraseñas
+        const contrasena = document.getElementById('contrasena');
+        const confirmar = document.getElementById('confirmarContrasena');
+
+        confirmar.addEventListener('input', function() {
+            if (contrasena.value !== confirmar.value) {
+                confirmar.setCustomValidity('Las contraseñas no coinciden');
+            } else {
+                confirmar.setCustomValidity('');
+            }
+        });
+    </script>
+
+    <style>
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-outline-primary {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+            .btn-outline-primary:hover {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-color: #667eea;
+                color: white;
+            }
+
+        .rounded-4 {
+            border-radius: 1rem !important;
+        }
+
+        @@media (max-width: 768px) {
+            .py-5
+
+        {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        }
+    </style>
+}

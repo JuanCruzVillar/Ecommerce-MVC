@@ -22,7 +22,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             _clienteService = clienteService;
         }
 
-
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
@@ -59,7 +58,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 return View(usuario);
             }
 
-            // Hash de la contraseña
             var hasher = new PasswordHasher<Usuario>();
             usuario.Contraseña = hasher.HashPassword(usuario, usuario.Contraseña);
             usuario.FechaRegistro = DateTime.Now;
@@ -94,30 +92,19 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Usuario usuario, string NuevaContrasena)
         {
-            // Debug: Ver qué datos llegan
-            System.Diagnostics.Debug.WriteLine($"ID recibido: {id}");
-            System.Diagnostics.Debug.WriteLine($"Usuario.IdUsuario: {usuario.IdUsuario}");
-            System.Diagnostics.Debug.WriteLine($"Nombres: {usuario.Nombres}");
-            System.Diagnostics.Debug.WriteLine($"Rol: {usuario.Rol}");
-            System.Diagnostics.Debug.WriteLine($"Activo: {usuario.Activo}");
-
             if (id != usuario.IdUsuario)
             {
-                System.Diagnostics.Debug.WriteLine("ERROR: IDs no coinciden");
                 return NotFound();
             }
 
             // Remover validaciones innecesarias
             ModelState.Remove("Contraseña");
             ModelState.Remove("FechaRegistro");
+            ModelState.Remove("IdClienteNavigation");
+            ModelState.Remove("NuevaContrasena");
 
             if (!ModelState.IsValid)
             {
-                System.Diagnostics.Debug.WriteLine("ERROR: ModelState inválido");
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error: {error.ErrorMessage}");
-                }
                 await CargarClientes(usuario.IdCliente);
                 return View(usuario);
             }
@@ -125,11 +112,8 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             var usuarioDb = await _usuarioService.GetByIdAsync(id);
             if (usuarioDb == null)
             {
-                System.Diagnostics.Debug.WriteLine("ERROR: Usuario no encontrado en DB");
                 return NotFound();
             }
-
-            System.Diagnostics.Debug.WriteLine($"Usuario DB antes - Nombres: {usuarioDb.Nombres}, Rol: {usuarioDb.Rol}");
 
             // Actualizar campos
             usuarioDb.Nombres = usuario.Nombres;
@@ -139,18 +123,20 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             usuarioDb.IdCliente = usuario.IdCliente;
             usuarioDb.Activo = usuario.Activo;
 
-            System.Diagnostics.Debug.WriteLine($"Usuario DB después - Nombres: {usuarioDb.Nombres}, Rol: {usuarioDb.Rol}");
-
             // Actualizar contraseña si se proporciona
             if (!string.IsNullOrEmpty(NuevaContrasena))
             {
-                System.Diagnostics.Debug.WriteLine("Actualizando contraseña");
                 var hasher = new PasswordHasher<Usuario>();
                 usuarioDb.Contraseña = hasher.HashPassword(usuarioDb, NuevaContrasena);
             }
 
-            await _usuarioService.UpdateAsync(usuarioDb);
-            System.Diagnostics.Debug.WriteLine("UpdateAsync ejecutado");
+            var result = await _usuarioService.UpdateAsync(usuarioDb);
+            if (!result)
+            {
+                TempData["Error"] = "No se pudo actualizar el usuario. Verifique que el correo no esté en uso.";
+                await CargarClientes(usuario.IdCliente);
+                return View(usuario);
+            }
 
             // Sincronizar con Cliente si existe
             if (usuario.IdCliente.HasValue)
@@ -162,7 +148,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     cliente.Apellidos = usuario.Apellidos;
                     cliente.Correo = usuario.Correo;
                     await _clienteService.UpdateAsync(cliente);
-                    System.Diagnostics.Debug.WriteLine("Cliente sincronizado");
                 }
             }
 

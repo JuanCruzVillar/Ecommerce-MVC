@@ -148,7 +148,7 @@
                             </div>
                         </div>
 
-                        <!-- Metodo de Pago -->
+                        <!-- Método de Pago -->
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">2</span>
@@ -161,7 +161,7 @@
                                     {
                                         <div class="col-md-6 mb-3">
                                             <div class="form-check metodo-pago-card">
-                                                @Html.RadioButtonFor(m => m.MetodoPagoSeleccionado, metodo.IdMetodoPago, new { @class = "form-check-input", id = $"pago_{metodo.IdMetodoPago}" })
+                                                @Html.RadioButtonFor(m => m.MetodoPagoSeleccionado, metodo.IdMetodoPago, new { @class = "form-check-input metodo-pago-radio", id = $"pago_{metodo.IdMetodoPago}" })
                                                 <label class="form-check-label w-100" for="pago_@metodo.IdMetodoPago">
                                                     <div class="card">
                                                         <div class="card-body text-center p-3">
@@ -174,6 +174,60 @@
                                             </div>
                                         </div>
                                     }
+                                </div>
+
+                                <!-- Formulario de Tarjeta (aparece cuando se selecciona método con tarjeta) -->
+                                <div id="form-tarjeta" style="display: none;">
+                                    <div class="card bg-light mt-3">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-credit-card me-2"></i>
+                                                Datos de la Tarjeta
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="alert alert-info mb-3">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Modo Demo:</strong> Esta es una simulación. Usa los siguientes datos de prueba:
+                                                <br><small>Tarjeta: 4532 1234 5678 9010 | CVV: 123 | Vencimiento: 12/25</small>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-12 mb-3">
+                                                    <label class="form-label">Número de Tarjeta</label>
+                                                    <input type="text" class="form-control" id="numero-tarjeta"
+                                                           placeholder="1234 5678 9012 3456" maxlength="19">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Titular de la Tarjeta</label>
+                                                    <input type="text" class="form-control" id="titular-tarjeta"
+                                                           placeholder="NOMBRE APELLIDO" style="text-transform: uppercase;">
+                                                </div>
+                                                <div class="col-md-3 mb-3">
+                                                    <label class="form-label">Vencimiento</label>
+                                                    <input type="text" class="form-control" id="vencimiento-tarjeta"
+                                                           placeholder="MM/AA" maxlength="5">
+                                                </div>
+                                                <div class="col-md-3 mb-3">
+                                                    <label class="form-label">CVV</label>
+                                                    <input type="text" class="form-control" id="cvv-tarjeta"
+                                                           placeholder="123" maxlength="4">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="guardar-tarjeta">
+                                                        <label class="form-check-label" for="guardar-tarjeta">
+                                                            Guardar esta tarjeta para futuras compras
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

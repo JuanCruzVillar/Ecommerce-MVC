@@ -3,38 +3,178 @@
     ViewData["Title"] = "Iniciar Sesión";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Iniciar Sesión</h4>
-                </div>
-                <div class="card-body">
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
+<div class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+            <div class="col-md-10 col-lg-8">
+                <div class="row bg-white rounded-4 shadow-lg overflow-hidden">
+                    <!-- Columna izquierda - Información -->
+                    <div class="col-md-6 d-none d-md-flex flex-column justify-content-center p-5"
+                         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="text-white">
+                            <h2 class="fw-bold mb-4">¡Bienvenido de nuevo!</h2>
+                            <p class="lead mb-4">Ingresá a tu cuenta para acceder a todas las funcionalidades de nuestra tienda.</p>
 
-                    <form asp-action="Login" method="post">
-                        @Html.AntiForgeryToken()
-                        <div class="mb-3">
-                            <label for="correo" class="form-label">Correo</label>
-                            <input type="email" class="form-control" name="correo" id="correo" required>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Acceso a tus compras anteriores</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Gestión de direcciones de envío</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Seguimiento de pedidos en tiempo real</span>
+                            </div>
+                            <div class="mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Ofertas exclusivas para clientes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha - Formulario -->
+                    <div class="col-md-6 p-5">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-dark mb-2">Iniciar Sesión</h3>
+                            <p class="text-muted">Ingresá tus credenciales para continuar</p>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="contrasena" class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" name="contrasena" id="contrasena" required>
-                        </div>
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                @ViewBag.Error
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
 
-                        <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-                    </form>
+                        <form asp-action="Login" asp-controller="Auth" asp-area="Negocio" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-4">
+                                <label for="correo" class="form-label fw-semibold">
+                                    <i class="bi bi-envelope me-1"></i>Correo Electrónico
+                                </label>
+                                <input type="email"
+                                       class="form-control form-control-lg"
+                                       name="correo"
+                                       id="correo"
+                                       placeholder="tu@email.com"
+                                       required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="contrasena" class="form-label fw-semibold">
+                                    <i class="bi bi-lock me-1"></i>Contraseña
+                                </label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           class="form-control form-control-lg"
+                                           name="contrasena"
+                                           id="contrasena"
+                                           placeholder="••••••••"
+                                           required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-lg text-white fw-semibold"
+                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="text-muted mb-3">¿No tenés cuenta?</p>
+                                <a href="/Negocio/Register/Index" class="btn btn-outline-primary btn-lg w-100">
+                                    <i class="bi bi-person-plus me-2"></i>Registrate Gratis
+                                </a>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Tus datos están protegidos
+                            </small>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer text-center">
-                    <small>&copy; 2025 - Mi Tienda</small>
+
+                <!-- Link para volver al catálogo -->
+                <div class="text-center mt-4">
+                    <a asp-action="Index" asp-controller="Catalogo" asp-area="Negocio"
+                       class="text-white text-decoration-none">
+                        <i class="bi bi-arrow-left me-2"></i>Volver al catálogo
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('contrasena');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        });
+
+        // Auto-dismiss alerts
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+
+    <style>
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-outline-primary {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+            .btn-outline-primary:hover {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-color: #667eea;
+                color: white;
+            }
+
+        .rounded-4 {
+            border-radius: 1rem !important;
+        }
+
+        @@media (max-width: 768px) {
+            .py-5
+
+        {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        }
+    </style>
+}

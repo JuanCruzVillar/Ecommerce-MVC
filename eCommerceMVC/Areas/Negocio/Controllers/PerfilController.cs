@@ -1,5 +1,7 @@
-﻿using eCommerce.Entities;
-using eCommerce.Data;
+﻿using eCommerce.Data;
+using eCommerce.Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +25,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -56,7 +58,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -90,7 +92,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -129,6 +131,9 @@ namespace eCommerce.Areas.Negocio.Controllers
 
                     _context.Update(usuarioAsociado);
                     await _context.SaveChangesAsync();
+
+                    // Refrescar los claims con los nuevos datos
+                    await RefreshClaims(usuarioAsociado);
                 }
 
                 TempData["Success"] = "Perfil actualizado exitosamente";
@@ -147,7 +152,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -178,7 +183,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -218,7 +223,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -248,7 +253,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -287,7 +292,7 @@ namespace eCommerce.Areas.Negocio.Controllers
         {
             try
             {
-                var idCliente = GetClienteId();
+                var idCliente = await GetClienteId();
 
                 if (idCliente == 0)
                 {
@@ -330,37 +335,37 @@ namespace eCommerce.Areas.Negocio.Controllers
 
         #region Métodos Helper
 
-        private int GetClienteId()
+        private async Task<int> GetClienteId()
         {
             try
             {
-                // Primero intentar obtener directamente el IdCliente del claim
-                var clienteIdClaim = User.FindFirst("IdCliente")?.Value;
-                if (!string.IsNullOrEmpty(clienteIdClaim) && int.TryParse(clienteIdClaim, out int clienteIdDirect))
-                {
-                    return clienteIdDirect;
-                }
-
-                // Si no existe, buscar por IdUsuario
+                // Obtener IdUsuario de los claims
                 var usuarioIdClaim = User.FindFirst("IdUsuario")?.Value;
-                if (!string.IsNullOrEmpty(usuarioIdClaim) && int.TryParse(usuarioIdClaim, out int usuarioId))
+                if (string.IsNullOrEmpty(usuarioIdClaim) || !int.TryParse(usuarioIdClaim, out int usuarioId))
                 {
-                    var usuario = _context.Usuarios
-                        .AsNoTracking()
-                        .FirstOrDefault(u => u.IdUsuario == usuarioId);
-
-                    return usuario?.IdCliente ?? 0;
+                    return 0;
                 }
 
-                // Como último recurso, intentar con el NameIdentifier
-                var nameIdentifier = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!string.IsNullOrEmpty(nameIdentifier) && int.TryParse(nameIdentifier, out int userId))
+                // Obtener IdCliente guardado en los claims
+                var clienteIdClaim = User.FindFirst("IdCliente")?.Value;
+                if (!string.IsNullOrEmpty(clienteIdClaim) && int.TryParse(clienteIdClaim, out int clienteIdFromClaim))
                 {
-                    var usuario = _context.Usuarios
+                    // Verificar que el IdCliente en claims siga siendo válido
+                    var usuario = await _context.Usuarios
                         .AsNoTracking()
-                        .FirstOrDefault(u => u.IdUsuario == userId);
+                        .FirstOrDefaultAsync(u => u.IdUsuario == usuarioId);
 
-                    return usuario?.IdCliente ?? 0;
+                    if (usuario != null && usuario.IdCliente.HasValue)
+                    {
+                        // Si cambió el IdCliente, refrescar la sesión
+                        if (usuario.IdCliente.Value != clienteIdFromClaim)
+                        {
+                            await RefreshClaims(usuario);
+                            return usuario.IdCliente.Value;
+                        }
+
+                        return clienteIdFromClaim;
+                    }
                 }
 
                 return 0;
@@ -368,6 +373,34 @@ namespace eCommerce.Areas.Negocio.Controllers
             catch (Exception)
             {
                 return 0;
+            }
+        }
+
+        private async Task RefreshClaims(Usuario usuario)
+        {
+            try
+            {
+                if (!usuario.IdCliente.HasValue) return;
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, usuario.Nombres),
+                    new Claim(ClaimTypes.Email, usuario.Correo),
+                    new Claim(ClaimTypes.Role, usuario.Rol),
+                    new Claim("IdCliente", usuario.IdCliente.Value.ToString()),
+                    new Claim("IdUsuario", usuario.IdUsuario.ToString())
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    new AuthenticationProperties { IsPersistent = true }
+                );
+            }
+            catch (Exception)
+            {
+                
             }
         }
 
