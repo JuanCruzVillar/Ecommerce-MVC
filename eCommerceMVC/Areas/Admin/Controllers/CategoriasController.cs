@@ -1,6 +1,6 @@
-﻿using eCommerce.Entities;
+﻿using eCommerce.Areas.Admin.Controllers;
+using eCommerce.Entities;
 using eCommerce.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 
 namespace eCommerceMVC.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    [Authorize(Roles = "Admin")]
-    public class CategoriasController : Controller
+    public class CategoriasController : BaseAdminController
     {
         private readonly ICategoriaService _categoriaService;
 
@@ -32,7 +30,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Error al cargar las categorías. Intente nuevamente.";
-                
                 return View(new List<Categoria>());
             }
         }
@@ -78,13 +75,11 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         {
             try
             {
-                
                 if (string.IsNullOrWhiteSpace(categoria.Descripcion))
                 {
                     ModelState.AddModelError("Descripcion", "La descripción es obligatoria");
                 }
 
-                
                 if (categoria.IdCategoriaPadre.HasValue && await ValidarJerarquiaCircular(categoria.IdCategoria, categoria.IdCategoriaPadre.Value))
                 {
                     ModelState.AddModelError("IdCategoriaPadre", "No se puede crear una jerarquía circular");
@@ -96,7 +91,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     return View(categoria);
                 }
 
-                // Limpiar y preparar datos
                 categoria.Descripcion = categoria.Descripcion.Trim();
                 categoria.FechaRegistro = DateTime.Now;
                 categoria.Activo = true;
@@ -151,13 +145,11 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
             try
             {
-                
                 if (string.IsNullOrWhiteSpace(categoria.Descripcion))
                 {
                     ModelState.AddModelError("Descripcion", "La descripción es obligatoria");
                 }
 
-                
                 if (categoria.IdCategoriaPadre.HasValue && await ValidarJerarquiaCircular(categoria.IdCategoria, categoria.IdCategoriaPadre.Value))
                 {
                     ModelState.AddModelError("IdCategoriaPadre", "No se puede crear una jerarquía circular");
@@ -169,7 +161,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     return View(categoria);
                 }
 
-              
                 categoria.Descripcion = categoria.Descripcion.Trim();
 
                 var result = await _categoriaService.UpdateAsync(categoria);
@@ -191,17 +182,13 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-
-
         // POST: Categorias Delete
-        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
-               
                 var categoria = await _categoriaService.GetByIdAsync(id);
 
                 if (categoria == null)
@@ -210,21 +197,18 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                
                 if (categoria.SubCategorias != null && categoria.SubCategorias.Any())
                 {
                     TempData["Error"] = "No se puede eliminar esta categoría porque tiene subcategorías asociadas.";
                     return RedirectToAction(nameof(Index));
                 }
 
-                
-                 if (categoria.Productos != null && categoria.Productos.Any())
-                 {
-                     TempData["Error"] = "No se puede eliminar esta categoría porque tiene productos asociados.";
-                     return RedirectToAction(nameof(Index));
-                 }
+                if (categoria.Productos != null && categoria.Productos.Any())
+                {
+                    TempData["Error"] = "No se puede eliminar esta categoría porque tiene productos asociados.";
+                    return RedirectToAction(nameof(Index));
+                }
 
-             
                 var result = await _categoriaService.DeleteAsync(id);
 
                 if (result)
@@ -239,7 +223,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Error interno al eliminar la categoría.";
-               
             }
 
             return RedirectToAction(nameof(Index));
@@ -247,16 +230,13 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
         #region Metodos Auxiliares
 
-
         private async Task<bool> ValidarJerarquiaCircular(int categoriaId, int categoriaPadreId)
         {
             try
             {
-                // Una categoria no puede ser padre de sí misma
                 if (categoriaId == categoriaPadreId)
                     return true;
 
-                // ver si el padre propuesto es descendiente de la categoria actual
                 var categoriaPadre = await _categoriaService.GetByIdAsync(categoriaPadreId);
                 while (categoriaPadre?.IdCategoriaPadre.HasValue == true)
                 {
@@ -270,11 +250,10 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
             catch
             {
-                return true; 
+                return true;
             }
         }
 
-        // metodo para cargar las categorías activas en ViewBag
         private async Task CargarCategoriasActivas(int? idExcluido = null, int? selectedId = null)
         {
             try
@@ -282,7 +261,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 var categorias = await _categoriaService.GetCategoriasPrincipalesAsync();
                 var lista = new List<SelectListItem>
                 {
-                    
                     new SelectListItem
                     {
                         Value = "",
@@ -293,7 +271,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
                 foreach (var cat in categorias)
                 {
-                    
                     if (idExcluido.HasValue && cat.IdCategoria == idExcluido.Value)
                         continue;
 
@@ -304,7 +281,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                         Selected = (selectedId.HasValue && cat.IdCategoria == selectedId.Value)
                     });
 
-                  
                     if (cat.SubCategorias != null && cat.SubCategorias.Any())
                     {
                         foreach (var sub in cat.SubCategorias)
@@ -326,7 +302,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                
                 ViewBag.Categorias = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "", Text = "-- Error al cargar categorías --" }
@@ -336,9 +311,8 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
         #endregion
 
-        #region API Endpoints para AJAX 
+        #region API Endpoints para AJAX
 
-      
         [HttpGet]
         public async Task<IActionResult> GetSubCategorias(int categoriaPadreId)
         {

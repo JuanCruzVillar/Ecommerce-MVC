@@ -1,11 +1,12 @@
-﻿using eCommerce.Entities.ViewModels;
+﻿using eCommerce.Areas.Negocio.Controllers;
+using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 
 [Area("Negocio")]
-public class CatalogoController : Controller
+public class CatalogoController : BaseNegocioController
 {
     private readonly IProductoService _productoService;
     private readonly ICategoriaService _categoriaService;
@@ -139,7 +140,7 @@ public class CatalogoController : Controller
             })
             .ToList();
 
-        // Mapear imágenes
+        // Mapear imagenes
         var imagenes = producto.Imagenes
      .OrderByDescending(i => i.EsPrincipal ?? false) // Principal primero
      .ThenBy(i => i.Orden) // Luego por orden

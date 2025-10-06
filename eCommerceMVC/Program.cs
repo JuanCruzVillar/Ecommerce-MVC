@@ -16,7 +16,7 @@ builder.Services.AddDbContext<DbecommerceContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EcommerceContext"))
 );
 
-// Repositories
+// Repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
@@ -34,14 +34,14 @@ builder.Services.AddScoped<ICarritoService, CarritoService>();
 
 builder.Services.AddHttpContextAccessor();
 
-// CORREGIDO: Autenticación y autorización con manejo dinámico de login
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
         options.SlidingExpiration = true;
 
-        // MEJORADO: Manejo dinámico de rutas de login basado en el área
+        
         options.Events.OnRedirectToLogin = context =>
         {
             var request = context.Request;
@@ -87,7 +87,7 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// Pipeline
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -105,20 +105,20 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rutas por áreas 
+
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
 );
 
-// Ruta por defecto fuera de áreas
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Catalogo}/{action=Index}/{id?}",
     defaults: new { area = "Negocio" }
 );
 
-// MEJORADO: Redireccionamiento inicial
+
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Negocio/Catalogo/Index");

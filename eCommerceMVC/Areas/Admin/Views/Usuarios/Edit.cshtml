@@ -6,7 +6,7 @@
 }
 
 <div class="container-fluid px-4 py-4">
-    <!-- Header -->
+    @* Header *@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <!-- Mensajes de alerta -->
+    @* Msj alerta *@
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
@@ -33,7 +33,7 @@
         </div>
     }
 
-    <!-- Card del formulario -->
+    @* Card formulario *@
     <div class="row">
         <div class="col-lg-8 mx-auto">
             <div class="card shadow-sm border-0">
@@ -48,7 +48,7 @@
                         <input type="hidden" asp-for="IdUsuario" />
                         <input type="hidden" asp-for="FechaRegistro" />
 
-                        <!-- Info del Usuario -->
+                        @* Info usuario *@
                         <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
                             <i class="bi bi-info-circle-fill me-2 fs-5"></i>
                             <div>
@@ -57,7 +57,7 @@
                             </div>
                         </div>
 
-                        <!-- Información Personal -->
+                        @* Info personal *@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h6 class="text-primary fw-bold mb-3">
@@ -80,7 +80,7 @@
                             </div>
                         </div>
 
-                        <!-- Credenciales -->
+                        @* Credenciales *@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h6 class="text-primary fw-bold mb-3">
@@ -110,7 +110,7 @@
                             </div>
                         </div>
 
-                        <!-- Configuración -->
+                        @* Configuracion *@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h6 class="text-primary fw-bold mb-3">
@@ -149,7 +149,7 @@
                             </div>
                         </div>
 
-                        <!-- Botones de acción -->
+                        @* Botones *@
                         <div class="row">
                             <div class="col-12">
                                 <hr class="my-4" />
@@ -195,7 +195,7 @@
                 $('#labelActivo').text(label);
             });
 
-            // Auto-cerrar alertas
+            
             setTimeout(function () {
                 $('.alert').fadeOut('slow');
             }, 5000);

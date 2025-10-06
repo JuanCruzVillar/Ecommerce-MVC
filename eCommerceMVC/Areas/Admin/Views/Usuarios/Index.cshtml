@@ -6,7 +6,7 @@
 }
 
 <div class="container-fluid px-4 py-4">
-    <!-- Header -->
+    @* Header *@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <!-- Estadísticas -->
+    @* Estadisticas *@
     <div class="row mb-3">
         <div class="col-md-4">
             <div class="card bg-primary text-white">
@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <!-- Alertas -->
+    @* Alertas *@
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -67,7 +67,7 @@
         </div>
     }
 
-    <!-- Tabla -->
+    @* tabla *@
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom py-3">
             <h5 class="mb-0 fw-semibold">
@@ -134,7 +134,7 @@
     </div>
 </div>
 
-<!-- Modal Eliminar -->
+@* Modaleliminar *@
 <div class="modal fade" id="modalEliminar" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

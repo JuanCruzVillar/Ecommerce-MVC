@@ -37,31 +37,8 @@ namespace eCommerce.Data
             
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
 
+
             
-            modelBuilder.Entity<Carrito>(entity =>
-            {
-                entity.HasKey(e => e.IdCarrito)
-                      .HasName("PK_CARRITO");
-
-                entity.ToTable("CARRITO");
-
-                
-                entity.Property(e => e.IdCarrito).HasColumnName("IdCarrito");
-                entity.Property(e => e.IdUsuario).HasColumnName("IdUsuario");
-                entity.Property(e => e.IdProducto).HasColumnName("IdProducto");
-                entity.Property(e => e.Cantidad).HasColumnName("Cantidad");
-
-               
-                entity.HasOne(d => d.IdUsuarioNavigation)
-                      .WithMany(p => p.Carritos)
-                      .HasForeignKey(d => d.IdUsuario)
-                      .HasConstraintName("FK_CARRITO_USUARIO");
-
-                entity.HasOne(d => d.IdProductoNavigation)
-                      .WithMany(p => p.Carritos)
-                      .HasForeignKey(d => d.IdProducto)
-                      .HasConstraintName("FK_CARRITO_PRODUCTO_IdProducto");
-            });
 
 
             // Categoria
@@ -111,6 +88,41 @@ namespace eCommerce.Data
                 entity.Property(e => e.Restablecer).HasDefaultValue(false);
             });
 
+            // Carrito
+            modelBuilder.Entity<Carrito>(entity =>
+            {
+                entity.HasKey(e => e.IdCarrito)
+                      .HasName("PK_CARRITO");
+
+                entity.ToTable("CARRITO");
+
+                entity.Property(e => e.IdCarrito).HasColumnName("IdCarrito");
+                entity.Property(e => e.IdUsuario).HasColumnName("IdUsuario");
+                entity.Property(e => e.IdProducto).HasColumnName("IdProducto");
+                entity.Property(e => e.Cantidad).HasColumnName("Cantidad");
+                entity.Property(e => e.IdCliente).HasColumnName("IdCliente"); 
+
+                // Relación con Usuario
+                entity.HasOne(d => d.IdUsuarioNavigation)
+                      .WithMany(p => p.Carritos)
+                      .HasForeignKey(d => d.IdUsuario)
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .HasConstraintName("FK_CARRITO_USUARIO");
+
+                // Relación con Producto
+                entity.HasOne(d => d.IdProductoNavigation)
+                      .WithMany(p => p.Carritos)
+                      .HasForeignKey(d => d.IdProducto)
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .HasConstraintName("FK_CARRITO_PRODUCTO");
+
+                
+                entity.HasOne(d => d.IdClienteNavigation)
+                      .WithMany(p => p.Carritos)
+                      .HasForeignKey(d => d.IdCliente)
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .HasConstraintName("FK_CARRITO_CLIENTE");
+            });
             // DetalleVenta
             modelBuilder.Entity<DetalleVentas>(entity =>
             {

@@ -87,7 +87,7 @@
            
             document.getElementById('Descripcion').focus();
 
-            // Validación en tiempo real de la descripción
+            // Validación en tiempo real
             document.getElementById('Descripcion').addEventListener('input', function() {
                 const valor = this.value.trim();
                 const contador = document.getElementById('contador-chars');
@@ -103,7 +103,7 @@
                 }
             });
 
-            // Prevenir envío con Enter accidental
+            
             document.getElementById('Descripcion').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();

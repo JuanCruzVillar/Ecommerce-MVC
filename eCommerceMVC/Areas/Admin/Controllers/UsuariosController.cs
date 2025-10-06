@@ -1,4 +1,5 @@
-﻿using eCommerce.Entities;
+﻿using eCommerce.Areas.Admin.Controllers;
+using eCommerce.Entities;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class UsuariosController : Controller
+    public class UsuariosController : BaseAdminController
     {
         private readonly IUsuarioService _usuarioService;
         private readonly IClienteService _clienteService;
@@ -29,7 +30,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return View(usuarios);
         }
 
-        // GET: Usuarios/Details/5
+        // GET: Usuarios/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -75,7 +76,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Usuarios/Edit/5
+        // GET: Usuarios/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -87,7 +88,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return View(usuario);
         }
 
-        // POST: Usuarios/Edit/5
+        // POST: Usuarios/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Usuario usuario, string NuevaContrasena)
@@ -155,7 +156,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Usuarios/Delete/5
+        // GET: Usuarios/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -166,7 +167,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return View(usuario);
         }
 
-        // POST: Usuarios/Delete/5
+        // POST: Usuarios/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

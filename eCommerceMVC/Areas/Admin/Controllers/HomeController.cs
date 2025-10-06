@@ -1,19 +1,17 @@
-﻿using eCommerce.Entities;
+﻿using eCommerce.Areas.Admin.Controllers;
+using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
+using eCommerceMVC.Services.Exporters;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using eCommerceMVC.Services.Exporters;
-using Microsoft.AspNetCore.Authorization;
 
 namespace eCommerceMVC.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    [Authorize(Roles = "Admin")]
-    public class HomeController : Controller
+    public class HomeController : BaseAdminController
     {
         private readonly IUsuarioService _usuarioService;
         private readonly IProductoService _productoService;
@@ -24,7 +22,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             _productoService = productoService;
         }
 
-       
         private List<VentaDetalleViewModel> GenerarVentasEjemplo(List<Usuario> usuarios, List<Producto> productos)
         {
             var ventas = new List<VentaDetalleViewModel>();
@@ -33,14 +30,13 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             for (int i = 0; i < usuarios.Count; i++)
             {
                 var usuario = usuarios[i];
-                int numProductos = rnd.Next(2, 6); // 2 a 5 productos por venta
+                int numProductos = rnd.Next(2, 6);
 
-                // seleccionar productos aleatorios 
                 var productosVenta = productos.OrderBy(x => rnd.Next()).Take(numProductos).ToList();
 
                 foreach (var producto in productosVenta)
                 {
-                    int cantidad = rnd.Next(1, 4); // 1 a 3 unidades
+                    int cantidad = rnd.Next(1, 4);
                     decimal importe = (producto.Precio ?? 0m) * cantidad;
 
                     ventas.Add(new VentaDetalleViewModel
@@ -60,7 +56,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return ventas;
         }
 
-        // Dashboard principal
         public async Task<IActionResult> Index()
         {
             var usuarios = (await _usuarioService.GetAllAsync()).ToList();
@@ -84,7 +79,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return View(model);
         }
 
-        // Exportar UNA sola venta (agrupando sus productos)
         public async Task<IActionResult> ExportarVentaPdf(int id)
         {
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
@@ -94,7 +88,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
             var ventas = GenerarVentasEjemplo(usuarios, productos);
 
-            // Agrupamos productos por venta
             var ventaCompleta = ventas
                 .Where(v => v.IdVenta == id)
                 .ToList();
@@ -108,7 +101,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return File(pdfBytes, "application/pdf", $"Venta_{id}.pdf");
         }
 
-        // Exportar TODAS las ventas en un solo PDF
         public async Task<IActionResult> ExportarTodasLasVentas()
         {
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
@@ -118,7 +110,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
             var ventas = GenerarVentasEjemplo(usuarios, productos);
 
-            // Agrupamos por IdVenta para que cada venta tenga sus productos
             var ventasAgrupadas = ventas
                 .GroupBy(v => v.IdVenta)
                 .Select(g => g.ToList())

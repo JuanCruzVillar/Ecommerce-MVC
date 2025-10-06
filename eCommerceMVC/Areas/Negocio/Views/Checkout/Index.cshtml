@@ -6,7 +6,6 @@
 
 <div class="container-fluid py-4">
     <div class="row">
-        
         <div class="col-lg-8">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
@@ -59,9 +58,6 @@
                                                                         }
                                                                     </small>
                                                                 </div>
-                                                                <div class="costo-envio" id="costo_@direccion.IdDireccionEnvio" style="display: none;">
-                                                                    <small class="text-success"><strong>Envío: $<span class="costo-valor">0</span></strong></small>
-                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -75,6 +71,7 @@
                                             <i class="fas fa-plus me-2"></i>Agregar Nueva Dirección
                                         </button>
                                     </div>
+                                    @Html.HiddenFor(m => m.UsarNuevaDireccion)
                                 }
                                 else
                                 {
@@ -85,7 +82,6 @@
                                     @Html.HiddenFor(m => m.UsarNuevaDireccion, new { @value = "true" })
                                 }
 
-                                <!--Nueva Dirección -->
                                 <div id="nueva-direccion-form" style="@(Model.DireccionesDisponibles.Any() ? "display: none;" : "")">
                                     <div class="card bg-light">
                                         <div class="card-header">
@@ -93,54 +89,50 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-6 mb-3">
                                                     @Html.LabelFor(m => m.NuevaDireccion.NombreCompleto, new { @class = "form-label" })
-                                                    @Html.TextBoxFor(m => m.NuevaDireccion.NombreCompleto, new { @class = "form-control", placeholder = "Nombre completo del destinatario" })
+                                                    @Html.TextBoxFor(m => m.NuevaDireccion.NombreCompleto, new { @class = "form-control", placeholder = "Nombre completo" })
                                                     @Html.ValidationMessageFor(m => m.NuevaDireccion.NombreCompleto, "", new { @class = "text-danger" })
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-6 mb-3">
                                                     @Html.LabelFor(m => m.NuevaDireccion.Telefono, new { @class = "form-label" })
-                                                    @Html.TextBoxFor(m => m.NuevaDireccion.Telefono, new { @class = "form-control", placeholder = "Teléfono de contacto" })
+                                                    @Html.TextBoxFor(m => m.NuevaDireccion.Telefono, new { @class = "form-control", placeholder = "Teléfono" })
                                                     @Html.ValidationMessageFor(m => m.NuevaDireccion.Telefono, "", new { @class = "text-danger" })
                                                 </div>
                                             </div>
-                                            <div class="row mt-3">
-                                                <div class="col-12">
+                                            <div class="row">
+                                                <div class="col-12 mb-3">
                                                     @Html.LabelFor(m => m.NuevaDireccion.Direccion, new { @class = "form-label" })
-                                                    @Html.TextBoxFor(m => m.NuevaDireccion.Direccion, new { @class = "form-control", placeholder = "Dirección completa" })
+                                                    @Html.TextBoxFor(m => m.NuevaDireccion.Direccion, new { @class = "form-control", placeholder = "Calle y número" })
                                                     @Html.ValidationMessageFor(m => m.NuevaDireccion.Direccion, "", new { @class = "text-danger" })
                                                 </div>
                                             </div>
-                                            <div class="row mt-3">
-                                                <div class="col-md-4">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
                                                     @Html.LabelFor(m => m.NuevaDireccion.Ciudad, new { @class = "form-label" })
                                                     @Html.TextBoxFor(m => m.NuevaDireccion.Ciudad, new { @class = "form-control", placeholder = "Ciudad" })
                                                     @Html.ValidationMessageFor(m => m.NuevaDireccion.Ciudad, "", new { @class = "text-danger" })
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 mb-3">
                                                     @Html.LabelFor(m => m.NuevaDireccion.Provincia, new { @class = "form-label" })
                                                     @Html.TextBoxFor(m => m.NuevaDireccion.Provincia, new { @class = "form-control", placeholder = "Provincia" })
                                                     @Html.ValidationMessageFor(m => m.NuevaDireccion.Provincia, "", new { @class = "text-danger" })
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 mb-3">
                                                     @Html.LabelFor(m => m.NuevaDireccion.CodigoPostal, new { @class = "form-label" })
-                                                    @Html.TextBoxFor(m => m.NuevaDireccion.CodigoPostal, new { @class = "form-control", placeholder = "Código Postal" })
+                                                    @Html.TextBoxFor(m => m.NuevaDireccion.CodigoPostal, new { @class = "form-control", placeholder = "CP" })
                                                     @Html.ValidationMessageFor(m => m.NuevaDireccion.CodigoPostal, "", new { @class = "text-danger" })
                                                 </div>
                                             </div>
-                                            <div class="row mt-3">
-                                                <div class="col-12">
+                                            <div class="row">
+                                                <div class="col-12 mb-3">
                                                     @Html.LabelFor(m => m.NuevaDireccion.Referencias, new { @class = "form-label" })
-                                                    @Html.TextBoxFor(m => m.NuevaDireccion.Referencias, new { @class = "form-control", placeholder = "Referencias adicionales (opcional)" })
+                                                    @Html.TextBoxFor(m => m.NuevaDireccion.Referencias, new { @class = "form-control", placeholder = "Referencias (opcional)" })
                                                 </div>
                                             </div>
-                                            <div class="row mt-3">
-                                                <div class="col-12">
-                                                    <div class="form-check">
-                                                        @Html.CheckBoxFor(m => m.NuevaDireccion.GuardarDireccion, new { @class = "form-check-input" })
-                                                        @Html.LabelFor(m => m.NuevaDireccion.GuardarDireccion, "Guardar esta dirección para futuras compras", new { @class = "form-check-label" })
-                                                    </div>
-                                                </div>
+                                            <div class="form-check">
+                                                @Html.CheckBoxFor(m => m.NuevaDireccion.GuardarDireccion, new { @class = "form-check-input" })
+                                                @Html.LabelFor(m => m.NuevaDireccion.GuardarDireccion, "Guardar para futuras compras", new { @class = "form-check-label" })
                                             </div>
                                         </div>
                                     </div>
@@ -148,7 +140,7 @@
                             </div>
                         </div>
 
-                        <!-- Método de Pago -->
+                        <!-- Paso 2: Método de Pago -->
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">2</span>
@@ -176,77 +168,74 @@
                                     }
                                 </div>
 
-                                <!-- Formulario de Tarjeta (aparece cuando se selecciona método con tarjeta) -->
+                                <!-- Formulario Tarjeta -->
                                 <div id="form-tarjeta" style="display: none;">
                                     <div class="card bg-light mt-3">
                                         <div class="card-header">
-                                            <h6 class="mb-0">
-                                                <i class="fas fa-credit-card me-2"></i>
-                                                Datos de la Tarjeta
-                                            </h6>
+                                            <h6 class="mb-0"><i class="fas fa-credit-card me-2"></i>Datos de la Tarjeta</h6>
                                         </div>
-                                        <div class="card-body">
-                                            <div class="alert alert-info mb-3">
-                                                <i class="fas fa-info-circle me-2"></i>
-                                                <strong>Modo Demo:</strong> Esta es una simulación. Usa los siguientes datos de prueba:
-                                                <br><small>Tarjeta: 4532 1234 5678 9010 | CVV: 123 | Vencimiento: 12/25</small>
-                                            </div>
-
+                                        
                                             <div class="row">
                                                 <div class="col-12 mb-3">
-                                                    <label class="form-label">Número de Tarjeta</label>
-                                                    <input type="text" class="form-control" id="numero-tarjeta"
-                                                           placeholder="1234 5678 9012 3456" maxlength="19">
+                                                    <label class="form-label">Número de Tarjeta *</label>
+                                                    <input type="text" class="form-control" id="numero-tarjeta" placeholder="1234 5678 9012 3456" maxlength="19">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label">Titular de la Tarjeta</label>
-                                                    <input type="text" class="form-control" id="titular-tarjeta"
-                                                           placeholder="NOMBRE APELLIDO" style="text-transform: uppercase;">
+                                                    <label class="form-label">Titular *</label>
+                                                    <input type="text" class="form-control" id="titular-tarjeta" placeholder="NOMBRE APELLIDO" style="text-transform: uppercase;">
                                                 </div>
                                                 <div class="col-md-3 mb-3">
-                                                    <label class="form-label">Vencimiento</label>
-                                                    <input type="text" class="form-control" id="vencimiento-tarjeta"
-                                                           placeholder="MM/AA" maxlength="5">
+                                                    <label class="form-label">Vencimiento *</label>
+                                                    <input type="text" class="form-control" id="vencimiento-tarjeta" placeholder="MM/AA" maxlength="5">
                                                 </div>
                                                 <div class="col-md-3 mb-3">
-                                                    <label class="form-label">CVV</label>
-                                                    <input type="text" class="form-control" id="cvv-tarjeta"
-                                                           placeholder="123" maxlength="4">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="guardar-tarjeta">
-                                                        <label class="form-check-label" for="guardar-tarjeta">
-                                                            Guardar esta tarjeta para futuras compras
-                                                        </label>
-                                                    </div>
+                                                    <label class="form-label">CVV *</label>
+                                                    <input type="text" class="form-control" id="cvv-tarjeta" placeholder="123" maxlength="4">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- cupon -->
+                                <!-- Formulario Transferencia -->
+                                <div id="form-transferencia" style="display: none;">
+                                    <div class="card bg-light mt-3">
+                                        <div class="card-header">
+                                            <h6 class="mb-0"><i class="fas fa-university me-2"></i>Datos para Transferencia</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="alert alert-info mb-3">
+                                                <strong>CBU:</strong> 0170099220000037914652<br>
+                                                <strong>Alias:</strong> TIENDA.HARDWARE.EJEMPLO<br>
+                                                <strong>Titular:</strong> eCommerce Store S.A.<br>
+                                                <strong>CUIT:</strong> 20-12345678-9
+                                            </div>
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Envía el comprobante a: pagos@ecommerce-demo.com
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+
+                        <!-- Paso 3: Cupón -->
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">3</span>
                                 Cupón de Descuento (Opcional)
                             </h5>
-
                             <div class="step-content">
                                 <div class="row align-items-end">
                                     <div class="col-md-8">
-                                        @Html.TextBoxFor(m => m.CodigoCupon, new { @class = "form-control", placeholder = "Ingresa tu código de cupón", id = "codigo-cupon" })
+                                        @Html.TextBoxFor(m => m.CodigoCupon, new { @class = "form-control", placeholder = "Código de cupón", id = "codigo-cupon" })
                                     </div>
                                     <div class="col-md-4">
                                         <button type="button" class="btn btn-outline-secondary w-100" id="btn-aplicar-cupon">
-                                            <i class="fas fa-tag me-2"></i>Aplicar Cupón
+                                            <i class="fas fa-tag me-2"></i>Aplicar
                                         </button>
                                     </div>
                                 </div>
@@ -254,34 +243,31 @@
                             </div>
                         </div>
 
-                        <!-- Notas/observaciones -->
+                        <!-- Paso 4: Notas -->
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">4</span>
                                 Notas Especiales (Opcional)
                             </h5>
-
                             <div class="step-content">
-                                @Html.TextAreaFor(m => m.NotasEspeciales, new { @class = "form-control", @rows = "3", placeholder = "Ej: No tiene timbre, la puerta es azul, etc" })
+                                @Html.TextAreaFor(m => m.NotasEspeciales, new { @class = "form-control", @rows = "3", placeholder = "Instrucciones de entrega..." })
                             </div>
                         </div>
 
-                        <!-- terminos y condiciones -->
+                        <!-- Términos -->
                         <div class="mb-4">
                             <div class="form-check">
                                 @Html.CheckBoxFor(m => m.AceptaTerminos, new { @class = "form-check-input", @required = "required" })
                                 <label class="form-check-label">
-                                    Acepto los <a href="#" target="_blank">términos y condiciones</a> y la <a href="#" target="_blank">política de privacidad</a>
+                                    Acepto los <a href="#" target="_blank">términos y condiciones</a>
                                 </label>
                             </div>
                         </div>
 
-
-                        <!-- Finalizar -->
+                        <!-- Botón Finalizar -->
                         <div class="text-center">
                             <button type="submit" class="btn btn-success btn-lg px-5" id="btn-finalizar-compra">
-                                <i class="fas fa-credit-card me-2"></i>
-                                Finalizar Compra
+                                <i class="fas fa-lock me-2"></i>Finalizar Compra
                                 <span class="total-final ms-2">$@Model.Total.ToString("N2")</span>
                             </button>
                         </div>
@@ -294,13 +280,9 @@
         <div class="col-lg-4">
             <div class="card shadow-sm sticky-top" style="top: 20px;">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="fas fa-receipt me-2"></i>
-                        Resumen del Pedido
-                    </h5>
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Resumen del Pedido</h5>
                 </div>
-                <div class="card-body" id="resumen-pedido">
-                    <!-- Productos -->
+                <div class="card-body">
                     <div class="productos-resumen mb-3">
                         @foreach (var item in Model.ItemsCarrito)
                         {
@@ -318,20 +300,18 @@
                             </div>
                         }
                     </div>
-
-                    <!-- Totales -->
                     <div class="totales">
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal (@Model.TotalItems items):</span>
                             <span id="subtotal-valor">$@Model.Subtotal.ToString("N2")</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Costo de envío:</span>
+                            <span>Envío:</span>
                             <span id="envio-valor">$@Model.CostoEnvio.ToString("N2")</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2" id="descuento-row" style="@(Model.DescuentoAplicado > 0 ? "" : "display: none;")">
-                            <span class="text-success">Descuento aplicado:</span>
-                            <span class="text-success" id="descuento-valor">-$@Model.DescuentoAplicado.ToString("N2")</span>
+                        <div class="d-flex justify-content-between mb-2 text-success" id="descuento-row" style="@(Model.DescuentoAplicado > 0 ? "" : "display: none;")">
+                            <span>Descuento:</span>
+                            <span id="descuento-valor">-$@Model.DescuentoAplicado.ToString("N2")</span>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between">
@@ -350,7 +330,7 @@
     {
         return metodoPago.ToLower() switch
         {
-            var x when x.Contains("tarjeta") => "credit-card",
+            var x when x.Contains("tarjeta") || x.Contains("crédito") || x.Contains("débito") => "credit-card",
             var x when x.Contains("efectivo") => "money-bill-wave",
             var x when x.Contains("transferencia") => "university",
             var x when x.Contains("mercadopago") => "mobile-alt",
@@ -383,20 +363,16 @@
         font-weight: bold;
     }
 
-    .direccion-card, .metodo-pago-card {
-        margin-bottom: 15px;
-    }
-
     .direccion-option, .metodo-pago-card .card {
         border: 2px solid #e9ecef;
         transition: all 0.3s ease;
         cursor: pointer;
     }
 
-    .direccion-option:hover, .metodo-pago-card .card:hover {
-        border-color: #007bff;
-        box-shadow: 0 2px 4px rgba(0,123,255,0.1);
-    }
+        .direccion-option:hover, .metodo-pago-card .card:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.1);
+        }
 
     .form-check-input:checked + label .card {
         border-color: #007bff;
@@ -410,158 +386,222 @@
         border-radius: 4px;
     }
 
-    .sticky-top {
-        position: -webkit-sticky;
-        position: sticky;
+    .campo-requerido {
+        border-color: #dc3545 !important;
+        animation: shake 0.3s;
+    }
+    @@keyframes shake {
+        0%, 100%
+
+    {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+
     }
 </style>
 
-<script>
-    $(document).ready(function() {
-        // RESTAURAR SELECCIONES PREVIAS DESPUÉS DE ERROR
-        var metodoPagoSeleccionado = '@Model.MetodoPagoSeleccionado';
-        var codigoCupon = '@Model.CodigoCupon';
-        var aceptaTerminos = '@Model.AceptaTerminos'.toLowerCase();
+@section Scripts {
+    <script>
+        console.log('Iniciando script checkout');
 
-        console.log('DEBUG JS - Método pago seleccionado:', metodoPagoSeleccionado);
-        console.log('DEBUG JS - Acepta términos:', aceptaTerminos);
+        $(document).ready(function() {
+            console.log('jQuery cargado - Script ejecutándose');
 
-        // Restaurar método de pago seleccionado
-        if (metodoPagoSeleccionado && metodoPagoSeleccionado !== '0') {
-            $('#pago_' + metodoPagoSeleccionado).prop('checked', true);
-            $('#pago_' + metodoPagoSeleccionado).closest('.metodo-pago-card').find('.card').addClass('selected');
-        }
+            var metodoPagoSeleccionado = '@Model.MetodoPagoSeleccionado';
 
-        // Restaurar cupón si había uno
-        if (codigoCupon && codigoCupon !== '') {
-            $('#codigo-cupon').val(codigoCupon);
-        }
-
-        // Restaurar términos y condiciones
-        if (aceptaTerminos === 'true') {
-            $('input[name="AceptaTerminos"]').prop('checked', true);
-        }
-
-        // Toggle nueva dirección
-        $('#btn-nueva-direccion').click(function() {
-            $('#nueva-direccion-form').slideToggle();
-            $('input[name="UsarNuevaDireccion"]').val($('#nueva-direccion-form').is(':visible'));
-        });
-
-        // Manejar selección visual de métodos de pago
-        $('input[name="MetodoPagoSeleccionado"]').change(function() {
-            // Quitar selección visual de todos
-            $('.metodo-pago-card .card').removeClass('selected');
-
-            // Agregar selección visual al seleccionado
-            if ($(this).is(':checked')) {
-                $(this).closest('.metodo-pago-card').find('.card').addClass('selected');
-                console.log('DEBUG JS - Método de pago seleccionado:', $(this).val());
-            }
-        });
-
-        // Calcular envío cuando se selecciona dirección
-        $('.direccion-radio').change(function() {
-            if ($(this).is(':checked')) {
-                var idDireccion = $(this).val();
-                calcularCostoEnvio(idDireccion);
-            }
-        });
-
-        // Aplicar cupón
-        $('#btn-aplicar-cupon').click(function() {
-            var codigo = $('#codigo-cupon').val();
-            if (!codigo) {
-                mostrarMensajeCupon('Por favor ingrese un código de cupón', 'danger');
-                return;
+            if (metodoPagoSeleccionado && metodoPagoSeleccionado !== '0') {
+                $('#pago_' + metodoPagoSeleccionado).prop('checked', true).closest('.metodo-pago-card').find('.card').addClass('selected');
+                mostrarFormularioPago(metodoPagoSeleccionado);
             }
 
-            aplicarCupon(codigo);
-        });
-
-        // Validación antes del submit
-        $('form.checkout-form').submit(function(e) {
-            var metodoPago = $('input[name="MetodoPagoSeleccionado"]:checked').val();
-            var aceptaTerminos = $('input[name="AceptaTerminos"]').is(':checked');
-
-            console.log('DEBUG JS - Submit - Método pago:', metodoPago);
-            console.log('DEBUG JS - Submit - Acepta términos:', aceptaTerminos);
-
-            if (!metodoPago || metodoPago === '0') {
-                alert('Por favor seleccione un método de pago');
+            // BOTÓN NUEVA DIRECCIÓN
+            $('#btn-nueva-direccion').on('click', function(e) {
                 e.preventDefault();
-                return false;
+                console.log('Click en botón nueva dirección');
+
+                var $form = $('#nueva-direccion-form');
+                var visible = $form.is(':visible');
+                console.log('Formulario visible antes:', visible);
+
+                if (visible) {
+                    $form.slideUp(300);
+                    $('input[name="UsarNuevaDireccion"]').val('false');
+                    $(this).html('<i class="fas fa-plus me-2"></i>Agregar Nueva Dirección');
+                } else {
+                    $form.slideDown(300);
+                    $('input[name="UsarNuevaDireccion"]').val('true');
+                    $('.direccion-radio').prop('checked', false);
+                    $(this).html('<i class="fas fa-minus me-2"></i>Cancelar');
+                }
+            });
+
+            // MÉTODOS DE PAGO
+            $('input[name="MetodoPagoSeleccionado"]').on('change', function() {
+                console.log('Cambio en método de pago:', $(this).val());
+                $('.metodo-pago-card .card').removeClass('selected');
+                if ($(this).is(':checked')) {
+                    $(this).closest('.metodo-pago-card').find('.card').addClass('selected');
+                    mostrarFormularioPago($(this).val());
+                }
+            });
+
+            function mostrarFormularioPago(idMetodo) {
+                console.log('Mostrando formulario para método ID:', idMetodo);
+                $('#form-tarjeta, #form-transferencia').hide();
+
+                var $metodoCard = $('#pago_' + idMetodo).closest('.metodo-pago-card');
+                var nombre = $metodoCard.find('h6').text().toLowerCase();
+                console.log('Nombre del método encontrado:', nombre);
+
+                if (nombre.indexOf('tarjeta') > -1 || nombre.indexOf('crédito') > -1 || nombre.indexOf('débito') > -1) {
+                    console.log('Mostrando formulario de tarjeta');
+                    $('#form-tarjeta').slideDown(300);
+                } else if (nombre.indexOf('transferencia') > -1) {
+                    console.log('Mostrando formulario de transferencia');
+                    $('#form-transferencia').slideDown(300);
+                }
             }
 
-            if (!aceptaTerminos) {
-                alert('Debe aceptar los términos y condiciones');
-                e.preventDefault();
-                return false;
-            }
-        });
+            $('.direccion-radio').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#nueva-direccion-form').slideUp(300);
+                    $('input[name="UsarNuevaDireccion"]').val('false');
+                    $('#btn-nueva-direccion').html('<i class="fas fa-plus me-2"></i>Agregar Nueva Dirección');
+                }
+            });
 
-        // Funciones auxiliares
-        function calcularCostoEnvio(idDireccion) {
-            $.ajax({
-                url: '@Url.Action("CalcularEnvio", "Checkout")',
-                type: 'POST',
-                data: JSON.stringify(parseInt(idDireccion)),
-                contentType: 'application/json',
-                success: function(response) {
-                    if (response.exito) {
-                        actualizarCostoEnvio(response.costoEnvio);
+            $('form.checkout-form').on('submit', function(e) {
+                var metodoPago = $('input[name="MetodoPagoSeleccionado"]:checked').val();
+                var direccion = $('input[name="DireccionEnvioSeleccionada"]:checked').val();
+                var usaNueva = $('input[name="UsarNuevaDireccion"]').val() === 'true';
+                var terminos = $('input[name="AceptaTerminos"]').is(':checked');
+
+                console.log('Submit - Método pago:', metodoPago);
+                console.log('Submit - Dirección:', direccion);
+                console.log('Submit - Usa nueva:', usaNueva);
+                console.log('Submit - Términos:', terminos);
+
+                if (!metodoPago || metodoPago === '0') {
+                    alert('Por favor seleccione un método de pago');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!direccion && !usaNueva) {
+                    alert('Por favor seleccione una dirección de envío');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!terminos) {
+                    alert('Debe aceptar los términos y condiciones');
+                    e.preventDefault();
+                    return false;
+                }
+
+                var $metodoCard = $('#pago_' + metodoPago).closest('.metodo-pago-card');
+                var nombre = $metodoCard.find('h6').text().toLowerCase();
+
+                if ((nombre.indexOf('tarjeta') > -1 || nombre.indexOf('crédito') > -1 || nombre.indexOf('débito') > -1) && $('#form-tarjeta').is(':visible')) {
+                    if (!validarTarjeta()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                } else if (nombre.indexOf('transferencia') > -1) {
+                    if (!confirm('¿Has realizado la transferencia?\n\nRecuerda enviar el comprobante a: pagos@ecommerce-demo.com')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                } else if (nombre.indexOf('mercadopago') > -1) {
+                    if (!confirm('Serás redirigido a MercadoPago. ¿Continuar?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                } else if (nombre.indexOf('efectivo') > -1) {
+                    if (!confirm('Pago contra entrega. ¿Confirmas?')) {
+                        e.preventDefault();
+                        return false;
                     }
                 }
             });
-        }
 
-        function aplicarCupon(codigo) {
-            $.ajax({
-                url: '@Url.Action("AplicarCupon", "Checkout")',
-                type: 'POST',
-                data: JSON.stringify({ Codigo: codigo }),
-                contentType: 'application/json',
-                success: function(response) {
-                    if (response.exito) {
-                        mostrarMensajeCupon(response.mensaje, 'success');
-                        actualizarTotales(response.descuento, response.nuevoTotal);
-                    } else {
-                        mostrarMensajeCupon(response.mensaje, 'danger');
-                    }
+            function validarTarjeta() {
+                var numero = $('#numero-tarjeta').val().trim();
+                var titular = $('#titular-tarjeta').val().trim();
+                var venc = $('#vencimiento-tarjeta').val().trim();
+                var cvv = $('#cvv-tarjeta').val().trim();
+
+                if (!numero || !titular || !venc || !cvv) {
+                    alert('Complete todos los datos de la tarjeta');
+                    if (!numero) $('#numero-tarjeta').addClass('campo-requerido').focus();
+                    else if (!titular) $('#titular-tarjeta').addClass('campo-requerido').focus();
+                    else if (!venc) $('#vencimiento-tarjeta').addClass('campo-requerido').focus();
+                    else if (!cvv) $('#cvv-tarjeta').addClass('campo-requerido').focus();
+                    return false;
                 }
-            });
-        }
 
-        function mostrarMensajeCupon(mensaje, tipo) {
-            $('#mensaje-cupon')
-                .removeClass('alert-success alert-danger')
-                .addClass('alert alert-' + tipo)
-                .text(mensaje)
-                .show();
-        }
+                var numeroLimpio = numero.replace(/\s/g, '');
+                if (numeroLimpio.length < 15) {
+                    alert('Número de tarjeta inválido (mínimo 15 dígitos)');
+                    $('#numero-tarjeta').addClass('campo-requerido').focus();
+                    return false;
+                }
 
-        function actualizarCostoEnvio(nuevoCoste) {
-            $('#envio-valor').text('$' + nuevoCoste.toFixed(2));
-            recalcularTotal();
-        }
+                if (!/^\d{2}\/\d{2}$/.test(venc)) {
+                    alert('Formato inválido. Use MM/AA');
+                    $('#vencimiento-tarjeta').addClass('campo-requerido').focus();
+                    return false;
+                }
 
-        function actualizarTotales(descuento, nuevoTotal) {
-            if (descuento > 0) {
-                $('#descuento-valor').text('-$' + descuento.toFixed(2));
-                $('#descuento-row').show();
+                var partes = venc.split('/');
+                var mes = parseInt(partes[0]);
+                if (mes < 1 || mes > 12) {
+                    alert('Mes inválido (debe ser 01-12)');
+                    $('#vencimiento-tarjeta').addClass('campo-requerido').focus();
+                    return false;
+                }
+
+                if (cvv.length < 3) {
+                    alert('CVV inválido (mínimo 3 dígitos)');
+                    $('#cvv-tarjeta').addClass('campo-requerido').focus();
+                    return false;
+                }
+
+                return true;
             }
-            $('#total-valor').text('$' + nuevoTotal.toFixed(2));
-            $('.total-final').text('$' + nuevoTotal.toFixed(2));
-        }
 
-        function recalcularTotal() {
-            var subtotal = parseFloat($('#subtotal-valor').text().replace('$', ''));
-            var envio = parseFloat($('#envio-valor').text().replace('$', ''));
-            var descuento = parseFloat($('#descuento-valor').text().replace('-$', '')) || 0;
-            var total = subtotal + envio - descuento;
+            // Formateo automático
+            $('#numero-tarjeta').on('input', function() {
+                $(this).removeClass('campo-requerido');
+                var value = $(this).val().replace(/\s/g, '').replace(/\D/g, '');
+                var formatted = value.match(/.{1,4}/g);
+                $(this).val(formatted ? formatted.join(' ') : value);
+            });
 
-            $('#total-valor').text('$' + total.toFixed(2));
-            $('.total-final').text('$' + total.toFixed(2));
-        }
-    });
-</script>
+            $('#vencimiento-tarjeta').on('input', function() {
+                $(this).removeClass('campo-requerido');
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                $(this).val(value);
+            });
+
+            $('#titular-tarjeta, #cvv-tarjeta').on('input', function() {
+                $(this).removeClass('campo-requerido');
+            });
+
+            $('#cvv-tarjeta').on('input', function() {
+                $(this).val($(this).val().replace(/\D/g, ''));
+            });
+        });
+    </script>
+}

@@ -1,4 +1,5 @@
-﻿using eCommerce.Data;
+﻿using eCommerce.Areas.Negocio.Controllers;
+using eCommerce.Data;
 using eCommerce.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -10,7 +11,7 @@ using System.Security.Claims;
 namespace eCommerceMVC.Areas.Negocio.Controllers
 {
     [Area("Negocio")]
-    public class RegisterController : Controller
+    public class RegisterController : BaseNegocioController
     {
         private readonly DbecommerceContext _context;
 
@@ -80,7 +81,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     Apellidos = apellidos.Trim(),
                     Correo = correo.Trim().ToLower(),
                     FechaRegistro = DateTime.Now,
-                    Restablecer = false // AGREGAR ESTO
+                    Restablecer = false 
                 };
 
                 nuevoCliente.Contraseña = hasher.HashPassword(nuevoCliente, contrasena);
@@ -99,7 +100,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     Activo = true,
                     FechaRegistro = DateTime.Now,
                     IdCliente = nuevoCliente.IdCliente,
-                    Restablecer = false // AGREGAR ESTO
+                    Restablecer = false 
                 };
 
                 nuevoUsuario.Contraseña = hasherUsuario.HashPassword(nuevoUsuario, contrasena);
@@ -129,7 +130,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
-                // CAMBIAR ESTO para ver el error real
+               
                 var errorCompleto = ex.Message;
                 if (ex.InnerException != null)
                 {
@@ -137,7 +138,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 }
                 ViewBag.Error = $"Error detallado: {errorCompleto}";
 
-                // También escribir en la consola de debug
+                
                 System.Diagnostics.Debug.WriteLine($"ERROR REGISTRO: {errorCompleto}");
                 System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
 

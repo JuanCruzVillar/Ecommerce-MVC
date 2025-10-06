@@ -61,7 +61,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     new Claim(ClaimTypes.Name, usuario.Nombres),
                     new Claim(ClaimTypes.Email, usuario.Correo),
                     new Claim(ClaimTypes.Role, usuario.Rol),
-                    new Claim("IdUsuario", usuario.IdUsuario.ToString()) // AGREGADO
+                    new Claim("IdUsuario", usuario.IdUsuario.ToString()) 
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

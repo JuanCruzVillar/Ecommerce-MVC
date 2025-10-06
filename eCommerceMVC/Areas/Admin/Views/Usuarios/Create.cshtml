@@ -6,7 +6,7 @@
 }
 
 <div class="container-fluid px-4 py-4">
-    <!-- Header -->
+    @* Header *@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <!-- Mensajes de alerta -->
+    @* Msj alertas *@
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
@@ -33,7 +33,7 @@
         </div>
     }
 
-    <!-- Card del formulario -->
+    @* Card formulario *@
     <div class="row">
         <div class="col-lg-8 mx-auto">
             <div class="card shadow-sm border-0">
@@ -46,7 +46,7 @@
                     <form asp-action="Create" method="post">
                         @Html.AntiForgeryToken()
 
-                        <!-- Información Personal -->
+                        @* Info personal *@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h6 class="text-primary fw-bold mb-3">
@@ -69,7 +69,7 @@
                             </div>
                         </div>
 
-                        <!-- Credenciales -->
+                        @* Credenciales *@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h6 class="text-primary fw-bold mb-3">
@@ -98,7 +98,7 @@
                             </div>
                         </div>
 
-                        <!-- Rol y Cliente -->
+                        @* Rol *@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h6 class="text-primary fw-bold mb-3">
@@ -127,7 +127,7 @@
                             </div>
                         </div>
 
-                        <!-- Botones de acción -->
+                        @* Botones de accion *@
                         <div class="row">
                             <div class="col-12">
                                 <hr class="my-4" />
@@ -153,7 +153,7 @@
 
     <script>
         $(document).ready(function () {
-            // Toggle password visibility
+            
             $('#togglePassword').on('click', function () {
                 const passwordInput = $('#passwordInput');
                 const toggleIcon = $('#toggleIcon');
@@ -167,7 +167,7 @@
                 }
             });
 
-            // Auto-cerrar alertas
+            
             setTimeout(function () {
                 $('.alert').fadeOut('slow');
             }, 5000);

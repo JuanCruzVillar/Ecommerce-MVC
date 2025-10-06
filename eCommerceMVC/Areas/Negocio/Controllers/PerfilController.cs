@@ -9,9 +9,8 @@ using System.Security.Claims;
 
 namespace eCommerce.Areas.Negocio.Controllers
 {
-    [Area("Negocio")]
     [Authorize]
-    public class PerfilController : Controller
+    public class PerfilController : BaseNegocioController
     {
         private readonly DbecommerceContext _context;
 
@@ -20,12 +19,11 @@ namespace eCommerce.Areas.Negocio.Controllers
             _context = context;
         }
 
-        // GET: Perfil/Index - Mostrar datos del perfil
         public async Task<IActionResult> Index()
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -53,12 +51,11 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
         }
 
-        // GET: Perfil/Editar
         public async Task<IActionResult> Editar()
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -85,14 +82,13 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
         }
 
-        // POST: Perfil/Editar
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Editar(Entities.Cliente cliente)
+        public async Task<IActionResult> Editar(Cliente cliente)
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -112,14 +108,12 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // Actualizar datos del cliente
                 clienteExistente.Nombres = cliente.Nombres?.Trim();
                 clienteExistente.Apellidos = cliente.Apellidos?.Trim();
                 clienteExistente.Correo = cliente.Correo?.Trim();
 
                 await _context.SaveChangesAsync();
 
-                // Sincronizar con Usuario si existe
                 var usuarioAsociado = await _context.Usuarios
                     .FirstOrDefaultAsync(u => u.IdCliente == idCliente);
 
@@ -132,7 +126,6 @@ namespace eCommerce.Areas.Negocio.Controllers
                     _context.Update(usuarioAsociado);
                     await _context.SaveChangesAsync();
 
-                    // Refrescar los claims con los nuevos datos
                     await RefreshClaims(usuarioAsociado);
                 }
 
@@ -147,12 +140,11 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
         }
 
-        // GET: Perfil/MisCompras - Historial de compras
         public async Task<IActionResult> MisCompras()
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -178,12 +170,11 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
         }
 
-        // GET: Perfil/DetalleCompra/5
         public async Task<IActionResult> DetalleCompra(int id)
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -218,12 +209,11 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
         }
 
-        // GET: Perfil/MisDirecciones
         public async Task<IActionResult> MisDirecciones()
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -246,14 +236,13 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
         }
 
-        // POST: Perfil/EliminarDireccion/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarDireccion(int id)
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -270,7 +259,6 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("MisDirecciones");
                 }
 
-                // Soft delete
                 direccion.Activo = false;
                 _context.Update(direccion);
                 await _context.SaveChangesAsync();
@@ -285,14 +273,13 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
         }
 
-        // POST: Perfil/EstablecerPredeterminada/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EstablecerPredeterminada(int id)
         {
             try
             {
-                var idCliente = await GetClienteId();
+                var idCliente = GetClienteId(); 
 
                 if (idCliente == 0)
                 {
@@ -300,18 +287,15 @@ namespace eCommerce.Areas.Negocio.Controllers
                     return RedirectToAction("Index", "Catalogo");
                 }
 
-                // Obtener todas las direcciones del cliente
                 var direccionesCliente = await _context.DireccionesEnvio
                     .Where(d => d.IdCliente == idCliente && d.Activo == true)
                     .ToListAsync();
 
-                // Desmarcar todas como predeterminadas
                 foreach (var dir in direccionesCliente)
                 {
                     dir.EsDireccionPrincipal = false;
                 }
 
-                // Establecer la nueva dirección predeterminada
                 var direccion = direccionesCliente.FirstOrDefault(d => d.IdDireccionEnvio == id);
                 if (direccion != null)
                 {
@@ -335,47 +319,7 @@ namespace eCommerce.Areas.Negocio.Controllers
 
         #region Métodos Helper
 
-        private async Task<int> GetClienteId()
-        {
-            try
-            {
-                // Obtener IdUsuario de los claims
-                var usuarioIdClaim = User.FindFirst("IdUsuario")?.Value;
-                if (string.IsNullOrEmpty(usuarioIdClaim) || !int.TryParse(usuarioIdClaim, out int usuarioId))
-                {
-                    return 0;
-                }
-
-                // Obtener IdCliente guardado en los claims
-                var clienteIdClaim = User.FindFirst("IdCliente")?.Value;
-                if (!string.IsNullOrEmpty(clienteIdClaim) && int.TryParse(clienteIdClaim, out int clienteIdFromClaim))
-                {
-                    // Verificar que el IdCliente en claims siga siendo válido
-                    var usuario = await _context.Usuarios
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(u => u.IdUsuario == usuarioId);
-
-                    if (usuario != null && usuario.IdCliente.HasValue)
-                    {
-                        // Si cambió el IdCliente, refrescar la sesión
-                        if (usuario.IdCliente.Value != clienteIdFromClaim)
-                        {
-                            await RefreshClaims(usuario);
-                            return usuario.IdCliente.Value;
-                        }
-
-                        return clienteIdFromClaim;
-                    }
-                }
-
-                return 0;
-            }
-            catch (Exception)
-            {
-                return 0;
-            }
-        }
-
+        
         private async Task RefreshClaims(Usuario usuario)
         {
             try

@@ -1,13 +1,14 @@
-﻿using eCommerce.Entities;
+﻿using eCommerce.Areas.Admin.Controllers;
+using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +19,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class ProductosController : Controller
+    public class ProductosController : BaseAdminController
     {
         private readonly IProductoService _productoService;
         private readonly ICategoriaService _categoriaService;
@@ -26,7 +27,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
         
         private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-        private readonly long _maxFileSize = 5 * 1024 * 1024; // 5MB
+        private readonly long _maxFileSize = 5 * 1024 * 1024;
 
         public ProductosController(
             IProductoService productoService,
@@ -136,7 +137,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-        // GET: Productos/Edit/5
+        // GET: Productos/Edit/
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -171,7 +172,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-        // POST: Productos/Edit/5
+        // POST: Productos/Edit/
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ProductoViewModel vm)
@@ -199,7 +200,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 var producto = await _productoService.GetByIdAsync(id);
                 if (producto == null) return NotFound();
 
-                // Actualizar campos
+                
                 producto.Nombre = vm.Nombre?.Trim();
                 producto.Descripcion = vm.Descripcion?.Trim();
                 producto.IdMarca = vm.IdMarca;
@@ -241,7 +242,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-        // GET: Productos/Details/5
+        // GET: Productos/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -260,7 +261,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-        // GET: Productos/Delete/5
+        // GET: Productos/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -279,7 +280,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
         }
 
-        // POST: Productos/Delete/5
+        // POST: Productos/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -304,7 +305,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Productos/GestionarImagenes/5
+        // GET: Productos/GestionarImagenes
         public async Task<IActionResult> GestionarImagenes(int? id)
         {
             if (id == null) return NotFound();
@@ -379,7 +380,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                         RutaImagen = rutaImagen,
                         NombreImagen = archivo.FileName,
                         Orden = ++maxOrden,
-                        EsPrincipal = !producto.Imagenes.Any(), // Primera imagen es principal
+                        EsPrincipal = !producto.Imagenes.Any(), 
                         Activo = true,
                         FechaRegistro = DateTime.Now
                     };
@@ -496,14 +497,14 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 
                 using var image = await Image.LoadAsync<Rgba32>(file.OpenReadStream());
 
-                // Crear imagen base con fondo blanco
+                // Crear imagen base con fondo en blanco
                 using var outputImage = new Image<Rgba32>(800, 800, Color.White);
 
                 // Redimensionar manteniendo aspecto
                 image.Mutate(x => x.Resize(new ResizeOptions
                 {
                     Size = new Size(800, 800),
-                    Mode = ResizeMode.Max // Mantiene aspecto, no recorta
+                    Mode = ResizeMode.Max 
                 }));
 
                 // Calcular posición para centrar
@@ -513,7 +514,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                 // Dibujar imagen sobre fondo blanco
                 outputImage.Mutate(ctx => ctx.DrawImage(image, new Point(x, y), 1f));
 
-                // Guardar como JPG con calidad 85
+                
                 var encoder = new JpegEncoder
                 {
                     Quality = 95

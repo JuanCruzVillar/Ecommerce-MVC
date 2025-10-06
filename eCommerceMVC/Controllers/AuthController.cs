@@ -24,7 +24,7 @@ namespace eCommerceMVC.Controllers
         public IActionResult Login(string returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View(); // Vista Admin
+            return View(); 
         }
 
         [HttpPost]
@@ -70,9 +70,7 @@ namespace eCommerceMVC.Controllers
             return RedirectToAction("Index", "Home", new { area = "Admin" });
         }
 
-        // -------------------------------
-        // LOGIN CLIENTE (POST desde modal)
-        // -------------------------------
+        
         [HttpPost]
         public async Task<IActionResult> LoginCliente(string correo, string contrasena)
         {
@@ -104,9 +102,7 @@ namespace eCommerceMVC.Controllers
         }
 
 
-        // -------------------------------
-        // LOGOUT
-        // -------------------------------
+        
         [HttpGet]
         public async Task<IActionResult> Logout()
         {

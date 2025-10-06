@@ -8,7 +8,7 @@
         <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
             <div class="col-md-10 col-lg-8">
                 <div class="row bg-white rounded-4 shadow-lg overflow-hidden">
-                    <!-- Columna izquierda - Información -->
+                    @* Info *@
                     <div class="col-md-6 d-none d-md-flex flex-column justify-content-center p-5"
                          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                         <div class="text-white">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
 
-                    <!-- Columna derecha - Formulario -->
+                    @* Formulario *@
                     <div class="col-md-6 p-5">
                         <div class="text-center mb-4">
                             <h3 class="fw-bold text-dark mb-2">Crear Cuenta</h3>
@@ -152,7 +152,7 @@
                     </div>
                 </div>
 
-                <!-- Link para volver al catálogo -->
+                @* Volver al catalogo *@
                 <div class="text-center mt-4">
                     <a asp-action="Index" asp-controller="Catalogo" asp-area="Negocio"
                        class="text-white text-decoration-none">
@@ -166,7 +166,7 @@
 
 @section Scripts {
     <script>
-        // Toggle password visibility
+       
         document.getElementById('togglePassword').addEventListener('click', function () {
             const passwordInput = document.getElementById('contrasena');
             const toggleIcon = document.getElementById('toggleIcon');
@@ -182,7 +182,7 @@
             }
         });
 
-        // Toggle confirm password visibility
+        
         document.getElementById('toggleConfirm').addEventListener('click', function () {
             const confirmInput = document.getElementById('confirmarContrasena');
             const toggleIcon = document.getElementById('toggleConfirmIcon');
@@ -198,7 +198,7 @@
             }
         });
 
-        // Auto-dismiss alerts
+        
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {

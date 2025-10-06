@@ -1,4 +1,5 @@
-﻿using eCommerce.Entities;
+﻿using eCommerce.Areas.Admin.Controllers;
+using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class VentasController : Controller
+    public class VentasController : BaseAdminController
     {
         public IActionResult Index()
         {

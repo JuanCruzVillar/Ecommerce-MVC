@@ -1,4 +1,5 @@
-﻿using eCommerce.Entities;
+﻿using eCommerce.Areas.Negocio.Controllers;
+using eCommerce.Entities;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,11 +8,11 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Security.Claims;
 
-namespace eCommerce.Areas.Cliente.Controllers
+namespace eCommerceMVC.Areas.Negocio.Controllers
 {
     [Area("Negocio")]
 
-    public class CheckoutController : Controller
+    public class CheckoutController : BaseNegocioController
     {
         private readonly ICheckoutService _checkoutService;
         private readonly ICarritoService _carritoService;
@@ -29,7 +30,7 @@ namespace eCommerce.Areas.Cliente.Controllers
             {
                 var idCliente = GetClienteId();
 
-                
+
                 Console.WriteLine($"DEBUG - IdCliente obtenido: {idCliente}");
                 foreach (var claim in User.Claims)
                 {
@@ -42,17 +43,17 @@ namespace eCommerce.Areas.Cliente.Controllers
                     return RedirectToAction("Login", "Auth");
                 }
 
-                
+
                 var itemsCarrito = await _carritoService.ObtenerItemsCarritoAsync(idCliente);
                 Console.WriteLine($"DEBUG - Items carrito encontrados: {itemsCarrito.Count}");
 
                 if (!itemsCarrito.Any())
                 {
                     TempData["Error"] = "Su carrito está vacío";
-                    return RedirectToAction("Index", "Tienda");
+                    return RedirectToAction("Index", "Catalogo");
                 }
 
-                
+
                 var stockDisponible = await _checkoutService.ValidarStockProductosAsync(idCliente);
                 if (!stockDisponible)
                 {
@@ -63,7 +64,7 @@ namespace eCommerce.Areas.Cliente.Controllers
                 var checkoutViewModel = await _checkoutService.ObtenerCheckoutAsync(idCliente);
                 Console.WriteLine($"DEBUG - Direcciones disponibles: {checkoutViewModel.DireccionesDisponibles.Count}");
 
-                
+
                 if (!checkoutViewModel.DireccionesDisponibles.Any())
                 {
                     checkoutViewModel.UsarNuevaDireccion = true;
@@ -94,7 +95,7 @@ namespace eCommerce.Areas.Cliente.Controllers
 
                 if (resultado.EsValido)
                 {
-                    
+
                     var costoEnvio = checkoutViewModel.CostoEnvio;
                     var total = subtotal + costoEnvio - resultado.DescuentoAplicado;
 
@@ -223,7 +224,7 @@ namespace eCommerce.Areas.Cliente.Controllers
                 Console.WriteLine($"DEBUG - DireccionSeleccionada: {model.DireccionEnvioSeleccionada}");
                 Console.WriteLine($"DEBUG - AceptaTerminos: {model.AceptaTerminos}");
 
-               
+
                 if (model.UsarNuevaDireccion && model.NuevaDireccion != null)
                 {
                     Console.WriteLine($"DEBUG - NuevaDireccion.NombreCompleto: '{model.NuevaDireccion.NombreCompleto}'");
@@ -260,7 +261,7 @@ namespace eCommerce.Areas.Cliente.Controllers
                     return await RecargarCheckoutConError(model, idCliente);
                 }
 
-                
+
                 if (model.UsarNuevaDireccion)
                 {
                     Console.WriteLine("DEBUG - Validando nueva dirección...");
@@ -377,7 +378,7 @@ namespace eCommerce.Areas.Cliente.Controllers
             }
         }
 
-        // Método helper para recargar el checkout preservando datos
+       
         private async Task<IActionResult> RecargarCheckoutConError(CheckoutViewModel model, int idCliente)
         {
             try
@@ -412,7 +413,7 @@ namespace eCommerce.Areas.Cliente.Controllers
             }
         }
 
-        // GET: Confirmación de pedido
+        // GET: Confirmacion de pedido
         public async Task<IActionResult> Confirmacion(int id)
         {
             try
@@ -423,7 +424,7 @@ namespace eCommerce.Areas.Cliente.Controllers
                 if (confirmacion == null)
                 {
                     TempData["Error"] = "Pedido no encontrado";
-                    return RedirectToAction("Index", "Tienda");
+                    return RedirectToAction("Index", "Catalogo");
                 }
 
                 return View(confirmacion);
@@ -431,7 +432,7 @@ namespace eCommerce.Areas.Cliente.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Error al obtener la confirmación: " + ex.Message;
-                return RedirectToAction("Index", "Tienda");
+                return RedirectToAction("Index", "Catalogo");
             }
         }
 
@@ -463,16 +464,7 @@ namespace eCommerce.Areas.Cliente.Controllers
 
         #region Métodos Helper
 
-        private int GetClienteId()
-        {
-            var clienteIdClaim = User.FindFirst("IdCliente")?.Value; 
-            if (int.TryParse(clienteIdClaim, out int clienteId))
-            {
-                return clienteId;
-            }
-            return 0;
-        }
-
+        
         private async Task<string> RenderPartialViewToStringAsync(string viewName, object model)
         {
             ViewData.Model = model;
@@ -500,6 +492,9 @@ namespace eCommerce.Areas.Cliente.Controllers
             }
         }
 
-        #endregion
+
     }
+
 }
+
+#endregion

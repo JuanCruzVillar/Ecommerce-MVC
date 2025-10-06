@@ -1,4 +1,5 @@
-﻿using eCommerce.Entities;
+﻿using eCommerce.Areas.Admin.Controllers;
+using eCommerce.Entities;
 using eCommerce.Services.Implementations;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class MarcasController : Controller
+    public class MarcasController : BaseAdminController
     {
         private readonly IMarcaService _marcaService;
         private readonly IProductoService _productoService;
@@ -28,7 +29,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return View(marcas);
         }
 
-        // GET: Marcas/Details/5
+        // GET: Marcas/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -36,7 +37,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             var marca = await _marcaService.GetByIdAsync(id.Value);
             if (marca == null) return NotFound();
 
-            // Obtener productos asociados
+           
             var todosLosProductos = await _productoService.GetAllAsync();
             var productosAsociados = todosLosProductos.Where(p => p.IdMarca == id.Value).ToList();
 
@@ -70,7 +71,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Marcas/Edit/5
+        // GET: Marcas/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -81,7 +82,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return View(marca);
         }
 
-        // POST: Marcas/Edit/5
+        // POST: Marcas/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Marca marca)
@@ -100,7 +101,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Marcas/Delete/5
+        // GET: Marcas/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -111,7 +112,7 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             return View(marca);
         }
 
-        // POST: Marcas/Delete/5
+        // POST: Marcas/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

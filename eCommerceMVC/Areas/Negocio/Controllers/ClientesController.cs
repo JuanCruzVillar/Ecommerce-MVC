@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using eCommerce.Areas.Negocio.Controllers;
+using eCommerce.Data;
+using eCommerce.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using eCommerce.Data;
-using eCommerce.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eCommerceMVC.Areas.Negocio.Controllers
 {
     [Area("Negocio")]
-    public class ClientesController : Controller
+    public class ClientesController : BaseNegocioController
     {
         private readonly DbecommerceContext _context;
 
@@ -117,7 +118,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return View(cliente);
         }
 
-        // GET: Cliente/Clientes/Delete/5
+        // GET: Cliente/Clientes/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,7 +136,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return View(cliente);
         }
 
-        // POST: Cliente/Clientes/Delete/5
+        // POST: Cliente/Clientes/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

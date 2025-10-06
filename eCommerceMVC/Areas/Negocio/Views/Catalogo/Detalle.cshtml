@@ -7,11 +7,11 @@
 
 <div class="container py-5">
     <div class="row">
-        <!-- Sección de imágenes con galería -->
+        @* Galeria *@
         <div class="col-md-6 mb-4">
             @if (Model.Imagenes != null && Model.Imagenes.Any())
             {
-                <!-- Imagen principal -->
+                @* Imagen principal *@
                 <div class="mb-3">
                     <div id="carouselProducto" class="carousel slide" data-bs-ride="false">
                         <div class="carousel-inner rounded shadow">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
 
-                <!-- Thumbnails -->
+               
                 @if (Model.Imagenes.Count > 1)
                 {
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
@@ -63,7 +63,7 @@
             }
             else
             {
-                <!-- Imagen única o placeholder -->
+                
                 <img class="img-fluid rounded shadow"
                      src="@(Model.Producto.RutaImagen ?? "https://dummyimage.com/1200x1200/dee2e6/6c757d.jpg")"
                      alt="@Model.Producto.Nombre"
@@ -237,7 +237,7 @@
     <script>
         $(document).ready(function () {
             var precioProducto = parseFloat("@(Model.Producto.Precio?.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) ?? "0")");
-             // Interes "random" para las cuotas
+             // Interes "random" para las cuotas pero 3 sin interes
             var cuotasDisponibles = [
                 { nro: 3, interes: 0.00 },
                 { nro: 6, interes: 0.135 },
