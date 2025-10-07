@@ -7,8 +7,8 @@
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-lg-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h4 class="mb-0">
                         <i class="fas fa-shopping-cart me-2"></i>
                         Finalizar Compra
@@ -19,7 +19,7 @@
                     {
                         @Html.AntiForgeryToken()
 
-                        <!-- Paso 1: Dirección de Envío -->
+                        @* Direccion de envio *@
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">1</span>
@@ -43,7 +43,7 @@
                                                                     <strong>@direccion.NombreCompleto</strong>
                                                                     @if (direccion.EsDireccionPrincipal)
                                                                     {
-                                                                        <span class="badge bg-primary ms-2">Principal</span>
+                                                                        <span class="badge ms-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Principal</span>
                                                                     }
                                                                     <br>
                                                                     <small class="text-muted">
@@ -53,7 +53,6 @@
                                                                         @if (!string.IsNullOrEmpty(direccion.Referencias))
                                                                         {
                                                                             <br>
-                                                            
                                                                             <em>@direccion.Referencias</em>
                                                                         }
                                                                     </small>
@@ -67,7 +66,7 @@
                                     </div>
 
                                     <div class="text-center mb-3">
-                                        <button type="button" class="btn btn-outline-primary" id="btn-nueva-direccion">
+                                        <button type="button" class="btn btn-custom-outline" id="btn-nueva-direccion">
                                             <i class="fas fa-plus me-2"></i>Agregar Nueva Dirección
                                         </button>
                                     </div>
@@ -140,7 +139,7 @@
                             </div>
                         </div>
 
-                        <!-- Paso 2: Método de Pago -->
+                        @* Metodo de pago *@
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">2</span>
@@ -157,7 +156,7 @@
                                                 <label class="form-check-label w-100" for="pago_@metodo.IdMetodoPago">
                                                     <div class="card">
                                                         <div class="card-body text-center p-3">
-                                                            <i class="fas fa-@GetPaymentIcon(metodo.Nombre) fa-2x mb-2 text-primary"></i>
+                                                            <i class="fas fa-@GetPaymentIcon(metodo.Nombre) fa-2x mb-2" style="color: #667eea;"></i>
                                                             <h6 class="mb-1">@metodo.Nombre</h6>
                                                             <small class="text-muted">@metodo.Descripcion</small>
                                                         </div>
@@ -168,13 +167,13 @@
                                     }
                                 </div>
 
-                                <!-- Formulario Tarjeta -->
+                                @* Formulario tarjeta *@
                                 <div id="form-tarjeta" style="display: none;">
                                     <div class="card bg-light mt-3">
                                         <div class="card-header">
                                             <h6 class="mb-0"><i class="fas fa-credit-card me-2"></i>Datos de la Tarjeta</h6>
                                         </div>
-                                        
+                                        <div class="card-body">
                                             <div class="row">
                                                 <div class="col-12 mb-3">
                                                     <label class="form-label">Número de Tarjeta *</label>
@@ -184,7 +183,7 @@
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
                                                     <label class="form-label">Titular *</label>
-                                                    <input type="text" class="form-control" id="titular-tarjeta" placeholder="NOMBRE APELLIDO" style="text-transform: uppercase;">
+                                                    <input type="text" class="form-control" id="titular-tarjeta" placeholder="NOMBRE Y APELLIDO" style="text-transform: uppercase;">
                                                 </div>
                                                 <div class="col-md-3 mb-3">
                                                     <label class="form-label">Vencimiento *</label>
@@ -199,7 +198,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Formulario Transferencia -->
+                                @* Formulario transferencia *@
                                 <div id="form-transferencia" style="display: none;">
                                     <div class="card bg-light mt-3">
                                         <div class="card-header">
@@ -208,21 +207,21 @@
                                         <div class="card-body">
                                             <div class="alert alert-info mb-3">
                                                 <strong>CBU:</strong> 0170099220000037914652<br>
-                                                <strong>Alias:</strong> TIENDA.HARDWARE.EJEMPLO<br>
-                                                <strong>Titular:</strong> eCommerce Store S.A.<br>
+                                                <strong>Alias:</strong> HARDWARE.STORE.EJEMPLO<br>
+                                                <strong>Titular:</strong> Hardware Store S.A.<br>
                                                 <strong>CUIT:</strong> 20-12345678-9
                                             </div>
                                             <div class="alert alert-warning">
                                                 <i class="fas fa-exclamation-triangle me-2"></i>
-                                                Envía el comprobante a: pagos@ecommerce-demo.com
+                                                Envía el comprobante a: HardwareStore@ejemplo.com
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        
+                        </div>
 
-                        <!-- Paso 3: Cupón -->
+                        @* Cupon descuento *@
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">3</span>
@@ -234,7 +233,7 @@
                                         @Html.TextBoxFor(m => m.CodigoCupon, new { @class = "form-control", placeholder = "Código de cupón", id = "codigo-cupon" })
                                     </div>
                                     <div class="col-md-4">
-                                        <button type="button" class="btn btn-outline-secondary w-100" id="btn-aplicar-cupon">
+                                        <button type="button" class="btn btn-custom-outline w-100" id="btn-aplicar-cupon">
                                             <i class="fas fa-tag me-2"></i>Aplicar
                                         </button>
                                     </div>
@@ -243,7 +242,7 @@
                             </div>
                         </div>
 
-                        <!-- Paso 4: Notas -->
+                        @* Notas *@
                         <div class="checkout-step mb-4">
                             <h5 class="step-title">
                                 <span class="step-number">4</span>
@@ -254,19 +253,19 @@
                             </div>
                         </div>
 
-                        <!-- Términos -->
+                        @* Terminos y condiciones *@
                         <div class="mb-4">
                             <div class="form-check">
                                 @Html.CheckBoxFor(m => m.AceptaTerminos, new { @class = "form-check-input", @required = "required" })
                                 <label class="form-check-label">
-                                    Acepto los <a href="#" target="_blank">términos y condiciones</a>
+                                    Acepto los <a href="#" style="color: #667eea;">términos y condiciones</a>
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Botón Finalizar -->
+                        @* Finalizar *@
                         <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-lg px-5" id="btn-finalizar-compra">
+                            <button type="submit" class="btn btn-custom btn-lg px-5" id="btn-finalizar-compra">
                                 <i class="fas fa-lock me-2"></i>Finalizar Compra
                                 <span class="total-final ms-2">$@Model.Total.ToString("N2")</span>
                             </button>
@@ -276,11 +275,13 @@
             </div>
         </div>
 
-        <!-- Resumen -->
+        @* Resumen *@
         <div class="col-lg-4">
-            <div class="card shadow-sm sticky-top" style="top: 20px;">
+            <div class="card shadow-sm sticky-top border-0" style="top: 20px;">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Resumen del Pedido</h5>
+                    <h5 class="mb-0" style="color: #667eea;">
+                        <i class="fas fa-receipt me-2"></i>Resumen del Pedido
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="productos-resumen mb-3">
@@ -294,7 +295,7 @@
                                     <small class="text-muted">@item.NombreMarca</small>
                                     <div class="d-flex justify-content-between">
                                         <span>Cant: @item.Cantidad</span>
-                                        <strong>$@item.Subtotal.ToString("N2")</strong>
+                                        <strong style="color: #667eea;">$@item.Subtotal.ToString("N2")</strong>
                                     </div>
                                 </div>
                             </div>
@@ -316,7 +317,7 @@
                         <hr>
                         <div class="d-flex justify-content-between">
                             <strong>Total:</strong>
-                            <strong class="text-primary fs-5" id="total-valor">$@Model.Total.ToString("N2")</strong>
+                            <strong class="fs-5" style="color: #667eea;" id="total-valor">$@Model.Total.ToString("N2")</strong>
                         </div>
                     </div>
                 </div>
@@ -348,14 +349,14 @@
     }
 
     .step-title {
-        color: #495057;
+        color: #667eea;
         border-bottom: 2px solid #dee2e6;
         padding-bottom: 10px;
         margin-bottom: 20px;
     }
 
     .step-number {
-        background-color: #007bff;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border-radius: 50%;
         padding: 5px 10px;
@@ -370,12 +371,12 @@
     }
 
         .direccion-option:hover, .metodo-pago-card .card:hover {
-            border-color: #007bff;
-            box-shadow: 0 2px 4px rgba(0,123,255,0.1);
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
 
     .form-check-input:checked + label .card {
-        border-color: #007bff;
+        border-color: #667eea;
         background-color: #f8f9ff;
     }
 
@@ -390,6 +391,33 @@
         border-color: #dc3545 !important;
         animation: shake 0.3s;
     }
+
+    .btn-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+    .btn-custom-outline {
+        border: 2px solid #667eea;
+        color: #667eea;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom-outline:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
     @@keyframes shake {
         0%, 100%
 
@@ -422,14 +450,10 @@
                 mostrarFormularioPago(metodoPagoSeleccionado);
             }
 
-            // BOTÓN NUEVA DIRECCIÓN
             $('#btn-nueva-direccion').on('click', function(e) {
                 e.preventDefault();
-                console.log('Click en botón nueva dirección');
-
                 var $form = $('#nueva-direccion-form');
                 var visible = $form.is(':visible');
-                console.log('Formulario visible antes:', visible);
 
                 if (visible) {
                     $form.slideUp(300);
@@ -443,9 +467,7 @@
                 }
             });
 
-            // MÉTODOS DE PAGO
             $('input[name="MetodoPagoSeleccionado"]').on('change', function() {
-                console.log('Cambio en método de pago:', $(this).val());
                 $('.metodo-pago-card .card').removeClass('selected');
                 if ($(this).is(':checked')) {
                     $(this).closest('.metodo-pago-card').find('.card').addClass('selected');
@@ -454,18 +476,14 @@
             });
 
             function mostrarFormularioPago(idMetodo) {
-                console.log('Mostrando formulario para método ID:', idMetodo);
                 $('#form-tarjeta, #form-transferencia').hide();
 
                 var $metodoCard = $('#pago_' + idMetodo).closest('.metodo-pago-card');
                 var nombre = $metodoCard.find('h6').text().toLowerCase();
-                console.log('Nombre del método encontrado:', nombre);
 
                 if (nombre.indexOf('tarjeta') > -1 || nombre.indexOf('crédito') > -1 || nombre.indexOf('débito') > -1) {
-                    console.log('Mostrando formulario de tarjeta');
                     $('#form-tarjeta').slideDown(300);
                 } else if (nombre.indexOf('transferencia') > -1) {
-                    console.log('Mostrando formulario de transferencia');
                     $('#form-transferencia').slideDown(300);
                 }
             }
@@ -483,11 +501,6 @@
                 var direccion = $('input[name="DireccionEnvioSeleccionada"]:checked').val();
                 var usaNueva = $('input[name="UsarNuevaDireccion"]').val() === 'true';
                 var terminos = $('input[name="AceptaTerminos"]').is(':checked');
-
-                console.log('Submit - Método pago:', metodoPago);
-                console.log('Submit - Dirección:', direccion);
-                console.log('Submit - Usa nueva:', usaNueva);
-                console.log('Submit - Términos:', terminos);
 
                 if (!metodoPago || metodoPago === '0') {
                     alert('Por favor seleccione un método de pago');
@@ -515,21 +528,6 @@
                         e.preventDefault();
                         return false;
                     }
-                } else if (nombre.indexOf('transferencia') > -1) {
-                    if (!confirm('¿Has realizado la transferencia?\n\nRecuerda enviar el comprobante a: pagos@ecommerce-demo.com')) {
-                        e.preventDefault();
-                        return false;
-                    }
-                } else if (nombre.indexOf('mercadopago') > -1) {
-                    if (!confirm('Serás redirigido a MercadoPago. ¿Continuar?')) {
-                        e.preventDefault();
-                        return false;
-                    }
-                } else if (nombre.indexOf('efectivo') > -1) {
-                    if (!confirm('Pago contra entrega. ¿Confirmas?')) {
-                        e.preventDefault();
-                        return false;
-                    }
                 }
             });
 
@@ -548,37 +546,9 @@
                     return false;
                 }
 
-                var numeroLimpio = numero.replace(/\s/g, '');
-                if (numeroLimpio.length < 15) {
-                    alert('Número de tarjeta inválido (mínimo 15 dígitos)');
-                    $('#numero-tarjeta').addClass('campo-requerido').focus();
-                    return false;
-                }
-
-                if (!/^\d{2}\/\d{2}$/.test(venc)) {
-                    alert('Formato inválido. Use MM/AA');
-                    $('#vencimiento-tarjeta').addClass('campo-requerido').focus();
-                    return false;
-                }
-
-                var partes = venc.split('/');
-                var mes = parseInt(partes[0]);
-                if (mes < 1 || mes > 12) {
-                    alert('Mes inválido (debe ser 01-12)');
-                    $('#vencimiento-tarjeta').addClass('campo-requerido').focus();
-                    return false;
-                }
-
-                if (cvv.length < 3) {
-                    alert('CVV inválido (mínimo 3 dígitos)');
-                    $('#cvv-tarjeta').addClass('campo-requerido').focus();
-                    return false;
-                }
-
                 return true;
             }
 
-            // Formateo automático
             $('#numero-tarjeta').on('input', function() {
                 $(this).removeClass('campo-requerido');
                 var value = $(this).val().replace(/\s/g, '').replace(/\D/g, '');

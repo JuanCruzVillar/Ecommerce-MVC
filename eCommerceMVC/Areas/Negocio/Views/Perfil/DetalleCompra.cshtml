@@ -1,5 +1,4 @@
 ﻿@model eCommerce.Entities.Venta
-
 @{
     ViewData["Title"] = "Detalle de Compra #" + Model.IdVenta;
     Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
@@ -9,19 +8,16 @@
     <div class="row">
         <div class="col-md-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="bi bi-receipt me-2"></i>Detalle de Compra #@Model.IdVenta</h2>
-                <a href="@Url.Action("MisCompras", "Perfil")" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Volver
-                </a>
+                <h2 style="color: #667eea;"><i class="bi bi-receipt me-2"></i>Detalle de Compra #@Model.IdVenta</h2>
+                <a href="@Url.Action("MisCompras", "Perfil")" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Volver</a>
             </div>
         </div>
     </div>
 
     <div class="row">
-        @* Info general *@
         <div class="col-md-8 mb-4">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow-sm border-0">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Información del Pedido</h5>
                 </div>
                 <div class="card-body">
@@ -40,24 +36,13 @@
                                 @{
                                     var estadoClase = "secondary";
                                     var estadoTexto = Model.IdEstadoPedidoNavigation?.Nombre ?? "Pendiente";
-
                                     switch (Model.IdEstadoPedido)
                                     {
-                                        case 1:
-                                            estadoClase = "warning";
-                                            break;
-                                        case 2:
-                                            estadoClase = "info";
-                                            break;
-                                        case 3:
-                                            estadoClase = "primary";
-                                            break;
-                                        case 4:
-                                            estadoClase = "success";
-                                            break;
-                                        case 5:
-                                            estadoClase = "danger";
-                                            break;
+                                        case 1: estadoClase = "warning"; break;
+                                        case 2: estadoClase = "info"; break;
+                                        case 3: estadoClase = "primary"; break;
+                                        case 4: estadoClase = "success"; break;
+                                        case 5: estadoClase = "danger"; break;
                                     }
                                 }
                                 <span class="badge bg-@estadoClase">@estadoTexto</span>
@@ -67,6 +52,7 @@
                             <label class="text-muted small">Método de Pago</label>
                             <p class="fw-bold">@(Model.IdMetodoPagoNavigation?.Nombre ?? "No especificado")</p>
                         </div>
+
                         @if (Model.FechaEstimadaEntrega.HasValue)
                         {
                             <div class="col-md-6 mb-3">
@@ -74,6 +60,7 @@
                                 <p class="fw-bold">@Model.FechaEstimadaEntrega?.ToString("dd/MM/yyyy")</p>
                             </div>
                         }
+
                         @if (!string.IsNullOrEmpty(Model.IdTransaccion))
                         {
                             <div class="col-md-6 mb-3">
@@ -86,8 +73,8 @@
                     @if (Model.IdDireccionEnvioNavigation != null)
                     {
                         <hr />
-                        <h6 class="mb-3"><i class="bi bi-geo-alt me-2"></i>Dirección de Envío</h6>
-                        <div class="alert alert-light mb-0">
+                        <h6 class="mb-3" style="color:#667eea;"><i class="bi bi-geo-alt me-2"></i>Dirección de Envío</h6>
+                        <div class="alert alert-light mb-0 border">
                             <p class="mb-1"><strong>@Model.IdDireccionEnvioNavigation.NombreCompleto</strong></p>
                             <p class="mb-1">@Model.IdDireccionEnvioNavigation.Direccion</p>
                             <p class="mb-1">@Model.IdDireccionEnvioNavigation.Ciudad, @Model.IdDireccionEnvioNavigation.Provincia</p>
@@ -103,7 +90,7 @@
                     @if (!string.IsNullOrEmpty(Model.NotasEspeciales))
                     {
                         <hr />
-                        <h6 class="mb-3"><i class="bi bi-chat-left-text me-2"></i>Notas del Pedido</h6>
+                        <h6 class="mb-3" style="color:#667eea;"><i class="bi bi-chat-left-text me-2"></i>Notas del Pedido</h6>
                         <div class="alert alert-info">
                             <p class="mb-0">@Model.NotasEspeciales</p>
                         </div>
@@ -111,9 +98,8 @@
                 </div>
             </div>
 
-            @* Productos *@
-            <div class="card shadow mt-4">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow-sm mt-4 border-0">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Productos Comprados</h5>
                 </div>
                 <div class="card-body">
@@ -135,10 +121,7 @@
                                             <div class="d-flex align-items-center">
                                                 @if (!string.IsNullOrEmpty(detalle.IdProductoNavigation?.RutaImagen))
                                                 {
-                                                    <img src="@detalle.IdProductoNavigation.RutaImagen"
-                                                         alt="@detalle.IdProductoNavigation.Nombre"
-                                                         class="me-3"
-                                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                                    <img src="@detalle.IdProductoNavigation.RutaImagen" alt="@detalle.IdProductoNavigation.Nombre" class="me-3" style="width:60px;height:60px;object-fit:cover;border-radius:5px;">
                                                 }
                                                 <div>
                                                     <p class="mb-0 fw-bold">@detalle.IdProductoNavigation?.Nombre</p>
@@ -146,15 +129,9 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center align-middle">
-                                            <span class="badge bg-light text-dark">@detalle.Cantidad</span>
-                                        </td>
-                                        <td class="text-end align-middle">
-                                            $@((detalle.Total / detalle.Cantidad)?.ToString("N2"))
-                                        </td>
-                                        <td class="text-end align-middle fw-bold">
-                                            $@detalle.Total?.ToString("N2")
-                                        </td>
+                                        <td class="text-center align-middle"><span class="badge bg-light text-dark">@detalle.Cantidad</span></td>
+                                        <td class="text-end align-middle">$@((detalle.Total / detalle.Cantidad)?.ToString("N2"))</td>
+                                        <td class="text-end align-middle fw-bold" style="color:#667eea;">$@detalle.Total?.ToString("N2")</td>
                                     </tr>
                                 }
                             </tbody>
@@ -164,23 +141,15 @@
             </div>
         </div>
 
-        @* Resumen pago *@
         <div class="col-md-4">
-            <div class="card shadow sticky-top" style="top: 20px;">
-                <div class="card-header bg-success text-white">
+            <div class="card shadow-sm sticky-top border-0" style="top:20px;">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Resumen de Pago</h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal:</span>
-                        <span class="fw-bold">
-                            $@((Model.ImporteTotal - Model.CostoEnvio + Model.DescuentoAplicado)?.ToString("N2"))
-                        </span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Costo de Envío:</span>
-                        <span class="fw-bold">$@Model.CostoEnvio?.ToString("N2")</span>
-                    </div>
+                    <div class="d-flex justify-content-between mb-2"><span>Subtotal:</span><span class="fw-bold">$@((Model.ImporteTotal - Model.CostoEnvio + Model.DescuentoAplicado)?.ToString("N2"))</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span>Costo de Envío:</span><span class="fw-bold">$@Model.CostoEnvio?.ToString("N2")</span></div>
+
                     @if (Model.DescuentoAplicado > 0)
                     {
                         <div class="d-flex justify-content-between mb-2 text-success">
@@ -194,26 +163,18 @@
                             <span class="fw-bold">-$@Model.DescuentoAplicado?.ToString("N2")</span>
                         </div>
                     }
-                    <hr />
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Total:</h5>
-                        <h5 class="text-success">$@Model.ImporteTotal?.ToString("N2")</h5>
-                    </div>
 
-                    <div class="alert alert-info mb-0">
-                        <small>
-                            <i class="bi bi-info-circle me-1"></i>
-                            <strong>Total de productos:</strong> @Model.TotalProductos
-                        </small>
-                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between mb-3"><h5>Total:</h5><h5 style="color:#667eea;">$@Model.ImporteTotal?.ToString("N2")</h5></div>
+                    <div class="alert alert-info mb-0"><small><i class="bi bi-info-circle me-1"></i><strong>Total de productos:</strong> @Model.TotalProductos</small></div>
                 </div>
             </div>
 
             @if (Model.HistorialPedidos != null && Model.HistorialPedidos.Any())
             {
-                <div class="card shadow mt-4">
-                    <div class="card-header bg-info text-white">
-                        <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historial del Pedido</h6>
+                <div class="card shadow-sm mt-4 border-0">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0" style="color:#667eea;"><i class="bi bi-clock-history me-2"></i>Historial del Pedido</h6>
                     </div>
                     <div class="card-body">
                         <div class="timeline">

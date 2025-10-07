@@ -1,28 +1,23 @@
 ﻿@model eCommerce.Entities.PedidoConfirmacionViewModel
 @{
-    ViewData["Title"] = "Checkout";
+    ViewData["Title"] = "Pedido Confirmado";
     Layout = "_Layout";
 }
 
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-          @* Msj confirmacion *@
             <div class="text-center mb-5">
                 <div class="success-icon mb-3">
-                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    <i class="fas fa-check-circle" style="font-size: 5rem; color: #667eea;"></i>
                 </div>
-                <h1 class="text-success mb-2">¡Pedido Confirmado!</h1>
+                <h1 class="mb-2" style="color: #667eea;">¡Pedido Confirmado!</h1>
                 <p class="lead text-muted">Gracias por tu compra. Tu pedido ha sido procesado exitosamente.</p>
             </div>
 
-            @* Info pedido *@
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-receipt me-2"></i>
-                        Detalles del Pedido @Model.NumeroVenta
-                    </h4>
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h4 class="mb-0"><i class="fas fa-receipt me-2"></i>Detalles del Pedido @Model.NumeroVenta</h4>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
@@ -30,10 +25,7 @@
                             <h6 class="text-muted mb-2">INFORMACIÓN DEL PEDIDO</h6>
                             <p class="mb-1"><strong>Número de Pedido:</strong> @Model.NumeroVenta</p>
                             <p class="mb-1"><strong>Fecha del Pedido:</strong> @Model.FechaPedido.ToString("dd/MM/yyyy HH:mm")</p>
-                            <p class="mb-1">
-                                <strong>Estado:</strong>
-                                <span class="badge bg-warning text-dark">@Model.EstadoPedido</span>
-                            </p>
+                            <p class="mb-1"><strong>Estado:</strong><span class="badge bg-warning text-dark">@Model.EstadoPedido</span></p>
                             @if (Model.FechaEstimadaEntrega.HasValue)
                             {
                                 <p class="mb-1"><strong>Fecha Estimada de Entrega:</strong> @Model.FechaEstimadaEntrega.Value.ToString("dd/MM/yyyy")</p>
@@ -42,14 +34,10 @@
                         <div class="col-md-6">
                             <h6 class="text-muted mb-2">RESUMEN DE PAGO</h6>
                             <p class="mb-1"><strong>Método de Pago:</strong> @Model.MetodoPago?.Nombre</p>
-                            <p class="mb-1">
-                                <strong>Total Pagado:</strong>
-                                <span class="text-success fs-5">$@Model.Total.ToString("N2")</span>
-                            </p>
+                            <p class="mb-1"><strong>Total Pagado:</strong><span class="fs-5" style="color: #667eea;">$@Model.Total.ToString("N2")</span></p>
                         </div>
                     </div>
 
-                    @* Direccion envio *@
                     @if (Model.DireccionEnvio != null)
                     {
                         <div class="mb-4">
@@ -67,7 +55,6 @@
                         </div>
                     }
 
-                    @* Notas *@
                     @if (!string.IsNullOrEmpty(Model.NotasEspeciales))
                     {
                         <div class="mb-4">
@@ -80,22 +67,16 @@
                 </div>
             </div>
 
-@* Productos *@
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-shopping-bag me-2"></i>
-                        Productos Ordenados
-                    </h5>
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0" style="color: #667eea;"><i class="fas fa-shopping-bag me-2"></i>Productos Ordenados</h5>
                 </div>
                 <div class="card-body">
                     @foreach (var item in Model.Items)
                     {
                         <div class="row align-items-center py-3 border-bottom">
                             <div class="col-md-2">
-                                <img src="@(!string.IsNullOrEmpty(item.RutaImagen) ? item.RutaImagen : "/images/no-image.png")"
-                                     alt="@item.NombreProducto"
-                                     class="img-fluid rounded producto-img">
+                                <img src="@(!string.IsNullOrEmpty(item.RutaImagen) ? item.RutaImagen : "/images/no-image.png")" alt="@item.NombreProducto" class="img-fluid rounded producto-img">
                             </div>
                             <div class="col-md-6">
                                 <h6 class="mb-1">@item.NombreProducto</h6>
@@ -106,14 +87,13 @@
                                 }
                             </div>
                             <div class="col-md-2 text-center">
-                                <span class="badge bg-secondary">Cant: @item.Cantidad</span>
+                                <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Cant: @item.Cantidad</span>
                             </div>
                             <div class="col-md-2 text-end">
-                                <strong>$@item.Subtotal.ToString("N2")</strong>
+                                <strong style="color: #667eea;">$@item.Subtotal.ToString("N2")</strong>
                                 @if (item.Cantidad > 1)
                                 {
                                     <br>
-                            
                                     <small class="text-muted">($@(item.Subtotal / item.Cantidad).ToString("N2") c/u)</small>
                                 }
                             </div>
@@ -122,10 +102,69 @@
                 </div>
             </div>
 
-@* Siguientes pasos *@
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>
-                        ¿Qué sigue?
-                    </h5>
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>¿Qué sigue?</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-envelope fa-2x me-3" style="color: #667eea;"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Recibirás un email de confirmación</h6>
+                            <p class="text-muted mb-0">Te enviaremos los detalles de tu pedido a tu correo electrónico.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-box fa-2x me-3" style="color: #667eea;"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Preparación del pedido</h6>
+                            <p class="text-muted mb-0">Nuestro equipo comenzará a preparar tu pedido para el envío.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-truck fa-2x me-3" style="color: #667eea;"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Seguimiento del envío</h6>
+                            <p class="text-muted mb-0">Podrás seguir el estado de tu pedido desde tu perfil.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="@Url.Action("MisCompras", "Perfil")" class="btn btn-custom me-2">
+                    <i class="fas fa-list me-2"></i>Ver Mis Compras
+                </a>
+                <a href="@Url.Action("Index", "Catalogo")" class="btn btn-outline-secondary">
+                    <i class="fas fa-shopping-cart me-2"></i>Seguir Comprando
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .producto-img {
+        max-height: 100px;
+        object-fit: cover;
+    }
+
+    .btn-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+</style>

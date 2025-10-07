@@ -14,7 +14,7 @@
                 @* Imagen principal *@
                 <div class="mb-3">
                     <div id="carouselProducto" class="carousel slide" data-bs-ride="false">
-                        <div class="carousel-inner rounded shadow">
+                        <div class="carousel-inner rounded shadow-sm">
                             @for (int i = 0; i < Model.Imagenes.Count; i++)
                             {
                                 var imagen = Model.Imagenes[i];
@@ -41,7 +41,6 @@
                     </div>
                 </div>
 
-               
                 @if (Model.Imagenes.Count > 1)
                 {
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
@@ -63,108 +62,72 @@
             }
             else
             {
-                
-                <img class="img-fluid rounded shadow"
+                <img class="img-fluid rounded shadow-sm"
                      src="@(Model.Producto.RutaImagen ?? "https://dummyimage.com/1200x1200/dee2e6/6c757d.jpg")"
                      alt="@Model.Producto.Nombre"
                      style="width:100%; height:auto; max-height:500px; object-fit: contain;" />
             }
         </div>
 
-        <style>
-            .thumbnail-item {
-                transition: all 0.3s ease;
-                border: 3px solid transparent;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-
-                .thumbnail-item:hover {
-                    transform: scale(1.05);
-                    border-color: #0d6efd;
-                }
-
-                .thumbnail-item.active {
-                    border-color: #198754;
-                }
-
-            .carousel-control-prev,
-            .carousel-control-next {
-                width: 5%;
-            }
-
-            .carousel-control-prev-icon,
-            .carousel-control-next-icon {
-                background-color: rgba(0, 0, 0, 0.5);
-                border-radius: 50%;
-                padding: 20px;
-            }
-
-            .carousel-item img {
-                transition: transform 0.3s ease;
-            }
-
-            .carousel-item:hover img {
-                transform: scale(1.02);
-            }
-        </style>
-
-       
-
         <!-- Detalles principales -->
         <div class="col-md-6">
-            <h2 class="fw-bolder">@Model.Producto.Nombre</h2>
-            <h4 class="text-success">$@Model.Producto.Precio?.ToString("N2")</h4>
+            <h2 class="fw-bolder mb-3">@Model.Producto.Nombre</h2>
+            <h4 class="mb-3" style="color: #667eea;">$@Model.Producto.Precio?.ToString("N2")</h4>
 
-            <p class="text-primary fw-bold mb-2">
-                3 cuotas sin interés de
-                $@((Model.Producto.Precio / 3)?.ToString("N2"))
+            <p class="fw-bold mb-4" style="color: #764ba2;">
+                <i class="bi bi-credit-card me-1"></i>
+                3 cuotas sin interés de $@((Model.Producto.Precio / 3)?.ToString("N2"))
             </p>
 
             <!-- Beneficios -->
-            <ul class="list-unstyled mt-3 mb-4">
-                <li>
-                    <i class="bi bi-credit-card me-2 text-primary"></i>
-                    Hasta <strong>24 cuotas</strong> en precio de lista
-                    <a href="#" class="ms-2 small text-decoration-underline"
-                       data-bs-toggle="modal" data-bs-target="#modalCuotas" id="btnVerCuotas">
-                        Ver cuotas
-                    </a>
-                </li>
-                <li>
-                    <i class="bi bi-shield-check me-2 text-success"></i>
-                    Garantía <strong>24 meses</strong>
-                    <a href="#" class="ms-2 small">Ver términos y condiciones</a>
-                </li>
-                <li>
-                    <i class="bi bi-box-seam me-2 text-warning"></i>
-                    <span class="text-dark fw-bold">Stock disponible</span>
-                </li>
-                <li>
-                    <i class="bi bi-truck me-2 text-info"></i>
-                    Envíos a todo el país
-                </li>
-            </ul>
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-credit-card me-2" style="color: #667eea;"></i>
+                            Hasta <strong>24 cuotas</strong> en precio de lista
+                            <a href="#" class="ms-2 small text-decoration-underline"
+                               data-bs-toggle="modal" data-bs-target="#modalCuotas" id="btnVerCuotas"
+                               style="color: #667eea;">
+                                Ver cuotas
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-shield-check me-2 text-success"></i>
+                            Garantía <strong>24 meses</strong>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-box-seam me-2 text-warning"></i>
+                            <span class="text-dark fw-bold">Stock disponible</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-truck me-2 text-info"></i>
+                            Envíos a todo el país
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
             <!-- Botones -->
-            <div class="mt-4 d-flex gap-2">
-                <button class="btn btn-dark agregar-carrito" data-producto="@Model.Producto.IdProducto">
-                    Agregar al carrito
+            <div class="d-flex gap-2">
+                <button class="btn btn-custom flex-grow-1 agregar-carrito" data-producto="@Model.Producto.IdProducto">
+                    <i class="bi bi-cart-plus me-1"></i>Agregar al carrito
                 </button>
                 <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-outline-secondary">
-                    Volver al catálogo
+                    <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
         </div>
     </div>
 
-   
     <!-- Sección de especificaciones -->
     <section class="mt-5">
-        <h4 class="fw-bolder mb-3">Especificaciones Técnicas</h4>
+        <h4 class="fw-bolder mb-3" style="color: #667eea;">
+            <i class="bi bi-list-ul me-2"></i>Especificaciones Técnicas
+        </h4>
         @if (Model.Especificaciones != null && Model.Especificaciones.Any())
         {
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0">
                 <ul class="list-group list-group-flush">
                     @foreach (var especificacion in Model.Especificaciones)
                     {
@@ -186,14 +149,16 @@
     </section>
 
     <!-- Productos relacionados -->
-    <section class="py-5 bg-light mt-5">
+    <section class="py-5 mt-5" style="background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);">
         <div class="container px-4 px-lg-5">
-            <h2 class="fw-bolder mb-4">Productos relacionados</h2>
+            <h4 class="fw-bolder mb-4" style="color: #667eea;">
+                <i class="bi bi-bookmark-star me-2"></i>Productos relacionados
+            </h4>
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                 @foreach (var relacionado in Model.Relacionados)
                 {
-                    <div class="col mb-5">
-                        <div class="card producto-card d-flex flex-column h-100">
+                    <div class="col mb-4">
+                        <div class="card producto-card d-flex flex-column h-100 border-0 shadow-sm">
                             <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = relacionado.IdProducto })" class="text-decoration-none text-dark">
                                 <img class="card-img-top" src="@(relacionado.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")"
                                      alt="@relacionado.Nombre" style="height:150px; object-fit:cover;" />
@@ -201,10 +166,10 @@
                             <div class="card-body p-3 text-center flex-grow-1 d-flex flex-column justify-content-between">
                                 <div class="mb-2 text-truncate-2">
                                     <h6>@relacionado.Nombre</h6>
-                                    <span>$@relacionado.Precio?.ToString("N2")</span>
+                                    <span class="fw-bold" style="color: #667eea;">$@relacionado.Precio?.ToString("N2")</span>
                                 </div>
-                                <button class="btn btn-outline-dark btn-sm w-100 agregar-carrito" data-producto="@relacionado.IdProducto">
-                                    Agregar al carrito
+                                <button class="btn btn-custom btn-sm w-100 agregar-carrito" data-producto="@relacionado.IdProducto">
+                                    <i class="bi bi-cart-plus me-1"></i>Agregar
                                 </button>
                             </div>
                         </div>
@@ -219,13 +184,16 @@
 <div class="modal fade" id="modalCuotas" tabindex="-1" aria-labelledby="modalCuotasLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg rounded-3">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="modalCuotasLabel">Opciones de financiación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title fw-bold" id="modalCuotasLabel">
+                    <i class="bi bi-credit-card me-2"></i>Opciones de financiación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <ul class="list-group" id="lista-cuotas"></ul>
                 <p class="mt-3 small text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
                     La cantidad de cuotas disponibles puede variar dependiendo de la tarjeta.
                 </p>
             </div>
@@ -233,11 +201,63 @@
     </div>
 </div>
 
+<style>
+    .btn-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+    .thumbnail-item {
+        transition: all 0.3s ease;
+        border: 3px solid transparent;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .thumbnail-item:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+        }
+
+        .thumbnail-item.active {
+            border-color: #764ba2;
+        }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(102, 126, 234, 0.7);
+        border-radius: 50%;
+        padding: 20px;
+    }
+
+    .producto-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .producto-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+</style>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
             var precioProducto = parseFloat("@(Model.Producto.Precio?.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) ?? "0")");
-             // Interes "random" para las cuotas pero 3 sin interes
+
             var cuotasDisponibles = [
                 { nro: 3, interes: 0.00 },
                 { nro: 6, interes: 0.135 },
@@ -252,13 +272,15 @@
                 cuotasDisponibles.forEach(function (plan) {
                     var total = precioProducto * (1 + plan.interes);
                     var valorCuota = total / plan.nro;
+                    var destacado = plan.interes === 0 ? 'style="background-color: #f0f4ff;"' : '';
                     $("#lista-cuotas").append(`
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <li class="list-group-item d-flex justify-content-between align-items-center" ${destacado}>
                             <div>
-                                <strong>${plan.nro} cuotas</strong> de
-                                $${valorCuota.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                                <strong>${plan.nro} cuotas</strong> ${plan.interes === 0 ? '<span class="badge bg-success ms-2">Sin interés</span>' : ''}
+                                <br>
+                                <small class="text-muted">${valorCuota.toLocaleString('es-AR', { minimumFractionDigits: 2 })} por mes</small>
                             </div>
-                            <span class="text-muted">Total $${total.toLocaleString('es-AR', { minimumFractionDigits: 0 })}</span>
+                            <span class="text-muted">Total: ${total.toLocaleString('es-AR', { minimumFractionDigits: 0 })}</span>
                         </li>
                     `);
                 });
@@ -267,65 +289,62 @@
             $('#modalCuotas').on('show.bs.modal', function () {
                 calcularCuotas();
             });
-        });
-    </script>
 
+            // Función para actualizar badge del carrito
+            function actualizarBadge(){
+                $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
+                    $('#carrito-badge').text(total);
+                });
+            }
 
+            // Obtener token antiforgery
+            var token = $('input[name="__RequestVerificationToken"]').val();
 
+            // Agregar al carrito
+            $('.agregar-carrito').off('click').on('click', function(e){
+                e.preventDefault();
+                var productoId = $(this).data('producto');
+                var boton = $(this);
+                var textoOriginal = boton.html();
 
-<script>
-    $(document).ready(function(){
-        // Función para actualizar badge del carrito
-        function actualizarBadge(){
-            $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
-                $('#carrito-badge').text(total);
+                boton.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Agregando...');
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
+                    data: {
+                        __RequestVerificationToken: token,
+                        productoId: productoId,
+                        cantidad: 1
+                    },
+                    success: function(){
+                        actualizarBadge();
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Agregado al carrito',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                        boton.prop('disabled', false).html(textoOriginal);
+                    },
+                    error: function(){
+                        Swal.fire({
+                            icon:'error',
+                            title:'Error',
+                            text:'No se pudo agregar el producto al carrito',
+                            confirmButtonColor: '#667eea'
+                        });
+                        boton.prop('disabled', false).html(textoOriginal);
+                    }
+                });
             });
-        }
 
-        // Obtener token antiforgery
-        var token = $('input[name="__RequestVerificationToken"]').val();
-
-        // Agregar al carrito
-        $('.agregar-carrito').off('click').on('click', function(e){
-            e.preventDefault();
-            var productoId = $(this).data('producto');
-            $.ajax({
-                type: "POST",
-                url: '@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
-                data: {
-                    __RequestVerificationToken: token,
-                    productoId: productoId,
-                    cantidad: 1
-                },
-                        success: function(){
+            // Inicializar badge al cargar la página
             actualizarBadge();
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'success',
-                title: 'Agregado al carrito',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true
-            });
-        },
-                error: function(){
-                    Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text:'No se pudo agregar el producto al carrito',
-                    });
-                }
-            });
-        });
 
-        // Inicializar badge al cargar la página
-        actualizarBadge();
-    });
-</script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
             // Sincronizar thumbnails con carrusel
             const thumbnails = document.querySelectorAll('.thumbnail-item');
             const carousel = document.querySelector('#carouselProducto');
@@ -349,5 +368,3 @@
         });
     </script>
 }
-
-  

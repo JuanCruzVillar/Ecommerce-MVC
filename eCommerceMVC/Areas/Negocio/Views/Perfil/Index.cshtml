@@ -4,14 +4,12 @@
     ViewData["Title"] = "Mi Perfil";
     Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
 }
-  
 
 <div class="container my-5">
     <div class="row">
         <div class="col-md-3">
-            @* Sidebar *@
-            <div class="list-group">
-                <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action active">
+            <div class="list-group shadow-sm">
+                <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action active" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #667eea;">
                     <i class="bi bi-person me-2"></i>Mi Perfil
                 </a>
                 <a href="@Url.Action("MisCompras", "Perfil")" class="list-group-item list-group-item-action">
@@ -24,8 +22,8 @@
         </div>
 
         <div class="col-md-9">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <div class="card shadow-sm border-0">
+                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>Mi Perfil</h4>
                     <a href="@Url.Action("Editar", "Perfil")" class="btn btn-light btn-sm">
                         <i class="bi bi-pencil me-1"></i>Editar
@@ -34,7 +32,7 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-12">
-                            <h5 class="border-bottom pb-2 mb-3">Información Personal</h5>
+                            <h5 class="border-bottom pb-2 mb-3" style="color: #667eea;">Información Personal</h5>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="text-muted small">Nombres</label>
@@ -58,16 +56,18 @@
                     {
                         <div class="row">
                             <div class="col-md-12">
-                                <h5 class="border-bottom pb-2 mb-3">Dirección Principal</h5>
+                                <h5 class="border-bottom pb-2 mb-3" style="color: #667eea;">Dirección Principal</h5>
                             </div>
+
                             @{
                                 var direccionPrincipal = Model.DireccionesEnvio.FirstOrDefault(d => d.EsDireccionPrincipal == true && d.Activo == true)
                                 ?? Model.DireccionesEnvio.FirstOrDefault(d => d.Activo == true);
                             }
+
                             @if (direccionPrincipal != null)
                             {
                                 <div class="col-md-12 mb-3">
-                                    <div class="alert alert-light">
+                                    <div class="alert alert-light border">
                                         <p class="mb-1"><strong>@direccionPrincipal.NombreCompleto</strong></p>
                                         <p class="mb-1">@direccionPrincipal.Direccion</p>
                                         <p class="mb-1">@direccionPrincipal.Ciudad, @direccionPrincipal.Provincia - CP: @direccionPrincipal.CodigoPostal</p>
@@ -90,30 +90,28 @@
 
                     <div class="row mt-4">
                         <div class="col-md-12">
-                            <h5 class="border-bottom pb-2 mb-3">Estadísticas de Cuenta</h5>
+                            <h5 class="border-bottom pb-2 mb-3" style="color: #667eea;">Estadísticas de Cuenta</h5>
                         </div>
-                        <div class="col-md-4 text-center">
-                            <div class="card bg-light">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="card border-0" style="background: linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%);">
                                 <div class="card-body">
-                                    <h3 class="text-primary">@Model.Venta.Count()</h3>
+                                    <h3 style="color: #667eea;">@Model.Venta.Count()</h3>
                                     <p class="text-muted mb-0">Compras Realizadas</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
-                            <div class="card bg-light">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="card border-0" style="background: linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%);">
                                 <div class="card-body">
-                                    <h3 class="text-success">@Model.DireccionesEnvio.Count(d => d.Activo == true)</h3>
+                                    <h3 style="color: #764ba2;">@Model.DireccionesEnvio.Count(d => d.Activo == true)</h3>
                                     <p class="text-muted mb-0">Direcciones Guardadas</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
-                            <div class="card bg-light">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="card border-0" style="background: linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%);">
                                 <div class="card-body">
-                                    <h3 class="text-info">
-                                        @Model.Venta.Where(v => v.FechaVenta >= DateTime.Now.AddMonths(-1)).Count()
-                                    </h3>
+                                    <h3 style="color: #667eea;">@Model.Venta.Where(v => v.FechaVenta >= DateTime.Now.AddMonths(-1)).Count()</h3>
                                     <p class="text-muted mb-0">Compras Este Mes</p>
                                 </div>
                             </div>
@@ -124,3 +122,11 @@
         </div>
     </div>
 </div>
+
+<style>
+    .list-group-item:not(.active):hover {
+        background-color: #f8f9ff;
+        color: #667eea;
+        border-color: #667eea;
+    }
+</style>

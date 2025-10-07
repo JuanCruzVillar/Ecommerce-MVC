@@ -8,12 +8,13 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-md-3">
-            @* Sidebar *@
-            <div class="list-group">
+            <div class="list-group shadow-sm">
                 <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action">
                     <i class="bi bi-person me-2"></i>Mi Perfil
                 </a>
-                <a href="@Url.Action("MisCompras", "Perfil")" class="list-group-item list-group-item-action active">
+                <a href="@Url.Action("MisCompras", "Perfil")"
+                   class="list-group-item list-group-item-action active"
+                   style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #667eea;">
                     <i class="bi bi-bag-check me-2"></i>Mis Compras
                 </a>
                 <a href="@Url.Action("MisDirecciones", "Perfil")" class="list-group-item list-group-item-action">
@@ -23,10 +24,11 @@
         </div>
 
         <div class="col-md-9">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow-sm border-0">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h4 class="mb-0"><i class="bi bi-bag-check me-2"></i>Mis Compras</h4>
                 </div>
+
                 <div class="card-body">
                     @if (Model.Any())
                     {
@@ -49,7 +51,9 @@
                                             <td class="fw-bold">#@venta.IdVenta</td>
                                             <td>@venta.FechaVenta?.ToString("dd/MM/yyyy")</td>
                                             <td>@venta.TotalProductos productos</td>
-                                            <td class="fw-bold text-success">$@venta.ImporteTotal?.ToString("N2")</td>
+                                            <td class="fw-bold" style="color: #667eea;">
+                                                $@venta.ImporteTotal?.ToString("N2")
+                                            </td>
                                             <td>
                                                 @{
                                                     var estadoClase = "secondary";
@@ -57,28 +61,18 @@
 
                                                     switch (venta.IdEstadoPedido)
                                                     {
-                                                        case 1: // Pendiente
-                                                            estadoClase = "warning";
-                                                            break;
-                                                        case 2: // Confirmado/Procesando
-                                                            estadoClase = "info";
-                                                            break;
-                                                        case 3: // Enviado
-                                                            estadoClase = "primary";
-                                                            break;
-                                                        case 4: // Entregado
-                                                            estadoClase = "success";
-                                                            break;
-                                                        case 5: // Cancelado
-                                                            estadoClase = "danger";
-                                                            break;
+                                                        case 1: estadoClase = "warning"; break;
+                                                        case 2: estadoClase = "info"; break;
+                                                        case 3: estadoClase = "primary"; break;
+                                                        case 4: estadoClase = "success"; break;
+                                                        case 5: estadoClase = "danger"; break;
                                                     }
                                                 }
                                                 <span class="badge bg-@estadoClase">@estadoTexto</span>
                                             </td>
                                             <td>
                                                 <a href="@Url.Action("DetalleCompra", "Perfil", new { id = venta.IdVenta })"
-                                                   class="btn btn-sm btn-outline-primary">
+                                                   class="btn btn-sm btn-custom-outline">
                                                     <i class="bi bi-eye me-1"></i>Ver Detalle
                                                 </a>
                                             </td>
@@ -100,10 +94,10 @@
                     else
                     {
                         <div class="text-center py-5">
-                            <i class="bi bi-bag-x" style="font-size: 4rem; color: #ddd;"></i>
+                            <i class="bi bi-bag-x" style="font-size: 4rem; color: #667eea; opacity: 0.3;"></i>
                             <h4 class="mt-3">No hay compras realizadas</h4>
                             <p class="text-muted">Aún no has realizado ninguna compra en nuestra tienda.</p>
-                            <a href="@Url.Action("Index", "Catalogo")" class="btn btn-primary mt-3">
+                            <a href="@Url.Action("Index", "Catalogo")" class="btn btn-custom mt-3">
                                 <i class="bi bi-shop me-2"></i>Comenzar a Comprar
                             </a>
                         </div>
@@ -113,3 +107,37 @@
         </div>
     </div>
 </div>
+
+<style>
+    .btn-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+    .btn-custom-outline {
+        border: 2px solid #667eea;
+        color: #667eea;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom-outline:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+    .list-group-item:not(.active):hover {
+        background-color: #f8f9ff;
+        color: #667eea;
+        border-color: #667eea;
+    }
+</style>

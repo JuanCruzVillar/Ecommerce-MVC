@@ -5,10 +5,11 @@
     Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
 }
 
+
 <div class="container my-5">
     <div class="row">
         <div class="col-md-3">
-            <div class="list-group">
+            <div class="list-group shadow-sm">
                 <a href="@Url.Action("Index", "Perfil")" class="list-group-item list-group-item-action">
                     <i class="bi bi-person me-2"></i>Mi Perfil
                 </a>
@@ -22,8 +23,8 @@
         </div>
 
         <div class="col-md-9">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow-sm border-0">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Mi Perfil</h4>
                 </div>
                 <div class="card-body">
@@ -75,7 +76,7 @@
                             <a href="@Url.Action("Index", "Perfil")" class="btn btn-secondary">
                                 <i class="bi bi-x-circle me-1"></i>Cancelar
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-custom">
                                 <i class="bi bi-check-circle me-1"></i>Guardar Cambios
                             </button>
                         </div>
@@ -83,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="card shadow mt-4">
+            <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header bg-light">
                     <h6 class="mb-0"><i class="bi bi-shield-check me-2"></i>Seguridad de la Cuenta</h6>
                 </div>
@@ -95,6 +96,32 @@
         </div>
     </div>
 </div>
+
+<style>
+    .btn-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9ff;
+        color: #667eea;
+        border-color: #667eea;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+</style>
 
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

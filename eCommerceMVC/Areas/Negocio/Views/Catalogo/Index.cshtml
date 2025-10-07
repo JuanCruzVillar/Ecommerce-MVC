@@ -6,75 +6,75 @@
 }
 @if (Model != null)
 {
-<header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Hardware Store</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Encontrá lo que buscás</p>
+    <header class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">Hardware Store</h1>
+                <p class="lead fw-normal mb-0" style="opacity: 0.9;">Encontrá lo que buscás</p>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<section class="py-5">
-    <div class="container px-4 px-lg-5 mt-5">
-        @if (ViewBag.CategoriaNombre != null)
-        {
-            <div class="mb-4">
-                <h3 class="mb-3">
-                    <i class="bi bi-filter-circle me-2"></i>@ViewBag.CategoriaNombre
-                </h3>
-                <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-x-circle me-1"></i>Ver todos los productos
-                </a>
-            </div>
-        }
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            @if (ViewBag.CategoriaNombre != null)
+            {
+                <div class="mb-4">
+                    <h3 class="mb-3" style="color: #667eea;">
+                        <i class="bi bi-filter-circle me-2"></i>@ViewBag.CategoriaNombre
+                    </h3>
+                    <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Ver todos los productos
+                    </a>
+                </div>
+            }
 
-        @if (!Model.Any())
-        {
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle me-2"></i>
-                No se encontraron productos en esta categoría.
-                <br />
-                <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-primary mt-3">
-                    Ver todos los productos
-                </a>
-            </div>
-        }
-        else
-        {
-            <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                @foreach (var producto in Model)
-                {
-                    <div class="col mb-5">
-                        <div class="card h-100">
-                            <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
-                                <img class="card-img-top" src="@(producto.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")" alt="@producto.Nombre" />
-                            </a>
-                            <div class="card-body p-4 text-center">
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No se encontraron productos en esta categoría.
+                    <br />
+                    <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-primary mt-3">
+                        Ver todos los productos
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    @foreach (var producto in Model)
+                    {
+                        <div class="col mb-5">
+                            <div class="card h-100 border-0 shadow-sm">
                                 <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
-                                    <h5 class="fw-bolder">@producto.Nombre</h5>
+                                    <img class="card-img-top" src="@(producto.RutaImagen ?? "https://dummyimage.com/450x300/dee2e6/6c757d.jpg")" alt="@producto.Nombre" />
                                 </a>
-                                @if (producto.Precio.HasValue)
-                                {
-                                    <span class="fw-bold text-primary">$@producto.Precio.Value.ToString("N2")</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Precio no disponible</span>
-                                }
-                            </div>
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
-                                <button class="btn btn-outline-dark mt-auto agregar-carrito" data-producto="@producto.IdProducto">
-                                    <i class="bi bi-cart-plus me-1"></i>Agregar al carrito
-                                </button>
+                                <div class="card-body p-4 text-center">
+                                    <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
+                                        <h5 class="fw-bolder">@producto.Nombre</h5>
+                                    </a>
+                                    @if (producto.Precio.HasValue)
+                                    {
+                                        <span class="fw-bold" style="color: #667eea;">$@producto.Precio.Value.ToString("N2")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Precio no disponible</span>
+                                    }
+                                </div>
+                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent text-center">
+                                    <button class="btn btn-custom mt-auto agregar-carrito" data-producto="@producto.IdProducto">
+                                        <i class="bi bi-cart-plus me-1"></i>Agregar al carrito
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
-</section>
+                    }
+                </div>
+            }
+        </div>
+    </section>
 
 }
 else
@@ -83,6 +83,7 @@ else
         Error: No se pudo cargar el perfil
     </div>
 }
+
 <style>
     .card-img-top {
         object-fit: cover;
@@ -95,7 +96,24 @@ else
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+
+    .btn-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-custom:disabled {
+            background: #6c757d;
         }
 </style>
 
