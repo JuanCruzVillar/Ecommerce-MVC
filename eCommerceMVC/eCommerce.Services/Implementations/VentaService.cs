@@ -1,5 +1,4 @@
-﻿
-using eCommerce.Data;
+﻿using eCommerce.Data;
 using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
@@ -24,6 +23,8 @@ namespace eCommerce.Services.Implementations
         {
             var ventas = await _context.Ventas
                 .Include(v => v.IdClienteNavigation)
+                .Include(v => v.IdMetodoPagoNavigation)
+                .Include(v => v.IdEstadoPedidoNavigation)
                 .Include(v => v.DetalleVenta)
                     .ThenInclude(dv => dv.IdProductoNavigation)
                 .OrderByDescending(v => v.FechaVenta)
@@ -33,20 +34,49 @@ namespace eCommerce.Services.Implementations
 
             foreach (var venta in ventas)
             {
-                foreach (var detalle in venta.DetalleVenta)
+                if (venta.DetalleVenta.Any())
                 {
+                    foreach (var detalle in venta.DetalleVenta)
+                    {
+                        ventasDetalle.Add(new VentaDetalleViewModel
+                        {
+                            IdVenta = venta.IdVenta,
+                            FechaVenta = venta.FechaVenta ?? DateTime.Now,
+                            IdCliente = venta.IdCliente ?? 0,
+                            ClienteNombre = $"{venta.IdClienteNavigation?.Nombres} {venta.IdClienteNavigation?.Apellidos}".Trim(),
+                            ClienteCorreo = venta.IdClienteNavigation?.Correo ?? "N/A",
+                            IdProducto = detalle.IdProducto ?? 0,
+                            ProductoNombre = detalle.IdProductoNavigation?.Nombre ?? "Sin nombre",
+                            // FIX: Cálculo correcto del precio unitario
+                            Precio = detalle.Cantidad > 0 ? (detalle.Total ?? 0) / detalle.Cantidad.Value : 0,
+                            TotalProductos = detalle.Cantidad ?? 0,
+                            ImporteTotal = detalle.Total ?? 0,
+                            IdTransaccion = venta.IdTransaccion ?? "N/A",
+                            EstadoPedido = venta.IdEstadoPedidoNavigation?.Nombre ?? "Pendiente",
+                            MetodoPago = venta.IdMetodoPagoNavigation?.Nombre ?? "N/A",
+                            DescuentoAplicado = venta.DescuentoAplicado ?? 0,
+                            CostoEnvio = venta.CostoEnvio ?? 0
+                        });
+                    }
+                }
+                else
+                {
+                    // Si no hay detalles, crear una fila con los datos de la venta
                     ventasDetalle.Add(new VentaDetalleViewModel
                     {
                         IdVenta = venta.IdVenta,
                         FechaVenta = venta.FechaVenta ?? DateTime.Now,
                         IdCliente = venta.IdCliente ?? 0,
-                        ClienteNombre = $"{venta.IdClienteNavigation?.Nombres} {venta.IdClienteNavigation?.Apellidos}",
-                        IdProducto = detalle.IdProducto ?? 0,
-                        ProductoNombre = detalle.IdProductoNavigation?.Nombre ?? "Sin nombre",
-                        Precio = detalle.Total ?? 0 / (detalle.Cantidad ?? 1),
-                        TotalProductos = detalle.Cantidad ?? 0,
-                        ImporteTotal = detalle.Total ?? 0,
-                        IdTransaccion = venta.IdTransaccion ?? "N/A"
+                        ClienteNombre = $"{venta.IdClienteNavigation?.Nombres} {venta.IdClienteNavigation?.Apellidos}".Trim(),
+                        ClienteCorreo = venta.IdClienteNavigation?.Correo ?? "N/A",
+                        ProductoNombre = "Venta múltiple",
+                        TotalProductos = venta.TotalProductos ?? 0,
+                        ImporteTotal = venta.ImporteTotal ?? 0,
+                        IdTransaccion = venta.IdTransaccion ?? "N/A",
+                        EstadoPedido = venta.IdEstadoPedidoNavigation?.Nombre ?? "Pendiente",
+                        MetodoPago = venta.IdMetodoPagoNavigation?.Nombre ?? "N/A",
+                        DescuentoAplicado = venta.DescuentoAplicado ?? 0,
+                        CostoEnvio = venta.CostoEnvio ?? 0
                     });
                 }
             }
@@ -58,6 +88,8 @@ namespace eCommerce.Services.Implementations
         {
             var venta = await _context.Ventas
                 .Include(v => v.IdClienteNavigation)
+                .Include(v => v.IdMetodoPagoNavigation)
+                .Include(v => v.IdEstadoPedidoNavigation)
                 .Include(v => v.DetalleVenta)
                     .ThenInclude(dv => dv.IdProductoNavigation)
                 .FirstOrDefaultAsync(v => v.IdVenta == idVenta);
@@ -71,28 +103,50 @@ namespace eCommerce.Services.Implementations
                 IdVenta = venta.IdVenta,
                 FechaVenta = venta.FechaVenta ?? DateTime.Now,
                 IdCliente = venta.IdCliente ?? 0,
-                ClienteNombre = $"{venta.IdClienteNavigation?.Nombres} {venta.IdClienteNavigation?.Apellidos}",
+                ClienteNombre = $"{venta.IdClienteNavigation?.Nombres} {venta.IdClienteNavigation?.Apellidos}".Trim(),
+                ClienteCorreo = venta.IdClienteNavigation?.Correo ?? "N/A",
                 IdProducto = detalle?.IdProducto ?? 0,
                 ProductoNombre = detalle?.IdProductoNavigation?.Nombre ?? "Sin nombre",
-                Precio = detalle?.Total ?? 0 / (detalle?.Cantidad ?? 1),
+                // FIX: Cálculo correcto del precio unitario
+                Precio = detalle?.Cantidad > 0 ? (detalle?.Total ?? 0) / detalle.Cantidad.Value : 0,
                 TotalProductos = venta.TotalProductos ?? 0,
                 ImporteTotal = venta.ImporteTotal ?? 0,
-                IdTransaccion = venta.IdTransaccion ?? "N/A"
+                IdTransaccion = venta.IdTransaccion ?? "N/A",
+                EstadoPedido = venta.IdEstadoPedidoNavigation?.Nombre ?? "Pendiente",
+                MetodoPago = venta.IdMetodoPagoNavigation?.Nombre ?? "N/A",
+                DescuentoAplicado = venta.DescuentoAplicado ?? 0,
+                CostoEnvio = venta.CostoEnvio ?? 0
             };
         }
 
         public async Task<Dashboard> ObtenerEstadisticasDashboardAsync()
         {
-            var totalVentas = await _context.Ventas.SumAsync(v => v.ImporteTotal ?? 0);
-            var totalClientes = await _context.Clientes.CountAsync();
-            var totalProductosVendidos = await _context.DetalleVentas.SumAsync(dv => dv.Cantidad ?? 0);
-
-            return new Dashboard
+            try
             {
-                TotalVenta = totalVentas,
-                TotalCliente = totalClientes,
-                TotalProducto = totalProductosVendidos
-            };
+                var totalVentas = await _context.Ventas.SumAsync(v => v.ImporteTotal ?? 0);
+                var totalClientes = await _context.Clientes.CountAsync();
+                var totalProductosVendidos = await _context.DetalleVentas.SumAsync(dv => dv.Cantidad ?? 0);
+                var ventasHoy = await _context.Ventas
+                    .Where(v => v.FechaVenta.HasValue && v.FechaVenta.Value.Date == DateTime.Today)
+                    .CountAsync();
+
+                var ventasCount = await _context.Ventas.CountAsync();
+                var ticketPromedio = ventasCount > 0 ? totalVentas / ventasCount : 0;
+
+                return new Dashboard
+                {
+                    TotalVenta = totalVentas,
+                    TotalCliente = totalClientes,
+                    TotalProducto = totalProductosVendidos,
+                    VentasHoy = ventasHoy,
+                    TicketPromedio = ticketPromedio
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ObtenerEstadisticasDashboardAsync: {ex.Message}");
+                return new Dashboard();
+            }
         }
     }
 }
