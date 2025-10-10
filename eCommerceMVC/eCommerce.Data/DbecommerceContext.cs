@@ -97,17 +97,9 @@ namespace eCommerce.Data
                 entity.ToTable("CARRITO");
 
                 entity.Property(e => e.IdCarrito).HasColumnName("IdCarrito");
-                entity.Property(e => e.IdUsuario).HasColumnName("IdUsuario");
                 entity.Property(e => e.IdProducto).HasColumnName("IdProducto");
                 entity.Property(e => e.Cantidad).HasColumnName("Cantidad");
-                entity.Property(e => e.IdCliente).HasColumnName("IdCliente"); 
-
-                // Relación con Usuario
-                entity.HasOne(d => d.IdUsuarioNavigation)
-                      .WithMany(p => p.Carritos)
-                      .HasForeignKey(d => d.IdUsuario)
-                      .OnDelete(DeleteBehavior.Restrict)
-                      .HasConstraintName("FK_CARRITO_USUARIO");
+                entity.Property(e => e.IdCliente).HasColumnName("IdCliente");
 
                 // Relación con Producto
                 entity.HasOne(d => d.IdProductoNavigation)
@@ -116,7 +108,7 @@ namespace eCommerce.Data
                       .OnDelete(DeleteBehavior.Restrict)
                       .HasConstraintName("FK_CARRITO_PRODUCTO");
 
-                
+                // Relación con Cliente
                 entity.HasOne(d => d.IdClienteNavigation)
                       .WithMany(p => p.Carritos)
                       .HasForeignKey(d => d.IdCliente)

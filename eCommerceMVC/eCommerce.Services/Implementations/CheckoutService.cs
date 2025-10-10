@@ -309,8 +309,8 @@ namespace eCommerce.Services.Implementations
 
                 // 5. Limpiar carrito
                 var itemsCarrito = await _context.Carritos
-                    .Where(c => c.IdUsuario == idCliente)
-                    .ToListAsync();
+    .Where(c => c.IdCliente == idCliente)  
+    .ToListAsync();
                 _context.Carritos.RemoveRange(itemsCarrito);
 
                 // 6. Crear historial de pedido
@@ -342,7 +342,7 @@ namespace eCommerce.Services.Implementations
         {
             var productosCarrito = await _context.Carritos
                 .Include(c => c.IdProductoNavigation)
-                .Where(c => c.IdUsuario == idCliente)
+                .Where(c => c.IdCliente == idCliente)  
                 .ToListAsync();
 
             foreach (var item in productosCarrito)

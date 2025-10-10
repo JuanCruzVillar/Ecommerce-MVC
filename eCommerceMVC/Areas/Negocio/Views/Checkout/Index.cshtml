@@ -419,20 +419,17 @@
         }
 
     @@keyframes shake {
-        0%, 100%
+        0%, 100% {
+            transform: translateX(0);
+        }
 
-    {
-        transform: translateX(0);
-    }
+        25% {
+            transform: translateX(-5px);
+        }
 
-    25% {
-        transform: translateX(-5px);
-    }
-
-    75% {
-        transform: translateX(5px);
-    }
-
+        75% {
+            transform: translateX(5px);
+        }
     }
 </style>
 
@@ -496,11 +493,20 @@
                 }
             });
 
+            // ✅ VALIDACION CORREGIDA
             $('form.checkout-form').on('submit', function(e) {
                 var metodoPago = $('input[name="MetodoPagoSeleccionado"]:checked').val();
                 var direccion = $('input[name="DireccionEnvioSeleccionada"]:checked').val();
-                var usaNueva = $('input[name="UsarNuevaDireccion"]').val() === 'true';
+                var usaNuevaInput = $('input[name="UsarNuevaDireccion"]');
+                var usaNueva = usaNuevaInput.val() === 'true' || usaNuevaInput.val() === 'True';
                 var terminos = $('input[name="AceptaTerminos"]').is(':checked');
+
+                console.log('DEBUG FORM SUBMIT:');
+                console.log('Metodo Pago:', metodoPago);
+                console.log('Direccion:', direccion);
+                console.log('UsarNueva valor:', usaNuevaInput.val());
+                console.log('UsarNueva boolean:', usaNueva);
+                console.log('Terminos:', terminos);
 
                 if (!metodoPago || metodoPago === '0') {
                     alert('Por favor seleccione un método de pago');
@@ -509,7 +515,7 @@
                 }
 
                 if (!direccion && !usaNueva) {
-                    alert('Por favor seleccione una dirección de envío');
+                    alert('Por favor seleccione una dirección de envío o ingrese una nueva');
                     e.preventDefault();
                     return false;
                 }
@@ -529,6 +535,9 @@
                         return false;
                     }
                 }
+
+                console.log('Validaciones pasadas - Enviando formulario');
+                return true;
             });
 
             function validarTarjeta() {

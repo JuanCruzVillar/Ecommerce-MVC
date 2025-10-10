@@ -69,14 +69,13 @@ namespace eCommerce.Repositories.Implementations
                 var usuario = await GetByIdAsync(id);
                 if (usuario == null) return false;
 
-                // Eliminar registros relacionados en CARRITO
-                var carritos = _context.Carritos.Where(c => c.IdUsuario == id);
+               
+                var carritos = _context.Carritos.Where(c => c.IdCliente == usuario.IdCliente);
                 _context.Carritos.RemoveRange(carritos);
 
-                // Eliminar el usuario
+                
                 _context.Usuarios.Remove(usuario);
                 await _context.SaveChangesAsync();
-
                 return true;
             }
             catch
@@ -84,5 +83,7 @@ namespace eCommerce.Repositories.Implementations
                 return false;
             }
         }
+
     }
+
 }

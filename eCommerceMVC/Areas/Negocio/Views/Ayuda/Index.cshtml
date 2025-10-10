@@ -1,0 +1,571 @@
+﻿@{
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ayuda al Cliente";
+}
+
+
+<div class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container text-center text-white">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="bi bi-info-circle me-3"></i>Centro de Ayuda
+        </h1>
+        <p class="lead">Encuentra respuestas a tus consultas sobre compras, envíos y más</p>
+    </div>
+</div>
+
+@*Nav*@
+<div class="bg-light py-4 sticky-top shadow-sm" style="top: 0; z-index: 1000;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-pills justify-content-center flex-wrap gap-2" id="helpNav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#preguntas-frecuentes">
+                            <i class="bi bi-question-circle me-2"></i>Preguntas Frecuentes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#envios">
+                            <i class="bi bi-truck me-2"></i>Envíos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#devoluciones">
+                            <i class="bi bi-arrow-repeat me-2"></i>Devoluciones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#garantias">
+                            <i class="bi bi-shield-check me-2"></i>Garantías
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container py-5">
+
+    @*Preguntas frecuentes*@
+    <section id="preguntas-frecuentes" class="mb-5 section-content">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="fw-bold mb-4" style="color: #667eea;">
+                    <i class="bi bi-question-circle me-2"></i>Preguntas Frecuentes
+                </h2>
+
+                <div class="accordion" id="faqAccordion">
+                    
+                    <div class="accordion-item mb-3 border-0 shadow-sm">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                ¿Cómo realizo una compra?
+                            </button>
+                        </h3>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Navegá por nuestro catálogo y seleccioná los productos que desees.</li>
+                                    <li>Agregá los productos al carrito haciendo clic en "Agregar al carrito".</li>
+                                    <li>Revisá tu carrito y hacé clic en "Proceder al pago".</li>
+                                    <li>Completá tus datos de envío y elegí el método de pago.</li>
+                                    <li>Confirmá tu pedido y listo, recibirás un email con la confirmación.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="accordion-item mb-3 border-0 shadow-sm">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                ¿Qué métodos de pago aceptan?
+                            </button>
+                        </h3>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Aceptamos los siguientes métodos de pago:
+                                <ul class="mt-2">
+                                    <li><strong>Tarjetas de crédito:</strong> Visa, Mastercard (hasta 12 cuotas sin interés)</li>
+                                    <li><strong>Tarjetas de débito:</strong> Visa Débito, Maestro</li>
+                                    <li><strong>Mercado Pago:</strong> Todas las opciones disponibles</li>
+                                    <li><strong>Transferencia bancaria:</strong> Al CBU indicado a la hora de hacer el Checkout</li>
+                                    <li><strong>Efectivo:</strong> Solo en retiro en tienda</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="accordion-item mb-3 border-0 shadow-sm">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                ¿Puedo modificar o cancelar mi pedido?
+                            </button>
+                        </h3>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Sí, podés modificar o cancelar tu pedido siempre que aún no haya sido despachado.
+                                Contactanos lo antes posible a través de nuestro WhatsApp (+54 291 123-4567) o email
+                                (info@hardwarestore.com) indicando tu número de pedido.
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="accordion-item mb-3 border-0 shadow-sm">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                ¿Emiten factura?
+                            </button>
+                        </h3>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Sí, emitimos factura A o B según corresponda. Al momento de realizar la compra,
+                                podés indicar tus datos fiscales. La factura se enviará junto con el producto o
+                                por email en formato electrónico.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item mb-3 border-0 shadow-sm">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                ¿Los productos tienen garantía?
+                            </button>
+                        </h3>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Todos nuestros productos cuentan con garantía oficial. La duración varía según el fabricante
+                                y el tipo de producto (generalmente entre 6 meses y 3 años). Para más detalles, consultá la
+                                sección de <a href="#garantias" class="text-decoration-none fw-semibold">Garantías</a>.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @*Envios*@
+    <section id="envios" class="mb-5 section-content">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="fw-bold mb-4" style="color: #667eea;">
+                    <i class="bi bi-truck me-2"></i>Envíos
+                </h2>
+
+                <div class="row g-4">
+                    
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">
+                                    <i class="bi bi-geo-alt text-primary me-2"></i>Zonas de Envío
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <strong>CABA y GBA:</strong> 24-48 horas hábiles
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <strong>Interior de Buenos Aires:</strong> 2-4 días hábiles
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <strong>Resto del país:</strong> 3-7 días hábiles
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <strong>Bahía Blanca:</strong> Retiro en sucursal sin cargo
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*Costos*@
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">
+                                    <i class="bi bi-cash-coin text-success me-2"></i>Costos de Envío
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="bi bi-star-fill text-warning me-2"></i>
+                                        <strong>Envío GRATIS</strong> en compras superiores a $150.000
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-arrow-right me-2"></i>
+                                        CABA y GBA: desde $3.500
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-arrow-right me-2"></i>
+                                        Interior: desde $4.500
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-arrow-right me-2"></i>
+                                        El costo exacto se calcula en el checkout según tu ubicación
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*Seguimiento*@
+                    <div class="col-12">
+                        <div class="alert" style="background-color: #f8f3ff; border-left: 4px solid #667eea;">
+                            <h5 class="alert-heading fw-bold">
+                                <i class="bi bi-box-seam me-2"></i>Seguimiento de Pedidos
+                            </h5>
+                            <p class="mb-0">
+                                Una vez despachado tu pedido, recibirás un email con el código de seguimiento.
+                                Podés rastrear tu envío en tiempo real desde la sección "Mis Pedidos" de tu cuenta.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @*Devoluciones*@
+    <section id="devoluciones" class="mb-5 section-content">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="fw-bold mb-4" style="color: #667eea;">
+                    <i class="bi bi-arrow-repeat me-2"></i>Devoluciones y Cambios
+                </h2>
+
+                <div class="row g-4">
+                    
+                    <div class="col-md-8">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">Política de Devolución</h5>
+                                <p>
+                                    Tenés <strong>30 días</strong> desde la recepción del producto para solicitar
+                                    un cambio o devolución, siempre que el producto esté:
+                                </p>
+                                <ul>
+                                    <li>Sin uso y en perfectas condiciones</li>
+                                    <li>Con su embalaje original completo</li>
+                                    <li>Con todos sus accesorios y manuales</li>
+                                    <li>Con la factura de compra</li>
+                                </ul>
+
+                                <h6 class="fw-bold mt-4 mb-3">¿Cómo solicitar una devolución?</h6>
+                                <ol>
+                                    <li>Contactanos por email o WhatsApp indicando tu número de pedido</li>
+                                    <li>Te enviaremos las instrucciones para el retorno del producto</li>
+                                    <li>Una vez recibido y verificado, procesaremos el reembolso</li>
+                                    <li>El reembolso se realizará por el mismo medio de pago en 5-10 días hábiles</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*Excepciones*@
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm bg-warning bg-opacity-10">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">
+                                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                    Excepciones
+                                </h5>
+                                <p class="small">
+                                    <strong>No se aceptan devoluciones de:</strong>
+                                </p>
+                                <ul class="small">
+                                    <li>Productos en oferta o liquidación</li>
+                                    <li>Software abierto o usado</li>
+                                    <li>Productos personalizados</li>
+                                    <li>Cables o accesorios usados</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm mt-3" style="background-color: #f8f3ff;">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-info-circle me-2"></i>Producto Defectuoso
+                                </h6>
+                                <p class="small mb-0">
+                                    Si recibiste un producto defectuoso, contactanos de inmediato.
+                                    Nos hacemos cargo del envío de retorno y del reemplazo.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @*Garantias*@
+    <section id="garantias" class="mb-5 section-content">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="fw-bold mb-4" style="color: #667eea;">
+                    <i class="bi bi-shield-check me-2"></i>Garantías
+                </h2>
+
+                <div class="alert alert-success border-0 shadow-sm mb-4">
+                    <h5 class="alert-heading fw-bold">
+                        <i class="bi bi-shield-fill-check me-2"></i>
+                        Todos nuestros productos tienen garantía oficial
+                    </h5>
+                    <p class="mb-0">
+                        Trabajamos únicamente con distribuidores autorizados para garantizar
+                        la autenticidad y cobertura de garantía de todos los productos.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                  
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">Plazos de Garantía</h5>
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="bi bi-cpu me-2 text-primary"></i>Procesadores</td>
+                                            <td class="text-end fw-semibold">3 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="bi bi-memory me-2 text-primary"></i>Memorias RAM</td>
+                                            <td class="text-end fw-semibold">Lifetime</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="bi bi-motherboard me-2 text-primary"></i>Motherboards</td>
+                                            <td class="text-end fw-semibold">2-3 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="bi bi-gpu-card me-2 text-primary"></i>Placas de Video</td>
+                                            <td class="text-end fw-semibold">2-3 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="bi bi-device-ssd me-2 text-primary"></i>Discos SSD/HDD</td>
+                                            <td class="text-end fw-semibold">2-5 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="bi bi-power me-2 text-primary"></i>Fuentes</td>
+                                            <td class="text-end fw-semibold">2-5 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="bi bi-display me-2 text-primary"></i>Monitores</td>
+                                            <td class="text-end fw-semibold">1-3 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="bi bi-keyboard me-2 text-primary"></i>Periféricos</td>
+                                            <td class="text-end fw-semibold">6-12 meses</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">¿Cómo hacer válida la garantía?</h5>
+
+                                <div class="mb-4">
+                                    <h6 class="fw-semibold mb-2">
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">1</span>
+                                        Contactanos
+                                    </h6>
+                                    <p class="small ms-4">
+                                        Envianos un email o WhatsApp con tu número de pedido y
+                                        descripción del problema.
+                                    </p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="fw-semibold mb-2">
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">2</span>
+                                        Evaluación
+                                    </h6>
+                                    <p class="small ms-4">
+                                        Nuestro equipo técnico evaluará el caso y te indicará
+                                        los pasos a seguir.
+                                    </p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="fw-semibold mb-2">
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">3</span>
+                                        Envío o Retiro
+                                    </h6>
+                                    <p class="small ms-4">
+                                        Según el caso, podés enviarnos el producto o llevarlo
+                                        a nuestra sucursal.
+                                    </p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="fw-semibold mb-2">
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">4</span>
+                                        Reparación o Reemplazo
+                                    </h6>
+                                    <p class="small ms-4">
+                                        Repararemos o reemplazaremos el producto según corresponda.
+                                        El tiempo estimado es de 10-20 días hábiles.
+                                    </p>
+                                </div>
+
+                                <div class="alert alert-info mb-0">
+                                    <small>
+                                        <strong>Nota:</strong> La garantía no cubre daños por mal uso,
+                                        caídas, líquidos o modificaciones no autorizadas.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @*Contacto*@
+    <section class="mt-5">
+        <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body text-white text-center py-5">
+                <h3 class="fw-bold mb-3">¿No encontraste lo que buscabas?</h3>
+                <p class="lead mb-4">Nuestro equipo está listo para ayudarte</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="mailto:info@hardwarestore.com" class="btn btn-light btn-lg">
+                        <i class="bi bi-envelope me-2"></i>Enviar Email
+                    </a>
+                    <a href="https://wa.me/5492911234567" class="btn btn-success btn-lg" target="_blank">
+                        <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        // Smooth scroll para los links del menú
+        document.querySelectorAll('#helpNav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Remover clase active de todos
+                document.querySelectorAll('#helpNav a').forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                // Agregar active al clickeado
+                this.classList.add('active');
+
+                // Scroll suave a la sección
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                const navHeight = 100; // Altura del nav sticky
+
+                if (targetSection) {
+                    const targetPosition = targetSection.offsetTop - navHeight;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Detectar scroll y activar el link correspondiente
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section-content');
+            const navLinks = document.querySelectorAll('#helpNav a');
+
+            let current = '';
+            const scrollPosition = window.pageYOffset + 150;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .nav-pills .nav-link {
+            color: #667eea;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .nav-pills .nav-link:hover {
+                background-color: rgba(102, 126, 234, 0.1);
+                color: #667eea;
+            }
+
+            .nav-pills .nav-link.active {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+        .section-content {
+            scroll-margin-top: 120px;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: #667eea;
+        }
+
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+            }
+
+        .sticky-top {
+            background-color: #f8f9fa !important;
+        }
+
+        @@media (max-width: 768px) {
+            .nav-pills
+
+        {
+            flex-direction: column;
+        }
+
+        .nav-pills .nav-link {
+            text-align: center;
+            width: 100%;
+        }
+
+        }
+    </style>
+}

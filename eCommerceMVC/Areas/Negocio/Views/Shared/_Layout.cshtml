@@ -132,7 +132,7 @@
                     <a class="nav-link text-dark" href="#">Notebooks</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="#">Ayuda</a>
+                    <a href="/Negocio/Ayuda" class="nav-link text-dark">Ayuda</a>
                 </li>
             </ul>
         </div>
@@ -142,8 +142,178 @@
         @RenderBody()
     </div>
 
-    <footer class="py-5 bg-dark">
-        <div class="container text-center text-white">&copy; 2025 - Hardware Store</div>
+    <footer class="mt-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container py-5">
+            <div class="row g-4 mb-5">
+
+                <!-- Información de la Empresa -->
+                <div class="col-md-3 col-sm-6">
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-laptop me-2"></i>Hardware Store
+                    </h5>
+                    <p class="text-white-50 small mb-3">
+                        Tu tienda de confianza para componentes y equipos de computación de calidad.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="https://facebook.com" class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com" class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        <a href="https://instagram.com" class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://youtube.com" class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Enlaces útiles -->
+                <div class="col-md-3 col-sm-6">
+                    <h6 class="fw-bold text-white mb-3">
+                        <i class="bi bi-link-45deg me-2"></i>Enlaces Útiles
+                    </h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="#" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Catálogo
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Arma tu PC
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Ofertas
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/Negocio/Ayuda" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Centro de Ayuda
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Información de envíos y compras -->
+                <div class="col-md-3 col-sm-6">
+                    <h6 class="fw-bold text-white mb-3">
+                        <i class="bi bi-truck me-2"></i>Compra y Envío
+                    </h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="/Negocio/Ayuda#envios" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Información de Envíos
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/Negocio/Ayuda#devoluciones" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Devoluciones
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/Negocio/Ayuda#garantias" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Garantías
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/Negocio/Ayuda#preguntas-frecuentes" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-chevron-right"></i> Preguntas Frecuentes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contacto -->
+                <div class="col-md-3 col-sm-6">
+                    <h6 class="fw-bold text-white mb-3">
+                        <i class="bi bi-telephone me-2"></i>Contacto
+                    </h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <div class="text-white-50 small">
+                                <i class="bi bi-geo-alt me-2"></i>
+                                <span>Bahía Blanca, Buenos Aires</span>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <a href="tel:+5429112345679" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-telephone me-2"></i>
+                                <span>+54 291 123-4567</span>
+                            </a>
+                        </li>
+                        <li class="mb-3">
+                            <a href="mailto:info@hardwarestore.com" class="text-white-50 text-decoration-none transition-link">
+                                <i class="bi bi-envelope me-2"></i>
+                                <span>info@hardwarestore.com</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="https://wa.me/5492911234567" target="_blank" class="btn btn-success btn-sm">
+                                <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="bg-white-50">
+
+            <!-- Newsletter y Copyright -->
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <p class="text-white-50 small mb-0">
+                        &copy; 2025 Hardware Store. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex gap-2 justify-content-md-end">
+                        <a href="#" class="text-white-50 text-decoration-none small transition-link">Términos y Condiciones</a>
+                        <span class="text-white-50">|</span>
+                        <a href="#" class="text-white-50 text-decoration-none small transition-link">Política de Privacidad</a>
+                        <span class="text-white-50">|</span>
+                        <a href="#" class="text-white-50 text-decoration-none small transition-link">Cookies</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .transition-link {
+                transition: color 0.3s ease;
+            }
+
+                .transition-link:hover {
+                    color: #ffffff !important;
+                }
+
+            .btn-light:hover {
+                background-color: rgba(255, 255, 255, 0.8) !important;
+                transform: translateY(-2px);
+            }
+
+            footer {
+                margin-top: auto;
+            }
+
+            @@media (max-width: 768px) {
+                footer .row > div
+
+            {
+                margin-bottom: 2rem;
+            }
+
+            footer h6 {
+                font-size: 1rem;
+            }
+
+            }
+        </style>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
