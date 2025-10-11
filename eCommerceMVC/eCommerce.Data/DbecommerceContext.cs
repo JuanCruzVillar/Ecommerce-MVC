@@ -32,6 +32,9 @@ namespace eCommerce.Data
 
         public virtual DbSet<ProductoImagen> ProductoImagenes { get; set; }
 
+        public virtual DbSet<ConfiguracionPc> ConfiguracionesPc { get; set; }
+        public virtual DbSet<ConfiguracionPcDetalle> ConfiguracionesPcDetalles { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             
@@ -527,6 +530,20 @@ namespace eCommerce.Data
                     .HasForeignKey(d => d.IdProducto)
                     .HasConstraintName("FK_PRODUCTO_IMAGEN_PRODUCTO");
             });
+            modelBuilder.Entity<ConfiguracionPc>()
+                .HasKey(c => c.IdConfiguracion);
+
+            modelBuilder.Entity<ConfiguracionPcDetalle>()
+                .HasKey(cd => cd.IdDetalleConfiguracion);
+
+            // Configura las relaciones
+            modelBuilder.Entity<ConfiguracionPc>()
+                .HasMany(c => c.ConfiguracionesPcDetalles)
+                .WithOne(cd => cd.IdConfiguracionNavigation)
+                .HasForeignKey(cd => cd.IdConfiguracion)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
 
             OnModelCreatingPartial(modelBuilder);
         }

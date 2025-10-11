@@ -41,5 +41,8 @@ namespace eCommerce.Entities
         public virtual ICollection<ProductoEspecificacion> Especificaciones { get; set; } = new List<ProductoEspecificacion>();
 
         public virtual ICollection<ProductoImagen> Imagenes { get; set; } = new List<ProductoImagen>();
+
+        public virtual ICollection<ProductoEspecificacion> ProductoEspecificaciones { get; set; }
+            = new List<ProductoEspecificacion>();
     }
 }

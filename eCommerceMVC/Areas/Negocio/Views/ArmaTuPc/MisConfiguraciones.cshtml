@@ -1,0 +1,155 @@
+﻿@using eCommerce.Entities.ViewModels
+@{
+    ViewData["Title"] = "Mis Configuraciones de PC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<ConfiguracionGuardadaDTO>
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-5 fw-bold mb-2">Mis Configuraciones</h1>
+                    <p class="lead text-muted">Gestiona tus PC armadas</p>
+                </div>
+                <a href="@Url.Action("Index")" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Nueva Configuración
+                </a>
+            </div>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            @if (!Model.Any())
+            {
+                <!-- Mensaje de vacío -->
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open" style="font-size: 4rem; color: #ccc;"></i>
+                    <h5 class="mt-3 text-muted">No tienes configuraciones guardadas</h5>
+                    <p class="text-muted mb-4">Crea tu primera configuración personalizada de PC</p>
+                    <a href="@Url.Action("Index")" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>Crear Configuración
+                    </a>
+                </div>
+            }
+            else
+            {
+                <!-- Lista de configuraciones -->
+                @foreach (var config in Model)
+                {
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Información de la configuración -->
+                                <div class="col-lg-8">
+                                    <h5 class="card-title fw-bold mb-2">@config.Nombre</h5>
+                                    @if (!string.IsNullOrEmpty(config.Descripcion))
+                                    {
+                                        <p class="card-text text-muted mb-3">@config.Descripcion</p>
+                                    }
+
+                                    <!-- Componentes -->
+                                    <div class="mb-3">
+                                        <small class="text-muted d-block mb-2"><strong>Componentes:</strong></small>
+                                        <div class="row">
+                                            @foreach (var componente in config.Componentes)
+                                            {
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        @if (!string.IsNullOrEmpty(componente.RutaImagen))
+                                                        {
+                                                            <img src="@componente.RutaImagen"
+                                                                 alt="@componente.Nombre"
+                                                                 style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                        }
+                                                        <div>
+                                                            <small class="d-block fw-bold">@componente.Nombre</small>
+                                                            <small class="text-muted">@componente.Tipo | @componente.Marca</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <!-- Metadata -->
+                                    <div class="mt-3 pt-3 border-top">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            Creada: @config.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                                            |
+                                            <i class="fas fa-cube me-1"></i>
+                                            @config.TotalComponentes componentes
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Resumen y acciones -->
+                                <div class="col-lg-4">
+                                    <div class="text-lg-end">
+                                        <!-- Total -->
+                                        <div class="mb-4">
+                                            <small class="text-muted d-block">Total</small>
+                                            <h4 class="mb-0 text-primary">$@config.Total.ToString("N0")</h4>
+                                        </div>
+
+                                        <!-- Botones de acción -->
+                                        <div class="d-grid gap-2">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                    onclick="agregarConfiguracionAlCarrito(@config.IdConfiguracion)">
+                                                <i class="fas fa-shopping-cart me-1"></i>Agregar al Carrito
+                                            </button>
+                                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-edit me-1"></i>Editar
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                                    onclick="eliminarConfiguracion(@config.IdConfiguracion, '@config.Nombre')">
+                                                <i class="fas fa-trash me-1"></i>Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function agregarConfiguracionAlCarrito(idConfiguracion) {
+        alert('Funcionalidad en desarrollo: Agregar configuración al carrito');
+        // TODO: Implementar lógica para agregar todos los componentes al carrito
+    }
+
+    function eliminarConfiguracion(idConfiguracion, nombreConfiguracion) {
+        if (confirm(`¿Estás seguro de que deseas eliminar la configuración "${nombreConfiguracion}"?`)) {
+            fetch('@Url.Action("EliminarConfiguracion")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: idConfiguracion })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error al eliminar la configuración');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar la configuración');
+            });
+        }
+    }
+</script>
