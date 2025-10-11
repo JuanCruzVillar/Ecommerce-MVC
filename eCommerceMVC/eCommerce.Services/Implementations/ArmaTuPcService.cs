@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;  
-using System;                           
-using System.Collections.Generic;       
-using System.Linq;                      
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using eCommerce.Data;
 using eCommerce.Entities;
@@ -26,11 +26,11 @@ namespace eCommerce.Services.Implementations
             var productos = await _context.Productos
                 .Include(p => p.IdMarcaNavigation)
                 .Include(p => p.IdCategoriaNavigation)
-                .ThenInclude(c => c.IdCategoriaPadreNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
                 .Include(p => p.ProductoEspecificaciones)
                 .Where(p => p.Activo == true &&
                            p.Stock > 0 &&
-                           p.IdCategoriaNavigation.IdCategoriaPadreNavigation.Descripcion.Contains("Procesador") &&
+                           p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Procesador") &&
                            p.IdMarcaNavigation.Descripcion == marca)
                 .ToListAsync();
 
@@ -136,7 +136,7 @@ namespace eCommerce.Services.Implementations
             var producto = await _context.Productos
                 .Include(p => p.IdMarcaNavigation)
                 .Include(p => p.IdCategoriaNavigation)
-                .ThenInclude(c => c.IdCategoriaPadreNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
                 .Include(p => p.ProductoEspecificaciones)
                 .FirstOrDefaultAsync(p => p.IdProducto == idProducto && p.Activo == true);
 
@@ -163,7 +163,7 @@ namespace eCommerce.Services.Implementations
                 _context.ConfiguracionesPc.Add(configuracion);
                 await _context.SaveChangesAsync();
 
-                // Guardar detalles de componentes
+               
                 var detalles = new List<ConfiguracionPcDetalle>();
 
                 if (model.Configuracion.IdProcesadorSeleccionado.HasValue)
@@ -213,7 +213,7 @@ namespace eCommerce.Services.Implementations
             }
         }
 
-        // Obtener configuraciones guardadas del cliente
+       
         public async Task<List<ConfiguracionGuardadaDTO>> ObtenerConfiguracionesGuardasAsync(int idCliente)
         {
             var configuraciones = await _context.ConfiguracionesPc
@@ -245,7 +245,7 @@ namespace eCommerce.Services.Implementations
             }).ToList();
         }
 
-        // Obtener configuración guardada específica
+       
         public async Task<ConfiguracionGuardadaDTO> ObtenerConfiguracionGuardadaAsync(int idConfiguracion, int idCliente)
         {
             var configuracion = await _context.ConfiguracionesPc
@@ -277,7 +277,7 @@ namespace eCommerce.Services.Implementations
             };
         }
 
-        // Eliminar configuración guardada
+        
         public async Task<bool> EliminarConfiguracionAsync(int idConfiguracion, int idCliente)
         {
             try
@@ -297,7 +297,7 @@ namespace eCommerce.Services.Implementations
             }
         }
 
-        // Calcular total
+       
         public async Task<decimal> CalcularTotalAsync(ArmaPcViewModel configuracion)
         {
             decimal total = 0;
@@ -314,15 +314,14 @@ namespace eCommerce.Services.Implementations
             return total;
         }
 
-        // Obtener configuración actual de sesión
+       
         public async Task<ArmaPcViewModel> ObtenerConfiguracionActualAsync(int idCliente)
         {
-            // Este método podría recuperar de sesión o base de datos
-            // Por ahora retorna un modelo vacío
+            
             return new ArmaPcViewModel { Paso = 1 };
         }
 
-        // Métodos privados
+       
         private List<ProductoDTO> MapearProductosADTO(List<Producto> productos)
         {
             return productos.Select(p => MapearProductoADTO(p)).ToList();
@@ -341,7 +340,7 @@ namespace eCommerce.Services.Implementations
                 NombreImagen = producto.NombreImagen,
                 Marca = producto.IdMarcaNavigation?.Descripcion,
                 Categoria = producto.IdCategoriaNavigation?.Descripcion,
-                CategoriaPadre = producto.IdCategoriaNavigation?.IdCategoriaPadreNavigation?.Descripcion,
+                CategoriaPadre = producto.IdCategoriaNavigation?.CategoriaPadre?.Descripcion,
                 Especificaciones = producto.ProductoEspecificaciones
                     .Where(e => e.Activo == true)
                     .OrderBy(e => e.Orden)

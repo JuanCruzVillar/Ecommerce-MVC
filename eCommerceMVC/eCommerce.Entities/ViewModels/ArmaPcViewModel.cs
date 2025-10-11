@@ -40,13 +40,13 @@ namespace eCommerce.Entities.ViewModels
         public List<ProductoDTO> PsusDisponibles { get; set; } = new List<ProductoDTO>();
         public List<ProductoDTO> CoolersDisponibles { get; set; } = new List<ProductoDTO>();
 
-        // Resumen de componentes seleccionados
+        
         public ComponenteSeleccionadoDTO ProcesadorSeleccionadoInfo { get; set; }
         public ComponenteSeleccionadoDTO MotherboardSeleccionadoInfo { get; set; }
         public List<ComponenteSeleccionadoDTO> ComponentesSeleccionados { get; set; } = new List<ComponenteSeleccionadoDTO>();
     }
 
-    // DTO para productos
+   
     public class ProductoDTO
     {
         public int IdProducto { get; set; }
@@ -58,27 +58,27 @@ namespace eCommerce.Entities.ViewModels
         public string NombreImagen { get; set; }
         public string Marca { get; set; }
         public string Categoria { get; set; }
-        public string CategoriaPadre { get; set; } // Para identificar "Socket AMD", "Socket Intel", etc.
+        public string CategoriaPadre { get; set; } 
         public List<EspecificacionProductoDTO> Especificaciones { get; set; } = new List<EspecificacionProductoDTO>();
 
-        // Campos calculados
+        
         public bool EnStock => Stock > 0;
         public string ResumenEspecificaciones => string.Join(" | ", Especificaciones.Take(3).Select(e => $"{e.Clave}: {e.Valor}"));
     }
 
-    // DTO para especificaciones de producto
+   
     public class EspecificacionProductoDTO
     {
         public string Clave { get; set; }
         public string Valor { get; set; }
     }
 
-    // DTO para componentes seleccionados
+    
     public class ComponenteSeleccionadoDTO
     {
         public int IdProducto { get; set; }
         public string Nombre { get; set; }
-        public string Tipo { get; set; } // Procesador, Motherboard, RAM, etc.
+        public string Tipo { get; set; } 
         public string Marca { get; set; }
         public decimal PrecioUnitario { get; set; }
         public int Cantidad { get; set; }
@@ -86,7 +86,7 @@ namespace eCommerce.Entities.ViewModels
         public string RutaImagen { get; set; }
     }
 
-    // ViewModel para guardar configuración
+    
     public class GuardarConfiguracionViewModel
     {
         public string Nombre { get; set; }
@@ -94,7 +94,7 @@ namespace eCommerce.Entities.ViewModels
         public ArmaPcViewModel Configuracion { get; set; }
     }
 
-    // ViewModel para mostrar configuraciones guardadas
+   
     public class ConfiguracionGuardadaDTO
     {
         public int IdConfiguracion { get; set; }
@@ -106,7 +106,7 @@ namespace eCommerce.Entities.ViewModels
         public List<ComponenteSeleccionadoDTO> Componentes { get; set; } = new List<ComponenteSeleccionadoDTO>();
     }
 
-    // ViewModel para paso específico
+    
     public class ArmaPcPasoViewModel
     {
         public int Paso { get; set; }
@@ -116,7 +116,7 @@ namespace eCommerce.Entities.ViewModels
         public int? ProductoSeleccionadoId { get; set; }
         public string MarcaActual { get; set; }
 
-        // Estado actual de la configuración
+       
         public ArmaPcViewModel ConfiguracionActual { get; set; }
     }
 }

@@ -8,12 +8,12 @@ namespace eCommerce.Data
 {
     public partial class DbecommerceContext : DbContext
     {
-        
+
 
         public DbecommerceContext(DbContextOptions<DbecommerceContext> options)
             : base(options) { }
 
-       
+
         public virtual DbSet<Categoria> Categorias { get; set; }
         public virtual DbSet<Producto> Productos { get; set; }
         public virtual DbSet<Marca> Marcas { get; set; }
@@ -37,12 +37,8 @@ namespace eCommerce.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
-
-
-            
-
 
             // Categoria
             modelBuilder.Entity<Categoria>(entity =>
@@ -61,6 +57,7 @@ namespace eCommerce.Data
                       .HasDefaultValueSql("(getdate())")
                       .HasColumnType("datetime");
 
+
                 entity.HasOne(e => e.CategoriaPadre)
                       .WithMany(e => e.SubCategorias)
                       .HasForeignKey(e => e.IdCategoriaPadre)
@@ -77,7 +74,7 @@ namespace eCommerce.Data
                     .HasMaxLength(50)
                     .IsUnicode(false);
                 entity.Property(e => e.Contraseña)
-                    .HasMaxLength(50)
+                    .HasMaxLength(256)
                     .IsUnicode(false);
                 entity.Property(e => e.Correo)
                     .HasMaxLength(50)
@@ -118,6 +115,7 @@ namespace eCommerce.Data
                       .OnDelete(DeleteBehavior.Restrict)
                       .HasConstraintName("FK_CARRITO_CLIENTE");
             });
+
             // DetalleVenta
             modelBuilder.Entity<DetalleVentas>(entity =>
             {
@@ -196,8 +194,8 @@ namespace eCommerce.Data
                     .HasMaxLength(50)
                     .IsUnicode(false);
                 entity.Property(e => e.Contraseña)
-    .HasMaxLength(256)
-    .IsUnicode(false);
+                    .HasMaxLength(256)
+                    .IsUnicode(false);
                 entity.Property(e => e.Correo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -530,20 +528,61 @@ namespace eCommerce.Data
                     .HasForeignKey(d => d.IdProducto)
                     .HasConstraintName("FK_PRODUCTO_IMAGEN_PRODUCTO");
             });
-            modelBuilder.Entity<ConfiguracionPc>()
-                .HasKey(c => c.IdConfiguracion);
 
-            modelBuilder.Entity<ConfiguracionPcDetalle>()
-                .HasKey(cd => cd.IdDetalleConfiguracion);
+            // ConfiguracionPc
+            modelBuilder.Entity<ConfiguracionPc>(entity =>
+            {
+                entity.HasKey(c => c.IdConfiguracion);
+                entity.ToTable("CONFIGURACION_PC");
 
-            // Configura las relaciones
-            modelBuilder.Entity<ConfiguracionPc>()
-                .HasMany(c => c.ConfiguracionesPcDetalles)
-                .WithOne(cd => cd.IdConfiguracionNavigation)
-                .HasForeignKey(cd => cd.IdConfiguracion)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(c => c.Nombre)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
 
+                entity.Property(c => c.Descripcion)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
 
+                entity.Property(c => c.Total)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.Property(c => c.FechaCreacion)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(c => c.Activo)
+                    .HasDefaultValue(true);
+
+                entity.HasMany(c => c.ConfiguracionesPcDetalles)
+                    .WithOne(cd => cd.IdConfiguracionNavigation)
+                    .HasForeignKey(cd => cd.IdConfiguracion)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ConfiguracionPcDetalle
+            modelBuilder.Entity<ConfiguracionPcDetalle>(entity =>
+            {
+                entity.HasKey(cd => cd.IdDetalleConfiguracion);
+                entity.ToTable("CONFIGURACION_PC_DETALLE");
+
+                entity.Property(cd => cd.Tipo)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(cd => cd.PrecioUnitario)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.Property(cd => cd.Subtotal)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValue(0m);
+
+                entity.HasOne(cd => cd.IdProductoNavigation)
+                    .WithMany()
+                    .HasForeignKey(cd => cd.IdProducto)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
             OnModelCreatingPartial(modelBuilder);
         }

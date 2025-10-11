@@ -1,7 +1,7 @@
 ﻿@using eCommerce.Entities.ViewModels
 @{
     ViewData["Title"] = "Arma tu PC";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
 }
 
 @model ArmaPcViewModel
@@ -31,19 +31,15 @@
                                  style="cursor: pointer; transition: all 0.3s ease;">
                                 <div class="card-body text-center p-5">
                                     <div class="mb-4">
-                                        <i class="fas fa-microchip" style="font-size: 4rem; color: #ED1C24;"></i>
+                                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="80" height="80" fill="#ED1C24" />
+                                            <text x="40" y="55" font-size="48" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">A</text>
+                                        </svg>
                                     </div>
                                     <h2 class="card-title fw-bold mb-3">AMD Ryzen</h2>
-                                    <p class="card-text text-muted mb-4">
-                                        Procesadores de alto rendimiento y excelente relación precio-rendimiento. Ideal para gaming y multitarea.
+                                    <p class="card-text text-muted">
+                                        Procesadores de alto rendimiento y excelente relación precio-rendimiento
                                     </p>
-                                    <div class="badge bg-danger mb-3">Popular</div>
-                                    <hr>
-                                    <ul class="list-unstyled text-start small mb-0">
-                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Socket AM5</li>
-                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Excelente valor</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>Multithreading potente</li>
-                                    </ul>
                                 </div>
                             </div>
                         </button>
@@ -58,19 +54,15 @@
                                  style="cursor: pointer; transition: all 0.3s ease;">
                                 <div class="card-body text-center p-5">
                                     <div class="mb-4">
-                                        <i class="fas fa-cpu" style="font-size: 4rem; color: #0071C5;"></i>
+                                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="80" height="80" fill="#0071C5" />
+                                            <text x="40" y="55" font-size="42" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">Intel</text>
+                                        </svg>
                                     </div>
                                     <h2 class="card-title fw-bold mb-3">Intel Core</h2>
-                                    <p class="card-text text-muted mb-4">
-                                        Rendimiento estable y confiable. Excelente para trabajo profesional y streaming.
+                                    <p class="card-text text-muted">
+                                        Rendimiento estable y confiable para trabajo profesional y streaming
                                     </p>
-                                    <div class="badge bg-info mb-3">Confiable</div>
-                                    <hr>
-                                    <ul class="list-unstyled text-start small mb-0">
-                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Socket LGA1700</li>
-                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Estable y confiable</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>Excelente eficiencia</li>
-                                    </ul>
                                 </div>
                             </div>
                         </button>
