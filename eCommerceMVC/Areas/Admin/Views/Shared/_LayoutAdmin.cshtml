@@ -26,7 +26,7 @@
             --secondary-color: #764ba2;
         }
 
-        /* Sidebar */
+        
         .sidebar {
             background: var(--primary-gradient);
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
@@ -87,7 +87,7 @@
                 font-weight: 500;
             }
 
-        /* Topbar */
+       
         .topbar {
             background: white;
             border-bottom: 2px solid var(--primary-color);
@@ -127,33 +127,7 @@
                     color: var(--primary-color);
                 }
 
-        /* Scroll to Top Button */
-        .scroll-to-top {
-            background: var(--primary-gradient);
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-            .scroll-to-top:hover {
-                background: var(--secondary-color);
-                transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-            }
-
-        /* Footer */
-        footer {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 2rem;
-            margin-top: auto;
-            text-align: center;
-        }
-
-            footer .container {
-                color: rgba(255, 255, 255, 0.8);
-            }
-
-        /* Content wrapper */
+        
         #content-wrapper {
             background: #f8f9fa;
         }
@@ -162,7 +136,105 @@
             padding: 2rem 1rem;
         }
 
-        /* Buttons */
+        
+        .table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+            
+            .table thead,
+            .dataTables_wrapper .table thead {
+                background: #f8f9fa !important;
+            }
+
+                .table thead th,
+                .dataTables_wrapper .table thead th {
+                    border: none;
+                    font-weight: 600;
+                    padding: 1rem;
+                    color: #212529 !important;
+                    background: #f8f9fa !important;
+                }
+
+        /* Iconos de ordenamiento en DataTables */
+        table.dataTable thead .sorting:before,
+        table.dataTable thead .sorting_asc:before,
+        table.dataTable thead .sorting_desc:before,
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting_asc:after,
+        table.dataTable thead .sorting_desc:after {
+            color: #212529 !important;
+            opacity: 0.7;
+        }
+
+        /* Body de tabla - texto negro */
+        .table tbody td,
+        .dataTables_wrapper .table tbody td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            color: #212529 !important;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        /* Links y botones en tablas - NEGRO */
+        .table tbody td a,
+        .table tbody td button,
+        .dataTables_wrapper .table tbody td a,
+        .dataTables_wrapper .table tbody td button {
+            color: #212529 !important;
+        }
+
+            /* Iconos en botones de acción - NEGRO */
+            .table tbody td a i,
+            .table tbody td button i,
+            .table tbody td .fas,
+            .table tbody td .far,
+            .table tbody td .fab,
+            .table tbody td .bi,
+            .dataTables_wrapper .table tbody td a i,
+            .dataTables_wrapper .table tbody td button i {
+                color: #212529 !important;
+            }
+
+        /* Botones con clases de color mantienen iconos blancos */
+        .table tbody td .btn-primary,
+        .table tbody td .btn-info,
+        .table tbody td .btn-success,
+        .table tbody td .btn-warning,
+        .table tbody td .btn-danger,
+        .table tbody td .btn-secondary {
+            color: white !important;
+        }
+
+            .table tbody td .btn-primary i,
+            .table tbody td .btn-info i,
+            .table tbody td .btn-success i,
+            .table tbody td .btn-warning i,
+            .table tbody td .btn-danger i,
+            .table tbody td .btn-secondary i {
+                color: white !important;
+            }
+
+        /* Hover en iconos de acción */
+        .table tbody td a:hover i,
+        .table tbody td button:hover i {
+            color: var(--primary-color) !important;
+        }
+
+        /* Controles de DataTables */
+        .dataTables_wrapper .dataTables_paginate .paginate_button,
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            color: #212529 !important;
+        }
+
+        
         .btn-primary {
             background: var(--primary-gradient);
             border: none;
@@ -174,35 +246,7 @@
                 box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
             }
 
-        /* Table styling */
-        .table {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-            .table thead {
-                background: var(--primary-gradient);
-                color: white;
-            }
-
-                .table thead th {
-                    border: none;
-                    font-weight: 600;
-                    padding: 1rem;
-                }
-
-            .table tbody td {
-                padding: 0.75rem 1rem;
-                border-bottom: 1px solid #e0e0e0;
-            }
-
-            .table tbody tr:hover {
-                background-color: #f8f9ff;
-            }
-
-        /* Badges */
+        
         .badge-primary {
             background: var(--primary-gradient);
         }
@@ -219,7 +263,33 @@
             background: #f59e0b;
         }
 
-        /* Media Query */
+       
+        footer {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            margin-top: auto;
+            text-align: center;
+        }
+
+            footer .container {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+        
+        .scroll-to-top {
+            background: var(--primary-gradient);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+            .scroll-to-top:hover {
+                background: var(--secondary-color);
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }
+
+        
         @@media (max-width: 768px) {
             .sidebar
 
@@ -246,6 +316,14 @@
         }
 
         }
+
+        .table tbody td .btn {
+            margin-right: 0.5rem; 
+        }
+
+            .table tbody td .btn:last-child {
+                margin-right: 0; 
+            }
     </style>
 </head>
 <body id="page-top">
@@ -411,29 +489,28 @@
                 });
             });
 
-            // Mensajes de éxito/error con SweetAlert2
             @if (TempData["Success"] != null)
             {
-                        <text>
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Éxito',
-                                text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"])),
-                                confirmButtonColor: '#667eea'
-                            });
-                        </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"])),
+                            confirmButtonColor: '#667eea'
+                        });
+                    </text>
             }
 
             @if (TempData["Error"] != null)
             {
-                        <text>
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"])),
-                                confirmButtonColor: '#667eea'
-                            });
-                        </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"])),
+                            confirmButtonColor: '#667eea'
+                        });
+                    </text>
             }
         });
     </script>

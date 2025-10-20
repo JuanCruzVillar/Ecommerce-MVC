@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace eCommerceMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    ////[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class UsuariosController : BaseAdminController
     {
         private readonly IUsuarioService _usuarioService;

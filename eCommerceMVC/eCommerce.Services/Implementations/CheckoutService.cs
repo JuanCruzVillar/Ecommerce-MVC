@@ -207,11 +207,13 @@ namespace eCommerce.Services.Implementations
             return 3000;
         }
 
+        // En tu CheckoutService.cs, método ProcesarPedidoAsync
+        // Reemplazá la sección donde se crea la venta:
+
         public async Task<int> ProcesarPedidoAsync(CheckoutViewModel checkoutVM, int idCliente)
         {
             Console.WriteLine($"DEBUG - Iniciando ProcesarPedidoAsync");
             Console.WriteLine($"DEBUG - IdCliente: {idCliente}");
-            Console.WriteLine($"DEBUG - UsarNuevaDireccion: {checkoutVM.UsarNuevaDireccion}");
 
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -225,31 +227,29 @@ namespace eCommerce.Services.Implementations
 
                 int? idDireccionFinal = null;
 
-                // Si usa nueva dirección, crearla primero
+                // Si usa nueva dirección (ya debería estar creada desde el controller)
                 if (checkoutVM.UsarNuevaDireccion)
                 {
-                    Console.WriteLine($"DEBUG - Creando nueva dirección...");
-                    var resultadoDireccion = await AgregarDireccionEnvioAsync(checkoutVM.NuevaDireccion, idCliente);
-
-                    if (resultadoDireccion)
-                    {
-                        var nuevaDireccion = await _context.DireccionesEnvio
-                            .Where(d => d.IdCliente == idCliente)
-                            .OrderByDescending(d => d.FechaRegistro)
-                            .FirstOrDefaultAsync();
-                        idDireccionFinal = nuevaDireccion?.IdDireccionEnvio;
-                        Console.WriteLine($"DEBUG - Dirección creada con ID: {idDireccionFinal}");
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("Error al crear la dirección de envío");
-                    }
+                    Console.WriteLine($"DEBUG - Usando dirección recién creada");
+                    idDireccionFinal = checkoutVM.DireccionEnvioSeleccionada;
                 }
                 else
                 {
                     idDireccionFinal = checkoutVM.DireccionEnvioSeleccionada;
                     Console.WriteLine($"DEBUG - Usando dirección existente ID: {idDireccionFinal}");
                 }
+
+                // CRÍTICO: Obtener el ID del estado "Pendiente" dinámicamente
+                var estadoPendiente = await _context.EstadosPedido
+                    .Where(e => e.Nombre == "Pendiente" && e.Activo)
+                    .FirstOrDefaultAsync();
+
+                if (estadoPendiente == null)
+                {
+                    throw new InvalidOperationException("No se encontró el estado 'Pendiente' en la base de datos");
+                }
+
+                Console.WriteLine($"DEBUG - Estado Pedido ID: {estadoPendiente.IdEstadoPedido}");
 
                 // 2. Crear la venta
                 var venta = new Venta
@@ -259,13 +259,13 @@ namespace eCommerce.Services.Implementations
                     ImporteTotal = checkoutVM.Total,
                     IdDireccionEnvio = idDireccionFinal,
                     IdMetodoPago = checkoutVM.MetodoPagoSeleccionado,
-                    IdEstadoPedido = 2, // Pendiente (ID generado en la BD)
+                    IdEstadoPedido = estadoPendiente.IdEstadoPedido, // ✅ Usar el ID dinámico
                     DescuentoAplicado = checkoutVM.DescuentoAplicado,
                     CostoEnvio = checkoutVM.CostoEnvio,
                     NotasEspeciales = checkoutVM.NotasEspeciales,
                     FechaVenta = DateTime.Now,
-                    FechaEstimadaEntrega = DateTime.Now.AddDays(7), // 7 días por defecto
-                    IdTransaccion = Guid.NewGuid().ToString("N")[..10] // ID único corto
+                    FechaEstimadaEntrega = DateTime.Now.AddDays(7),
+                    IdTransaccion = Guid.NewGuid().ToString("N")[..10]
                 };
 
                 Console.WriteLine($"DEBUG - Creando venta...");
@@ -309,15 +309,15 @@ namespace eCommerce.Services.Implementations
 
                 // 5. Limpiar carrito
                 var itemsCarrito = await _context.Carritos
-    .Where(c => c.IdCliente == idCliente)  
-    .ToListAsync();
+                    .Where(c => c.IdCliente == idCliente)
+                    .ToListAsync();
                 _context.Carritos.RemoveRange(itemsCarrito);
 
                 // 6. Crear historial de pedido
                 var historial = new HistorialPedido
                 {
                     IdVenta = venta.IdVenta,
-                    IdEstadoPedido = 2, 
+                    IdEstadoPedido = estadoPendiente.IdEstadoPedido, 
                     Comentarios = "Pedido creado exitosamente",
                     FechaCambio = DateTime.Now
                 };
