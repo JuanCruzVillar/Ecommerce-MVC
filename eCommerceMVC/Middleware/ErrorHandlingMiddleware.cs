@@ -3,9 +3,9 @@ using System.Net;
 
 namespace eCommerceMVC.Middleware
 {
-    /// <summary>
-    /// Middleware para manejo centralizado de errores
-    /// </summary>
+    
+    /// Middleware para manejo de errores
+    
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
@@ -70,9 +70,9 @@ namespace eCommerceMVC.Middleware
         }
     }
 
-    /// <summary>
-    /// Extension method para registrar el middleware
-    /// </summary>
+    
+    // Extension method para registrar el middleware
+    
     public static class ErrorHandlingMiddlewareExtensions
     {
         public static IApplicationBuilder UseErrorHandlingMiddleware(this IApplicationBuilder builder)

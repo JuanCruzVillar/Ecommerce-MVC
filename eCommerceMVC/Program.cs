@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ============================================
-// 1. CONFIGURACIÓN DE VARIABLES DE ENTORNO
-// ============================================
+
+// CONFIGURACIÓN DE VARIABLES DE ENTORNO
+
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -20,9 +20,9 @@ builder.Configuration
     .AddEnvironmentVariables()
     .Build();
 
-// ============================================
-// 2. LOGGING MEJORADO
-// ============================================
+
+// LOGGING MEJORADO
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
@@ -33,9 +33,9 @@ if (builder.Environment.IsProduction())
     builder.Logging.SetMinimumLevel(LogLevel.Warning);
 }
 
-// ============================================
-// 3. SERVICIOS
-// ============================================
+
+// SERVICIOS
+
 builder.Services.AddControllersWithViews();
 
 // DbContext con validación de connection string
@@ -52,7 +52,7 @@ builder.Services.AddDbContext<DbecommerceContext>(options =>
 {
     options.UseSqlServer(connectionString);
 
-    // Solo en desarrollo: queries detalladas
+    
     if (builder.Environment.IsDevelopment())
     {
         options.EnableSensitiveDataLogging();
@@ -79,9 +79,9 @@ builder.Services.AddScoped<IArmatuPcService, ArmatuPcService>();
 
 builder.Services.AddHttpContextAccessor();
 
-// ============================================
-// 4. AUTENTICACIÓN Y SEGURIDAD
-// ============================================
+
+// AUTENTICACIÓN Y SEGURIDAD
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -118,9 +118,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-// ============================================
-// 5. SESSION
-// ============================================
+
+// SESSION
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -132,14 +132,14 @@ builder.Services.AddSession(options =>
         : CookieSecurePolicy.SameAsRequest;
 });
 
-// ============================================
-// 6. BUILD APP
-// ============================================
+
+// BUILD APP
+
 var app = builder.Build();
 
-// ============================================
-// 7. MIDDLEWARE PIPELINE (ORDEN IMPORTANTE)
-// ============================================
+
+// MIDDLEWARE PIPELINE
+
 
 // Manejo de excepciones personalizado
 app.UseCustomExceptionHandling(app.Environment);
@@ -154,9 +154,9 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ============================================
-// 8. RUTAS
-// ============================================
+
+// RUTAS
+
 
 // Rutas de áreas (Admin, Negocio)
 app.MapControllerRoute(
@@ -178,9 +178,9 @@ app.MapGet("/", context =>
     return Task.CompletedTask;
 });
 
-// ============================================
-// 9. HEALTH CHECK (útil para deployment)
-// ============================================
+
+// HEALTH CHECK 
+
 app.MapGet("/health", async (DbecommerceContext db) =>
 {
     try
@@ -203,9 +203,9 @@ app.MapGet("/health", async (DbecommerceContext db) =>
     }
 });
 
-// ============================================
-// 10. LOG DE INICIO
-// ============================================
+
+// LOG DE INICIO
+
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("========================================");
 logger.LogInformation("🚀 Hardware Store eCommerce iniciado");

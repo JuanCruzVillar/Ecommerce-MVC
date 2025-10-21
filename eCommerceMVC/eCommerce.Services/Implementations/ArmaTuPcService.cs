@@ -8,7 +8,6 @@ using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
 
-
 namespace eCommerce.Services.Implementations
 {
     public class ArmatuPcService : IArmatuPcService
@@ -20,7 +19,72 @@ namespace eCommerce.Services.Implementations
             _context = context;
         }
 
-        // Obtener procesadores de una marca específica (AMD Ryzen o Intel)
+        // Obtener memorias RAM (Categorías: DDR4, DDR5 - Padre: Memoria Ram)
+        public async Task<List<ProductoDTO>> ObtenerRamsAsync()
+        {
+            // IdCategoria 13 (DDR4) y 14 (DDR5) - Padre: 11 (Memoria Ram)
+            var productos = await _context.Productos
+                .Include(p => p.IdMarcaNavigation)
+                .Include(p => p.IdCategoriaNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
+                .Include(p => p.ProductoEspecificaciones)
+                .Where(p => p.Activo == true &&
+                           p.Stock > 0 &&
+                           (
+                               // Buscar por IdCategoria directamente (más preciso)
+                               p.IdCategoria == 13 || // DDR4
+                               p.IdCategoria == 14 || // DDR5
+                                                      // O por categoría padre "Memoria Ram"
+                               (p.IdCategoriaNavigation.IdCategoriaPadre == 11)
+                           ))
+                .ToListAsync();
+
+            Console.WriteLine($"DEBUG - RAMs encontradas: {productos.Count}");
+            foreach (var p in productos)
+            {
+                Console.WriteLine($"  - {p.Nombre} | Categoría: {p.IdCategoriaNavigation?.Descripcion} | Padre: {p.IdCategoriaNavigation?.CategoriaPadre?.Descripcion}");
+            }
+
+            return MapearProductosADTO(productos);
+        }
+
+        // Obtener tarjetas gráficas (búsqueda flexible)
+        public async Task<List<ProductoDTO>> ObtenerGpusAsync()
+        {
+            var productos = await _context.Productos
+                .Include(p => p.IdMarcaNavigation)
+                .Include(p => p.IdCategoriaNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
+                .Include(p => p.ProductoEspecificaciones)
+                .Where(p => p.Activo == true &&
+                           p.Stock > 0 &&
+                           (
+                               // Buscar por múltiples variantes
+                               p.IdCategoriaNavigation.Descripcion.Contains("Gráfica") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Grafica") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("GPU") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Video") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Placa") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Tarjeta") ||
+                               // O categoría padre
+                               (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                                (p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Gráfica") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("GPU") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Video") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Placa")))
+                           ))
+                .ToListAsync();
+
+            Console.WriteLine($"DEBUG - GPUs encontradas: {productos.Count}");
+            foreach (var p in productos)
+            {
+                Console.WriteLine($"  - {p.Nombre} | Categoría: {p.IdCategoriaNavigation?.Descripcion} | Padre: {p.IdCategoriaNavigation?.CategoriaPadre?.Descripcion}");
+            }
+
+            return MapearProductosADTO(productos);
+        }
+
+        // Obtener procesadores de una marca específica (AMD o Intel)
         public async Task<List<ProductoDTO>> ObtenerProcesadoresAsync(string marca)
         {
             var productos = await _context.Productos
@@ -30,57 +94,49 @@ namespace eCommerce.Services.Implementations
                 .Include(p => p.ProductoEspecificaciones)
                 .Where(p => p.Activo == true &&
                            p.Stock > 0 &&
-                           p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Procesador") &&
-                           p.IdMarcaNavigation.Descripcion == marca)
+                           p.IdMarcaNavigation.Descripcion == marca &&
+                           (p.IdCategoriaNavigation.Descripcion.Contains("Procesador") ||
+                            p.IdCategoriaNavigation.Descripcion.Contains("CPU") ||
+                            (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                             (p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Procesador") ||
+                              p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("CPU")))))
                 .ToListAsync();
 
+            Console.WriteLine($"DEBUG - Procesadores {marca} encontrados: {productos.Count}");
             return MapearProductosADTO(productos);
         }
 
         // Obtener motherboards compatibles con la marca del procesador
         public async Task<List<ProductoDTO>> ObtenerMotherboardsAsync(string marca)
         {
-            var socket = marca == "AMD" ? "Socket AMD" : "Socket Intel";
+            var socket = marca == "AMD" ? "AMD" : "Intel";
 
             var productos = await _context.Productos
                 .Include(p => p.IdMarcaNavigation)
                 .Include(p => p.IdCategoriaNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
                 .Include(p => p.ProductoEspecificaciones)
                 .Where(p => p.Activo == true &&
                            p.Stock > 0 &&
-                           p.IdCategoriaNavigation.Descripcion == socket)
+                           (
+                               // Buscar por categoría
+                               p.IdCategoriaNavigation.Descripcion.Contains("Motherboard") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Mother") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Placa Base") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Placa Madre") ||
+                               // O por categoría padre
+                               (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                                (p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Motherboard") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Mother")))
+                           ) &&
+                           // Que sea compatible con el socket
+                           (p.IdCategoriaNavigation.Descripcion.Contains(socket) ||
+                            p.Nombre.Contains(socket) ||
+                            (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                             p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains(socket))))
                 .ToListAsync();
 
-            return MapearProductosADTO(productos);
-        }
-
-        // Obtener memorias RAM (genéricas)
-        public async Task<List<ProductoDTO>> ObtenerRamsAsync()
-        {
-            var productos = await _context.Productos
-                .Include(p => p.IdMarcaNavigation)
-                .Include(p => p.IdCategoriaNavigation)
-                .Include(p => p.ProductoEspecificaciones)
-                .Where(p => p.Activo == true &&
-                           p.Stock > 0 &&
-                           p.IdCategoriaNavigation.Descripcion.Contains("Memoria RAM"))
-                .ToListAsync();
-
-            return MapearProductosADTO(productos);
-        }
-
-        // Obtener tarjetas gráficas
-        public async Task<List<ProductoDTO>> ObtenerGpusAsync()
-        {
-            var productos = await _context.Productos
-                .Include(p => p.IdMarcaNavigation)
-                .Include(p => p.IdCategoriaNavigation)
-                .Include(p => p.ProductoEspecificaciones)
-                .Where(p => p.Activo == true &&
-                           p.Stock > 0 &&
-                           p.IdCategoriaNavigation.Descripcion.Contains("Tarjeta Gráfica"))
-                .ToListAsync();
-
+            Console.WriteLine($"DEBUG - Motherboards {socket} encontrados: {productos.Count}");
             return MapearProductosADTO(productos);
         }
 
@@ -90,13 +146,22 @@ namespace eCommerce.Services.Implementations
             var productos = await _context.Productos
                 .Include(p => p.IdMarcaNavigation)
                 .Include(p => p.IdCategoriaNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
                 .Include(p => p.ProductoEspecificaciones)
                 .Where(p => p.Activo == true &&
                            p.Stock > 0 &&
-                           (p.IdCategoriaNavigation.Descripcion.Contains("SSD") ||
-                            p.IdCategoriaNavigation.Descripcion.Contains("HDD")))
+                           (
+                               p.IdCategoriaNavigation.Descripcion.Contains("SSD") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("HDD") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Disco") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Almacenamiento") ||
+                               (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                                (p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Almacenamiento") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Disco")))
+                           ))
                 .ToListAsync();
 
+            Console.WriteLine($"DEBUG - Almacenamiento encontrado: {productos.Count}");
             return MapearProductosADTO(productos);
         }
 
@@ -106,12 +171,21 @@ namespace eCommerce.Services.Implementations
             var productos = await _context.Productos
                 .Include(p => p.IdMarcaNavigation)
                 .Include(p => p.IdCategoriaNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
                 .Include(p => p.ProductoEspecificaciones)
                 .Where(p => p.Activo == true &&
                            p.Stock > 0 &&
-                           p.IdCategoriaNavigation.Descripcion.Contains("Fuente"))
+                           (
+                               p.IdCategoriaNavigation.Descripcion.Contains("Fuente") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("PSU") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Power Supply") ||
+                               (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                                (p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Fuente") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("PSU")))
+                           ))
                 .ToListAsync();
 
+            Console.WriteLine($"DEBUG - Fuentes encontradas: {productos.Count}");
             return MapearProductosADTO(productos);
         }
 
@@ -121,12 +195,22 @@ namespace eCommerce.Services.Implementations
             var productos = await _context.Productos
                 .Include(p => p.IdMarcaNavigation)
                 .Include(p => p.IdCategoriaNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
                 .Include(p => p.ProductoEspecificaciones)
                 .Where(p => p.Activo == true &&
                            p.Stock > 0 &&
-                           p.IdCategoriaNavigation.Descripcion.Contains("Cooler"))
+                           (
+                               p.IdCategoriaNavigation.Descripcion.Contains("Cooler") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Refrigeración") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Refrigeracion") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Ventilador") ||
+                               (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                                (p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Cooler") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Refrigeración")))
+                           ))
                 .ToListAsync();
 
+            Console.WriteLine($"DEBUG - Coolers encontrados: {productos.Count}");
             return MapearProductosADTO(productos);
         }
 
@@ -144,6 +228,7 @@ namespace eCommerce.Services.Implementations
 
             return MapearProductoADTO(producto);
         }
+
 
         // Guardar configuración en base de datos
         public async Task<bool> GuardarConfiguracionAsync(int idCliente, GuardarConfiguracionViewModel model)

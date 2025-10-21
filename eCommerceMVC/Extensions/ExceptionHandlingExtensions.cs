@@ -10,12 +10,12 @@ namespace eCommerceMVC.Extensions
         {
             if (env.IsDevelopment())
             {
-                // En desarrollo: página detallada de errores
+                // página detallada de errores
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                // En producción: middleware personalizado
+                // middleware personalizado
                 app.UseErrorHandlingMiddleware();
 
                 // Status code pages para errores HTTP
