@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Acceso Denegado";
+    var isAdminArea = ViewBag.IsAdminArea ?? false;
+    var loginUrl = isAdminArea ? "/Admin/Auth/Login" : "/Negocio/Auth/Login";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Hardware Store</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .error-icon {
+            font-size: 100px;
+            margin-bottom: 1rem;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .error-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 1rem;
+        }
+
+        .error-description {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 12px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                color: white;
+            }
+
+        .btn-home {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 12px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+            .btn-home:hover {
+                background: #cbd5e0;
+                color: #2d3748;
+            }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">🚫</div>
+        <h1 class="error-title">Acceso Denegado</h1>
+        <p class="error-description">
+            No tienes los permisos necesarios para acceder a este recurso.
+            @(isAdminArea ? "Se requieren privilegios de administrador." : "Debes iniciar sesión para continuar.")
+        </p>
+
+        <div style="margin-top: 2rem;">
+            <a href="@loginUrl" class="btn-login">
+                🔐 Iniciar Sesión
+            </a>
+            <a href="@(isAdminArea ? "/Admin/Home" : "/Negocio/Catalogo")" class="btn-home">
+                🏠 Ir al Inicio
+            </a>
+        </div>
+    </div>
+</body>
+</html>

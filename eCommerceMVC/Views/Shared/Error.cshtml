@@ -1,0 +1,156 @@
+﻿@{
+    ViewData["Title"] = "Error";
+    var statusCode = ViewBag.StatusCode ?? 500;
+    var errorMessage = ViewBag.ErrorMessage ?? "Ha ocurrido un error";
+    var errorDescription = ViewBag.ErrorDescription ?? "Por favor, intente nuevamente más tarde.";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Hardware Store</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .error-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .error-description {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .btn-home {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 12px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: #cbd5e0;
+            color: #2d3748;
+        }
+
+        .error-actions {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        @if (statusCode == 404)
+        {
+            <div class="error-icon">🔍</div>
+            <div class="error-code">404</div>
+        }
+        else if (statusCode == 403 || statusCode == 401)
+        {
+            <div class="error-icon">🔒</div>
+            <div class="error-code">@statusCode</div>
+        }
+        else if (statusCode == 500)
+        {
+            <div class="error-icon">⚠️</div>
+            <div class="error-code">500</div>
+        }
+        else
+        {
+            <div class="error-icon">❌</div>
+            <div class="error-code">@statusCode</div>
+        }
+
+        <h1 class="error-title">@errorMessage</h1>
+        <p class="error-description">@errorDescription</p>
+
+        <div class="error-actions">
+            <a href="/" class="btn-home">
+                🏠 Volver al Inicio
+            </a>
+            <a href="javascript:history.back()" class="btn-back">
+                ← Regresar
+            </a>
+        </div>
+
+        @if (statusCode == 404)
+        {
+            <div style="margin-top: 2rem; color: #a0aec0; font-size: 0.9rem;">
+                <p>Si crees que esto es un error, <a href="/Negocio/Ayuda" style="color: #667eea;">contáctanos</a>.</p>
+            </div>
+        }
+    </div>
+</body>
+</html>
