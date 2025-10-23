@@ -487,6 +487,8 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 }
 
             return componentes;
+
+
         }
     }
 }

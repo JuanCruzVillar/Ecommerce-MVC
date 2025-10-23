@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace eCommerceMVC.Areas.Negocio.Controllers
 {
@@ -18,12 +18,18 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
         private readonly ICheckoutService _checkoutService;
         private readonly ICarritoService _carritoService;
         private readonly DbecommerceContext _context;
+        private readonly ILogger<CheckoutController> _logger;
 
-        public CheckoutController(ICheckoutService checkoutService, ICarritoService carritoService, DbecommerceContext context)
+        public CheckoutController(
+            ICheckoutService checkoutService,
+            ICarritoService carritoService,
+            DbecommerceContext context,
+            ILogger<CheckoutController> logger)
         {
             _checkoutService = checkoutService;
             _carritoService = carritoService;
             _context = context;
+            _logger = logger;
         }
 
         // GET: /Cliente/Checkout
@@ -33,12 +39,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             {
                 var idCliente = GetClienteId();
 
-                Console.WriteLine($"DEBUG - IdCliente obtenido: {idCliente}");
-                foreach (var claim in User.Claims)
-                {
-                    Console.WriteLine($"DEBUG - Claim: {claim.Type} = {claim.Value}");
-                }
-
                 if (idCliente == 0)
                 {
                     TempData["Error"] = "Debe iniciar sesión para continuar con la compra";
@@ -46,7 +46,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 }
 
                 var itemsCarrito = await _carritoService.ObtenerItemsCarritoAsync(idCliente);
-                Console.WriteLine($"DEBUG - Items carrito encontrados: {itemsCarrito.Count}");
 
                 if (!itemsCarrito.Any())
                 {
@@ -62,20 +61,18 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 }
 
                 var checkoutViewModel = await _checkoutService.ObtenerCheckoutAsync(idCliente);
-                Console.WriteLine($"DEBUG - Direcciones disponibles: {checkoutViewModel.DireccionesDisponibles.Count}");
 
                 if (!checkoutViewModel.DireccionesDisponibles.Any())
                 {
                     checkoutViewModel.UsarNuevaDireccion = true;
-                    Console.WriteLine("DEBUG - Forzando UsarNuevaDireccion = true");
                 }
 
                 return View(checkoutViewModel);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG - Error en Index: {ex.Message}");
-                TempData["Error"] = "Error al cargar el checkout: " + ex.Message;
+                _logger.LogError(ex, "Error al cargar checkout para cliente");
+                TempData["Error"] = "Error al cargar el checkout. Por favor, intente nuevamente.";
                 return RedirectToAction("Index", "Carrito");
             }
         }
@@ -117,10 +114,11 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al validar cupón {Codigo}", cuponModel.Codigo);
                 return Json(new
                 {
                     exito = false,
-                    mensaje = "Error al validar el cupón: " + ex.Message
+                    mensaje = "Error al validar el cupón. Por favor, intente nuevamente."
                 });
             }
         }
@@ -167,10 +165,11 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al agregar dirección para cliente");
                 return Json(new
                 {
                     exito = false,
-                    mensaje = "Error: " + ex.Message
+                    mensaje = "Error al procesar la solicitud. Por favor, intente nuevamente."
                 });
             }
         }
@@ -191,10 +190,11 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error al calcular envío para dirección {DireccionId}", idDireccionEnvio);
                 return Json(new
                 {
                     exito = false,
-                    mensaje = "Error al calcular envío: " + ex.Message
+                    mensaje = "Error al calcular el costo de envío"
                 });
             }
         }
@@ -208,7 +208,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
             try
             {
-                // Limpiar ModelState de campos que no necesitan validación
                 ModelState.Remove("Cliente");
                 ModelState.Remove("ItemsCarrito");
                 ModelState.Remove("DireccionesDisponibles");
@@ -216,32 +215,22 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 ModelState.Remove("CodigoCupon");
                 ModelState.Remove("MensajeCupon");
                 ModelState.Remove("NotasEspeciales");
+                ModelState.Remove("CantidadCuotas");
 
-                Console.WriteLine($"DEBUG - ProcesarPedido IdCliente: {idCliente}");
-                Console.WriteLine($"DEBUG - MetodoPago: {model.MetodoPagoSeleccionado}");
-                Console.WriteLine($"DEBUG - UsarNuevaDireccion: {model.UsarNuevaDireccion}");
-
-                // Validación de método de pago
                 if (model.MetodoPagoSeleccionado == 0)
                 {
-                    Console.WriteLine("DEBUG - Error: Método de pago no seleccionado");
                     ModelState.AddModelError("MetodoPagoSeleccionado", "Debe seleccionar un método de pago");
                     return await RecargarCheckoutConError(model, idCliente);
                 }
 
-                // Si usa nueva dirección, validarla y guardarla
                 if (model.UsarNuevaDireccion)
                 {
-                    Console.WriteLine("DEBUG - Validando nueva dirección...");
-
                     if (model.NuevaDireccion == null)
                     {
-                        Console.WriteLine("DEBUG - Error: NuevaDireccion es null");
                         ModelState.AddModelError("", "Los datos de la dirección son requeridos");
                         return await RecargarCheckoutConError(model, idCliente);
                     }
 
-                    // Validar campos requeridos
                     var erroresDireccion = new List<string>();
 
                     if (string.IsNullOrWhiteSpace(model.NuevaDireccion.NombreCompleto))
@@ -259,7 +248,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
                     if (erroresDireccion.Any())
                     {
-                        Console.WriteLine($"DEBUG - Errores en dirección: {string.Join(", ", erroresDireccion)}");
                         foreach (var error in erroresDireccion)
                         {
                             ModelState.AddModelError("", error);
@@ -267,7 +255,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                         return await RecargarCheckoutConError(model, idCliente);
                     }
 
-                    // Crear la entidad DireccionEnvio directamente
                     var nuevaDireccion = new DireccionEnvio
                     {
                         IdCliente = idCliente,
@@ -287,19 +274,15 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     await _context.SaveChangesAsync();
 
                     model.DireccionEnvioSeleccionada = nuevaDireccion.IdDireccionEnvio;
-                    Console.WriteLine($"DEBUG - Nueva dirección guardada con ID: {nuevaDireccion.IdDireccionEnvio}");
                 }
                 else
                 {
-                    // Validar que se haya seleccionado una dirección existente
                     if (!model.DireccionEnvioSeleccionada.HasValue || model.DireccionEnvioSeleccionada == 0)
                     {
-                        Console.WriteLine("DEBUG - Error: Dirección no seleccionada");
                         ModelState.AddModelError("DireccionEnvioSeleccionada", "Debe seleccionar una dirección de envío");
                         return await RecargarCheckoutConError(model, idCliente);
                     }
 
-                    // Verificar que la dirección pertenece al cliente
                     var direccionExiste = await _context.DireccionesEnvio
                         .AnyAsync(d => d.IdDireccionEnvio == model.DireccionEnvioSeleccionada.Value
                                     && d.IdCliente == idCliente
@@ -312,17 +295,12 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     }
                 }
 
-                // Validar términos
                 if (!model.AceptaTerminos)
                 {
-                    Console.WriteLine("DEBUG - Error: Términos no aceptados");
                     ModelState.AddModelError("AceptaTerminos", "Debe aceptar los términos y condiciones");
                     return await RecargarCheckoutConError(model, idCliente);
                 }
 
-                Console.WriteLine("DEBUG - Todas las validaciones pasaron, procesando pedido...");
-
-                // Validar stock
                 var stockDisponible = await _checkoutService.ValidarStockProductosAsync(idCliente);
                 if (!stockDisponible)
                 {
@@ -330,10 +308,8 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     return await RecargarCheckoutConError(model, idCliente);
                 }
 
-                // Obtener datos actualizados del carrito
                 var checkoutActualizado = await _checkoutService.ObtenerCheckoutAsync(idCliente);
 
-                // Aplicar cupón si existe
                 if (!string.IsNullOrEmpty(model.CodigoCupon))
                 {
                     var resultadoCupon = await _checkoutService.ValidarCuponAsync(model.CodigoCupon, checkoutActualizado.Subtotal);
@@ -344,12 +320,10 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     }
                 }
 
-                // Actualizar datos del modelo
                 model.ItemsCarrito = checkoutActualizado.ItemsCarrito;
                 model.Subtotal = checkoutActualizado.Subtotal;
                 model.TotalItems = checkoutActualizado.TotalItems;
 
-                // Calcular costo de envío
                 if (model.DireccionEnvioSeleccionada.HasValue)
                 {
                     model.CostoEnvio = await _checkoutService.CalcularCostoEnvioAsync(model.DireccionEnvioSeleccionada.Value);
@@ -357,29 +331,25 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
                 model.Total = model.Subtotal + model.CostoEnvio - model.DescuentoAplicado;
 
-                // Procesar el pedido
                 var idVenta = await _checkoutService.ProcesarPedidoAsync(model, idCliente);
 
                 if (idVenta > 0)
                 {
-                    Console.WriteLine($"DEBUG - Pedido procesado exitosamente, ID: {idVenta}");
+                    _logger.LogInformation("Pedido {VentaId} procesado exitosamente para cliente {ClienteId}", idVenta, idCliente);
                     TempData["Success"] = "¡Pedido procesado exitosamente!";
                     return RedirectToAction("Confirmacion", new { id = idVenta });
                 }
                 else
                 {
-                    Console.WriteLine("DEBUG - Error: ProcesarPedidoAsync devolvió 0");
+                    _logger.LogWarning("Fallo al procesar pedido para cliente {ClienteId}", idCliente);
                     ModelState.AddModelError("", "Error al procesar el pedido. Intente nuevamente.");
                     return await RecargarCheckoutConError(model, idCliente);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG - Error en ProcesarPedido: {ex.Message}");
-                Console.WriteLine($"DEBUG - InnerException: {ex.InnerException?.Message}");
-                Console.WriteLine($"DEBUG - StackTrace: {ex.StackTrace}");
-
-                ModelState.AddModelError("", $"Error al procesar el pedido: {ex.Message}");
+                _logger.LogError(ex, "Error al procesar pedido para cliente {ClienteId}", idCliente);
+                ModelState.AddModelError("", "Error al procesar el pedido. Por favor, intente nuevamente.");
                 return await RecargarCheckoutConError(model, idCliente);
             }
         }
@@ -402,7 +372,8 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Error al obtener la confirmación: " + ex.Message;
+                _logger.LogError(ex, "Error al obtener confirmación del pedido {PedidoId}", id);
+                TempData["Error"] = "Error al obtener la confirmación del pedido";
                 return RedirectToAction("Index", "Catalogo");
             }
         }
@@ -429,29 +400,19 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { error = ex.Message });
+                _logger.LogError(ex, "Error al obtener resumen del pedido");
+                return Json(new { error = "Error al cargar el resumen" });
             }
         }
 
         #region Métodos Helper
 
-        /// <summary>
-        /// Recarga la vista de checkout con los datos actualizados cuando hay errores
-        /// </summary>
         private async Task<IActionResult> RecargarCheckoutConError(CheckoutViewModel model, int idCliente)
         {
             try
             {
-                Console.WriteLine($"DEBUG - RecargarCheckout IdCliente: {idCliente}");
-
-                // Recargar datos frescos desde la base de datos
                 var checkoutFresco = await _checkoutService.ObtenerCheckoutAsync(idCliente);
 
-                Console.WriteLine($"DEBUG - Items carrito: {checkoutFresco.ItemsCarrito.Count}");
-                Console.WriteLine($"DEBUG - Direcciones: {checkoutFresco.DireccionesDisponibles.Count}");
-                Console.WriteLine($"DEBUG - Métodos pago: {checkoutFresco.MetodosPagoDisponibles.Count}");
-
-                // Preservar selecciones del usuario
                 checkoutFresco.MetodoPagoSeleccionado = model.MetodoPagoSeleccionado;
                 checkoutFresco.DireccionEnvioSeleccionada = model.DireccionEnvioSeleccionada;
                 checkoutFresco.UsarNuevaDireccion = model.UsarNuevaDireccion;
@@ -460,29 +421,25 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 checkoutFresco.CodigoCupon = model.CodigoCupon;
                 checkoutFresco.CostoEnvio = model.CostoEnvio;
                 checkoutFresco.DescuentoAplicado = model.DescuentoAplicado;
+                checkoutFresco.CantidadCuotas = model.CantidadCuotas;
 
-                // Preservar datos de nueva dirección si los había
                 if (model.UsarNuevaDireccion && model.NuevaDireccion != null)
                 {
                     checkoutFresco.NuevaDireccion = model.NuevaDireccion;
                 }
 
-                // Calcular total
                 checkoutFresco.Total = checkoutFresco.Subtotal + checkoutFresco.CostoEnvio - checkoutFresco.DescuentoAplicado;
 
                 return View("Index", checkoutFresco);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DEBUG - Error en RecargarCheckout: {ex.Message}");
-                TempData["Error"] = "Error al cargar el checkout: " + ex.Message;
+                _logger.LogError(ex, "Error al recargar checkout para cliente {ClienteId}", idCliente);
+                TempData["Error"] = "Error al cargar el checkout. Por favor, intente nuevamente.";
                 return RedirectToAction("Index", "Carrito");
             }
         }
 
-        /// <summary>
-        /// Renderiza una vista parcial a string para retornar por AJAX
-        /// </summary>
         private async Task<string> RenderPartialViewToStringAsync(string viewName, object model)
         {
             ViewData.Model = model;

@@ -4,7 +4,7 @@
     Layout = "_Layout";
 }
 
-<!-- DEBUG: Verificar datos del modelo -->
+
 @{
     var cantidadMetodos = Model.MetodosPagoDisponibles?.Count ?? 0;
     var cantidadDirecciones = Model.DireccionesDisponibles?.Count ?? 0;
@@ -68,7 +68,6 @@
                                                                         @if (!string.IsNullOrEmpty(direccion.Referencias))
                                                                         {
                                                                             <br>
-                                                            
                                                                             <em>@direccion.Referencias</em>
                                                                         }
                                                                     </small>
@@ -215,35 +214,65 @@
                                                                placeholder="123" maxlength="4">
                                                     </div>
                                                 </div>
+
+                                                @* SECCIÓN DE CUOTAS  *@
                                                 <div id="seccion-cuotas" style="display: none;">
-                                                    <label class="form-label">Cuotas</label>
-                                                    <select class="form-select" id="cuotas">
-                                                        <option value="1">1 cuota sin interés</option>
-                                                        <option value="3">3 cuotas sin interés</option>
-                                                        <option value="6">6 cuotas sin interés</option>
-                                                        <option value="12">12 cuotas sin interés</option>
-                                                    </select>
+                                                    <hr class="my-3">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <label class="form-label fw-bold">
+                                                                <i class="fas fa-calendar-alt me-2" style="color: #667eea;"></i>
+                                                                Cantidad de cuotas
+                                                            </label>
+
+                                                            @Html.DropDownListFor(m => m.CantidadCuotas,
+                                                            new SelectList(new List<SelectListItem>()),
+                                                                                                        "Seleccione cantidad de cuotas",
+                                                                                                        new { @class = "form-select form-select-lg", id = "select-cuotas" })
+
+                                                    <div class="alert alert-info mt-3 mb-0" id="info-cuota-seleccionada" style="display: none;">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-md-6">
+                                                                <div class="mb-2 mb-md-0">
+                                                                    <i class="fas fa-info-circle me-2"></i>
+                                                                    <strong id="cuotas-texto">Seleccione cuotas</strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6 text-md-end">
+                                                                <div class="small text-muted">Valor por cuota</div>
+                                                                <strong id="valor-cuota" style="color: #667eea; font-size: 1.3rem;">$0,00</strong>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-2 pt-2 border-top" id="info-total-financiado" style="display: none;">
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span class="text-muted small">Total financiado:</span>
+                                                                <strong id="total-financiado" class="text-muted">$0,00</strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
 
-                                    @* Información de Transferencia *@
-                                    <div id="form-transferencia" style="display: none;" class="mt-3">
-                                        <div class="alert alert-info">
-                                            <h6><i class="fas fa-university me-2"></i>Datos para Transferencia</h6>
-                                            <p class="mb-1"><strong>CBU:</strong> 0170099220000037914652</p>
-                                            <p class="mb-1"><strong>Alias:</strong> HARDWARE.STORE.EJEMPLO</p>
-                                            <p class="mb-1"><strong>Titular:</strong> Hardware Store S.A.</p>
-                                            <p class="mb-0"><strong>CUIT:</strong> 20-12345678-9</p>
-                                            <hr>
-                                            <small class="text-muted">
-                                                <i class="fas fa-exclamation-circle me-1"></i>
-                                                Enviar comprobante a: ventas@hardwarestore.com
-                                            </small>
-                                        </div>
-                                    </div>
-                                }
+                            @* Información de Transferencia *@
+                            <div id="form-transferencia" style="display: none;" class="mt-3">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-university me-2"></i>Datos para Transferencia</h6>
+                                    <p class="mb-1"><strong>CBU:</strong> 0170099220000037914652</p>
+                                    <p class="mb-1"><strong>Alias:</strong> HARDWARE.STORE.EJEMPLO</p>
+                                    <p class="mb-1"><strong>Titular:</strong> Hardware Store S.A.</p>
+                                    <p class="mb-0"><strong>CUIT:</strong> 20-12345678-9</p>
+                                    <hr>
+                                    <small class="text-muted">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        Enviar comprobante a: ventas@hardwarestore.com
+                                    </small>
+                                </div>
+                            </div>
+                                                        }
                                 else
                                 {
                                     <div class="alert alert-danger">
@@ -479,21 +508,73 @@
             border-color: #667eea;
         }
 
+    /* Estilos para el select de cuotas */
+    #select-cuotas {
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: white;
+    }
+
+        #select-cuotas:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+
+        #select-cuotas option {
+            padding: 10px;
+            font-size: 0.95rem;
+        }
+
+    /* Animación para el alert de cuotas */
+    #info-cuota-seleccionada {
+        border-left: 4px solid #667eea;
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    /* Estilo para el valor de cuota destacado */
+    #valor-cuota {
+        text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Responsive para móviles */
+    @@media (max-width: 768px) {
+        #select-cuotas {
+            font-size: 0.9rem;
+        }
+
+        #valor-cuota {
+            font-size: 1.1rem !important;
+        }
+    }
+
+    @@keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
     @@keyframes shake {
-        0%, 100%
+        0%, 100% {
+            transform: translateX(0);
+        }
 
-    {
-        transform: translateX(0);
-    }
+        25% {
+            transform: translateX(-5px);
+        }
 
-    25% {
-        transform: translateX(-5px);
-    }
-
-    75% {
-        transform: translateX(5px);
-    }
-
+        75% {
+            transform: translateX(5px);
+        }
     }
 </style>
 
@@ -503,11 +584,143 @@
             console.log('✅ Checkout script iniciado');
             console.log('Métodos de pago disponibles:', @Model.MetodosPagoDisponibles.Count);
 
+            // Planes de cuotas 
+            var planesCuotas = [
+                { nro: 1, interes: 0.00, texto: 'Pago en 1 cuota' },
+                { nro: 3, interes: 0.00, texto: '3 cuotas sin interés' },
+                { nro: 6, interes: 0.135, texto: '6 cuotas' },
+                { nro: 9, interes: 0.285, texto: '9 cuotas' },
+                { nro: 12, interes: 0.462, texto: '12 cuotas' },
+                { nro: 18, interes: 0.933, texto: '18 cuotas' },
+                { nro: 24, interes: 1.571, texto: '24 cuotas' }
+            ];
+
+            
+            function formatearPrecio(valor) {
+                return valor.toLocaleString('es-AR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            // Función para poblar el select de cuotas
+            function poblarSelectCuotas() {
+                var subtotalTexto = $('#subtotal-valor').text().replace('$', '').replace(/\./g, '').replace(',', '.');
+                var subtotal = parseFloat(subtotalTexto);
+
+                console.log('Subtotal texto:', subtotalTexto);
+                console.log('Subtotal parseado:', subtotal);
+
+                var $select = $('#select-cuotas');
+                $select.empty();
+                $select.append('<option value="">Seleccione cantidad de cuotas</option>');
+
+                planesCuotas.forEach(function(plan) {
+                    var total = subtotal * (1 + plan.interes);
+                    var valorCuota = total / plan.nro;
+                    var sinInteres = plan.interes === 0;
+
+                    var textoOpcion = plan.nro + ' cuota' + (plan.nro > 1 ? 's' : '') + ' de $' + formatearPrecio(valorCuota);
+                    if (sinInteres && plan.nro > 1) {
+                        textoOpcion += ' (Sin interés)';
+                    } else if (plan.interes > 0) {
+                        textoOpcion += ' (Total: $' + formatearPrecio(total) + ')';
+                    }
+
+                    $select.append($('<option>', {
+                        value: plan.nro,
+                        text: textoOpcion,
+                        'data-valor-cuota': valorCuota.toFixed(2),
+                        'data-total': total.toFixed(2),
+                        'data-interes': plan.interes,
+                        'data-texto': plan.texto
+                    }));
+                });
+
+                // Seleccionar 1 cuota por defecto
+                $select.val('1');
+                actualizarInfoCuota(1);
+            }
+
+            // Actualizar información de cuota seleccionada
+            function actualizarInfoCuota(cuotas) {
+                var $option = $('#select-cuotas option[value="' + cuotas + '"]');
+
+                if ($option.length === 0) {
+                    $('#info-cuota-seleccionada').hide();
+                    return;
+                }
+
+                var valorCuota = parseFloat($option.data('valor-cuota'));
+                var total = parseFloat($option.data('total'));
+                var interes = parseFloat($option.data('interes'));
+                var texto = $option.data('texto');
+
+                $('#cuotas-texto').text(texto);
+                $('#valor-cuota').text('$' + formatearPrecio(valorCuota));
+
+                // Mostrar total financiado solo si hay interés
+                if (interes > 0) {
+                    $('#total-financiado').text('$' + formatearPrecio(total));
+                    $('#info-total-financiado').show();
+                } else {
+                    $('#info-total-financiado').hide();
+                }
+
+                $('#info-cuota-seleccionada').slideDown(300);
+            }
+
+            // Evento cambio en el select de cuotas
+            $('#select-cuotas').on('change', function() {
+                var cuotas = $(this).val();
+                if (cuotas) {
+                    actualizarInfoCuota(parseInt(cuotas));
+                } else {
+                    $('#info-cuota-seleccionada').slideUp(300);
+                }
+            });
+
+            // Función para mostrar formulario de pago
+            function mostrarFormularioPago(idMetodo) {
+                console.log('🔍 Mostrando formulario para método:', idMetodo);
+                $('#form-tarjeta, #form-transferencia, #seccion-cuotas').hide();
+
+                var $radio = $('input[name="MetodoPagoSeleccionado"][value="' + idMetodo + '"]');
+                var nombre = $radio.data('nombre');
+
+                console.log('Nombre método:', nombre);
+
+                if (nombre && (nombre.includes('tarjeta') || nombre.includes('crédito') || nombre.includes('débito'))) {
+                    console.log('✅ Mostrando formulario de tarjeta');
+                    $('#form-tarjeta').slideDown(300);
+                    if (nombre.includes('crédito')) {
+                        console.log('✅ Mostrando sección de cuotas');
+                        $('#seccion-cuotas').show();
+                        poblarSelectCuotas();
+                    }
+                } else if (nombre && nombre.includes('transferencia')) {
+                    console.log('✅ Mostrando formulario de transferencia');
+                    $('#form-transferencia').slideDown(300);
+                }
+            }
+
             // Restaurar selección si viene de error
             var metodoPagoSeleccionado = '@Model.MetodoPagoSeleccionado';
             if (metodoPagoSeleccionado && metodoPagoSeleccionado !== '0') {
+                console.log('Restaurando método de pago:', metodoPagoSeleccionado);
                 $('#pago_' + metodoPagoSeleccionado).prop('checked', true);
                 mostrarFormularioPago(metodoPagoSeleccionado);
+            }
+
+            // Restaurar selección de cuotas si viene de error
+            var cuotasSeleccionadas = '@Model.CantidadCuotas';
+            if (cuotasSeleccionadas && cuotasSeleccionadas !== '0' && $('#seccion-cuotas').is(':visible')) {
+                setTimeout(function() {
+                    $('#select-cuotas').val(cuotasSeleccionadas);
+                    if (cuotasSeleccionadas) {
+                        actualizarInfoCuota(parseInt(cuotasSeleccionadas));
+                    }
+                }, 300);
             }
 
             // Toggle nueva dirección
@@ -531,28 +744,10 @@
             // Cambio de método de pago
             $('input[name="MetodoPagoSeleccionado"]').on('change', function() {
                 if ($(this).is(':checked')) {
-                    console.log('Método seleccionado:', $(this).val());
+                    console.log('📌 Método seleccionado:', $(this).val());
                     mostrarFormularioPago($(this).val());
                 }
             });
-
-            function mostrarFormularioPago(idMetodo) {
-                $('#form-tarjeta, #form-transferencia, #seccion-cuotas').hide();
-
-                var $radio = $('input[name="MetodoPagoSeleccionado"][value="' + idMetodo + '"]');
-                var nombre = $radio.data('nombre');
-
-                console.log('Nombre método:', nombre);
-
-                if (nombre.includes('tarjeta') || nombre.includes('crédito') || nombre.includes('débito')) {
-                    $('#form-tarjeta').slideDown(300);
-                    if (nombre.includes('crédito')) {
-                        $('#seccion-cuotas').show();
-                    }
-                } else if (nombre.includes('transferencia')) {
-                    $('#form-transferencia').slideDown(300);
-                }
-            }
 
             // Seleccionar dirección existente
             $('.direccion-radio').on('change', function() {
@@ -603,6 +798,17 @@
                     if (!validarTarjeta()) {
                         e.preventDefault();
                         return false;
+                    }
+
+                    // Validar cuotas si es tarjeta de crédito
+                    if (nombre.includes('crédito') && $('#seccion-cuotas').is(':visible')) {
+                        var cuotasSelec = $('#select-cuotas').val();
+                        if (!cuotasSelec) {
+                            alert('Por favor seleccione la cantidad de cuotas');
+                            $('#select-cuotas').focus();
+                            e.preventDefault();
+                            return false;
+                        }
                     }
                 }
 
@@ -667,8 +873,7 @@
                     return;
                 }
 
-                // Aquí iría la llamada AJAX para validar el cupón
-                // Por ahora solo mensaje de ejemplo
+                
                 mostrarMensajeCupon('Función de cupones pendiente de implementar', 'info');
             });
 

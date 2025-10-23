@@ -312,11 +312,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-pc-display me-1"></i>PC Armadas
-                    </a>
-                </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="#">
@@ -506,6 +501,8 @@
             function actualizarBadge(){
                 $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
                     $('#carrito-badge').text(total);
+                }).fail(function() {
+                    // Silenciosamente falla si hay error
                 });
             }
 
@@ -553,7 +550,9 @@
                                 $('#navbarSugerencias').hide().empty();
                             }
                         }
-                    );
+                    ).fail(function() {
+                        $('#navbarSugerencias').hide().empty();
+                    });
                 }, 300);
             });
 
@@ -575,26 +574,26 @@
         // Mensajes de éxito/error con SweetAlert2
         @if (TempData["Success"] != null)
         {
-                    <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: '@TempData["Success"]',
-                        confirmButtonColor: '#667eea'
-                    });
-                    </text>
+                        <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: '@TempData["Success"]',
+                            confirmButtonColor: '#667eea'
+                        });
+                        </text>
         }
 
         @if (TempData["Error"] != null)
         {
-                    <text>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: '@TempData["Error"]',
-                        confirmButtonColor: '#667eea'
-                    });
-                    </text>
+                        <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: '@TempData["Error"]',
+                            confirmButtonColor: '#667eea'
+                        });
+                        </text>
         }
 
         // Submenús de categorías
@@ -625,6 +624,8 @@
             });
         });
     </script>
+
+    
 
     @RenderSection("Scripts", required: false)
 </body>

@@ -12,6 +12,20 @@
         </h2>
     </div>
 
+    <!-- Mensaje para usuarios sin sesión -->
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>¡Importante!</strong> Para finalizar tu compra, necesitás
+            <a href="@Url.Action("Login", "Auth", new { area = "Negocio", returnUrl = Url.Action("Index", "Checkout") })" class="alert-link">iniciar sesión</a>
+            o
+            <a href="@Url.Action("Register", "Auth", new { area = "Negocio" })" class="alert-link">registrarte</a>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Contenedor del carrito -->
     <div class="table-responsive" id="carrito-container" @(Model.Any() ? "" : "style='display:none;'")>
         <table class="table table-bordered align-middle text-center shadow-sm" id="carrito-table">
             <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
@@ -60,7 +74,30 @@
             <a href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left me-1"></i>Seguir comprando
             </a>
-            @Html.ActionLink("Finalizar Compra", "Index", "Checkout", new { area = "Negocio" }, new { @class = "btn btn-custom" })
+            @if (User.Identity.IsAuthenticated)
+            {
+                @Html.ActionLink("Finalizar Compra", "Index", "Checkout", new { area = "Negocio" }, new { @class = "btn btn-custom" })
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Auth", new { area = "Negocio", returnUrl = Url.Action("Index", "Checkout") })" class="btn btn-custom">
+                    <i class="bi bi-lock me-1"></i>Iniciar sesión para comprar
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Mensaje carrito vacío -->
+    <div id="carrito-vacio" style="display: none;">
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-cart-x" style="font-size: 5rem; color: #667eea;"></i>
+            </div>
+            <h3 class="mb-3">Tu carrito está vacío</h3>
+            <p class="text-muted mb-4">¡Empezá a agregar productos para comenzar tu compra!</p>
+            <a href='@Url.Action("Index", "Catalogo", new { area = "Negocio" })' class="btn btn-custom">
+                <i class="bi bi-shop me-2"></i>Ir al catálogo
+            </a>
         </div>
     </div>
 </div>
@@ -92,9 +129,14 @@
 @section Scripts {
     <script>
         $(document).ready(function(){
+            const userAuth = @(User.Identity.IsAuthenticated ? "true" : "false");
 
             function parseARNumber(str){
                 return parseFloat(str.replace(/\./g,'').replace(',', '.')) || 0;
+            }
+
+            function formatARNumber(num) {
+                return num.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2});
             }
 
             function actualizarTotal(){
@@ -104,42 +146,104 @@
                     let subtotal = parseARNumber(subtotalStr);
                     total += subtotal;
                 });
-                $('#total').text('$' + total.toLocaleString('es-AR', {minimumFractionDigits:2}));
+                $('#total').text('$' + formatARNumber(total));
             }
 
             function actualizarBadge(){
-                $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
-                    $('#carrito-badge').text(total);
-                });
+                if (window.CarritoLS) {
+                    window.CarritoLS.actualizarBadge();
+                }
             }
 
             function actualizarVistaCarrito(){
                 if($('#carrito-body tr').length === 0){
                     $('#carrito-container').hide();
-                    if($('#carrito-vacio').length === 0){
-                        $('.container.py-5').append(`
-                            <div id="carrito-vacio" class="text-center py-5">
-                                <div class="mb-4">
-                                    <i class="bi bi-cart-x" style="font-size: 5rem; color: #667eea;"></i>
-                                </div>
-                                <h3 class="mb-3">Tu carrito está vacío</h3>
-                                <p class="text-muted mb-4">¡Empezá a agregar productos para comenzar tu compra!</p>
-                                <a href='@Url.Action("Index", "Catalogo", new { area = "Negocio" })' class="btn btn-custom">
-                                    <i class="bi bi-shop me-2"></i>Ir al catálogo
-                                </a>
-                            </div>
-                        `);
-                    }
+                    $('#carrito-vacio').show();
+                } else {
+                    $('#carrito-container').show();
+                    $('#carrito-vacio').hide();
                 }
             }
 
-            actualizarTotal();
-            actualizarBadge();
-            actualizarVistaCarrito();
+            // Si NO está autenticado, cargar desde localStorage
+            if (!userAuth) {
+                cargarDesdeLocalStorage();
+            } else {
+                actualizarTotal();
+                actualizarVistaCarrito();
+            }
 
-            $('.eliminar-producto').click(function(){
+            // Función para cargar carrito desde localStorage
+            function cargarDesdeLocalStorage() {
+                const carrito = window.CarritoLS.obtener();
+
+                if (carrito.length === 0) {
+                    $('#carrito-container').hide();
+                    $('#carrito-vacio').show();
+                    return;
+                }
+
+                // Obtener info de los productos
+                const productosIds = carrito.map(item => item.idProducto);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("ObtenerProductosInfo", "Carrito", new { area = "Negocio" })',
+                    contentType: 'application/json',
+                    data: JSON.stringify(productosIds),
+                    success: function(response) {
+                        if (response.success && response.productos.length > 0) {
+                            $('#carrito-body').empty();
+
+                            response.productos.forEach(function(producto) {
+                                const itemCarrito = carrito.find(c => c.idProducto === producto.idProducto);
+                                const cantidad = itemCarrito ? itemCarrito.cantidad : 1;
+                                const subtotal = (producto.precio || 0) * cantidad;
+
+                                const html = `
+                                    <tr data-producto="${producto.idProducto}">
+                                        <td class="text-start">
+                                            <img src="${producto.rutaImagen || 'https://dummyimage.com/80x80/dee2e6/6c757d.jpg'}"
+                                                 alt="${producto.nombre}" class="img-thumbnail me-2"
+                                                 style="width:80px; height:80px; object-fit:cover;">
+                                            ${producto.nombre}
+                                        </td>
+                                        <td class="fw-semibold">$${formatARNumber(producto.precio || 0)}</td>
+                                        <td class="fw-semibold">${cantidad}</td>
+                                        <td class="subtotal fw-bold" style="color: #667eea;">$${formatARNumber(subtotal)}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm eliminar-producto">
+                                                <i class="bi bi-trash me-1"></i>Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+
+                                $('#carrito-body').append(html);
+                            });
+
+                            $('#carrito-container').show();
+                            $('#carrito-vacio').hide();
+                            actualizarTotal();
+                        } else {
+                            $('#carrito-container').hide();
+                            $('#carrito-vacio').show();
+                        }
+                    },
+                    error: function() {
+                        console.error('Error al cargar productos');
+                        $('#carrito-container').hide();
+                        $('#carrito-vacio').show();
+                    }
+                });
+            }
+
+            actualizarBadge();
+
+            // Eliminar producto
+            $(document).on('click', '.eliminar-producto', function(){
                 let row = $(this).closest('tr');
-                let productoId = row.data('producto');
+                let productoId = parseInt(row.data('producto'));
 
                 Swal.fire({
                     title:'Eliminar producto',
@@ -151,17 +255,31 @@
                     cancelButtonText:'Cancelar'
                 }).then((result)=>{
                     if(result.isConfirmed){
-                        $.post('@Url.Action("Eliminar", "Carrito", new { area = "Negocio" })', {productoId: productoId}, function(){
+                        if (!userAuth) {
+                            // Eliminar de localStorage
+                            window.CarritoLS.eliminar(productoId);
                             row.remove();
                             actualizarTotal();
                             actualizarBadge();
                             actualizarVistaCarrito();
                             Swal.fire({icon:'success', title:'Producto eliminado', timer:1500, showConfirmButton:false});
-                        });
+                        } else {
+                            // Eliminar de BD
+                            $.post('@Url.Action("Eliminar", "Carrito", new { area = "Negocio" })',
+                                {productoId: productoId},
+                                function(){
+                                    row.remove();
+                                    actualizarTotal();
+                                    actualizarBadge();
+                                    actualizarVistaCarrito();
+                                    Swal.fire({icon:'success', title:'Producto eliminado', timer:1500, showConfirmButton:false});
+                            });
+                        }
                     }
                 });
             });
 
+            // Vaciar carrito
             $('#vaciar-carrito').click(function(){
                 Swal.fire({
                     title:'Vaciar carrito',
@@ -173,17 +291,25 @@
                     cancelButtonText:'Cancelar'
                 }).then((result)=>{
                     if(result.isConfirmed){
-                        $.post('@Url.Action("Vaciar", "Carrito", new { area = "Negocio" })', function(){
+                        if (!userAuth) {
+                            window.CarritoLS.vaciar();
                             $('#carrito-body').empty();
                             actualizarTotal();
                             actualizarBadge();
                             actualizarVistaCarrito();
                             Swal.fire({icon:'success', title:'Carrito vaciado', timer:1500, showConfirmButton:false});
-                        });
+                        } else {
+                            $.post('@Url.Action("Vaciar", "Carrito", new { area = "Negocio" })', function(){
+                                $('#carrito-body').empty();
+                                actualizarTotal();
+                                actualizarBadge();
+                                actualizarVistaCarrito();
+                                Swal.fire({icon:'success', title:'Carrito vaciado', timer:1500, showConfirmButton:false});
+                            });
+                        }
                     }
                 });
             });
-
         });
     </script>
 }

@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eCommerce.Data;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace eCommerceMVC.Areas.Admin.Controllers
 {
@@ -18,26 +20,30 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         private readonly DbecommerceContext _context;
         private readonly IUsuarioService _usuarioService;
         private readonly IProductoService _productoService;
+        private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
         public HomeController(
             DbecommerceContext context,
             IUsuarioService usuarioService,
-            IProductoService productoService)
+            IProductoService productoService,
+            ILogger<HomeController> logger,
+            IConfiguration configuration)
         {
             _context = context;
             _usuarioService = usuarioService;
             _productoService = productoService;
+            _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<IActionResult> Index(DateTime? fechaInicio, DateTime? fechaFin, int? idEstado)
         {
             try
             {
-                // Definir rango de fechas (por defecto últimos 30 días)
                 var inicio = fechaInicio ?? DateTime.Now.AddDays(-30);
                 var fin = fechaFin ?? DateTime.Now.AddDays(1);
 
-                // Obtener ventas reales de la BD
                 var ventasQuery = _context.Ventas
                     .Include(v => v.IdClienteNavigation)
                     .Include(v => v.IdMetodoPagoNavigation)
@@ -47,10 +53,8 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                         .ThenInclude(dv => dv.IdProductoNavigation)
                     .AsQueryable();
 
-                // Filtrar por rango de fechas
                 ventasQuery = ventasQuery.Where(v => v.FechaVenta >= inicio && v.FechaVenta <= fin);
 
-                // Filtrar por estado si se especifica
                 if (idEstado.HasValue && idEstado > 0)
                 {
                     ventasQuery = ventasQuery.Where(v => v.IdEstadoPedido == idEstado);
@@ -60,7 +64,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     .OrderByDescending(v => v.FechaVenta)
                     .ToListAsync();
 
-                // Construir lista de detalles (una fila por producto en la venta)
                 var detalles = new List<VentaDetalleViewModel>();
                 foreach (var venta in ventasReales)
                 {
@@ -88,7 +91,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     }
                     else
                     {
-                        // Si no hay detalles, agregar una fila con los totales de la venta
                         detalles.Add(new VentaDetalleViewModel
                         {
                             IdVenta = venta.IdVenta,
@@ -107,7 +109,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     }
                 }
 
-                // Calcular métricas
                 var totalVentas = ventasReales.Sum(v => v.ImporteTotal ?? 0);
                 var ventasHoy = ventasReales.Count(v => v.FechaVenta.HasValue && v.FechaVenta.Value.Date == DateTime.Today);
                 var clientesUnicos = ventasReales.Select(v => v.IdCliente).Distinct().Count();
@@ -131,14 +132,13 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     EstadoSeleccionado = idEstado ?? 0
                 };
 
-                // Estados para el filtro
                 ViewBag.Estados = await _context.EstadosPedido.ToListAsync();
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error en Dashboard: {ex.Message}");
+                _logger.LogError(ex, "Error al cargar el dashboard");
                 TempData["Error"] = "Error al cargar el dashboard";
                 return View(new VentasViewModel { Detalles = new List<VentaDetalleViewModel>() });
             }
@@ -148,7 +148,15 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         {
             try
             {
-                QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+                var licenseType = _configuration.GetValue<string>("QuestPDF:LicenseType");
+                if (!string.IsNullOrEmpty(licenseType))
+                {
+                    QuestPDF.Settings.License = Enum.Parse<QuestPDF.Infrastructure.LicenseType>(licenseType);
+                }
+                else
+                {
+                    QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+                }
 
                 var venta = await _context.Ventas
                     .Include(v => v.IdClienteNavigation)
@@ -159,9 +167,11 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     .FirstOrDefaultAsync(v => v.IdVenta == id);
 
                 if (venta == null)
-                    return NotFound();
+                {
+                    TempData["Error"] = "Venta no encontrada";
+                    return RedirectToAction("Index");
+                }
 
-                // Convertir a VentaDetalleViewModel
                 var ventaDetalles = venta.DetalleVenta
                     .Select(d => new VentaDetalleViewModel
                     {
@@ -183,8 +193,8 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error exportando PDF: {ex.Message}");
-                TempData["Error"] = "Error al exportar PDF";
+                _logger.LogError(ex, "Error al exportar PDF de venta {VentaId}", id);
+                TempData["Error"] = "Error al exportar el PDF";
                 return RedirectToAction("Index");
             }
         }
@@ -193,7 +203,15 @@ namespace eCommerceMVC.Areas.Admin.Controllers
         {
             try
             {
-                QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+                var licenseType = _configuration.GetValue<string>("QuestPDF:LicenseType");
+                if (!string.IsNullOrEmpty(licenseType))
+                {
+                    QuestPDF.Settings.License = Enum.Parse<QuestPDF.Infrastructure.LicenseType>(licenseType);
+                }
+                else
+                {
+                    QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+                }
 
                 var inicio = fechaInicio ?? DateTime.Now.AddDays(-30);
                 var fin = fechaFin ?? DateTime.Now.AddDays(1);
@@ -207,7 +225,6 @@ namespace eCommerceMVC.Areas.Admin.Controllers
                     .OrderByDescending(v => v.FechaVenta)
                     .ToListAsync();
 
-                // Agrupar por venta
                 var ventasAgrupadas = new List<List<VentaDetalleViewModel>>();
                 foreach (var venta in ventas)
                 {
@@ -235,8 +252,8 @@ namespace eCommerceMVC.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error exportando reporte: {ex.Message}");
-                TempData["Error"] = "Error al exportar reporte";
+                _logger.LogError(ex, "Error al exportar reporte de ventas");
+                TempData["Error"] = "Error al exportar el reporte";
                 return RedirectToAction("Index");
             }
         }

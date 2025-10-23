@@ -1,23 +1,28 @@
 ﻿using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace eCommerce.Areas.Negocio.Controllers
 {
+    [Area("Negocio")]
     public class CarritoController : BaseNegocioController
     {
         private readonly ICarritoService _carritoService;
+        private readonly IProductoService _productoService;
 
-        public CarritoController(ICarritoService carritoService)
+        public CarritoController(ICarritoService carritoService, IProductoService productoService)
         {
             _carritoService = carritoService;
+            _productoService = productoService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var clienteId = GetClienteId(); 
+            var clienteId = GetClienteId();
             if (clienteId == 0)
             {
+                // Usuario no autenticado - mostrar vista vacía para manejar con localStorage
                 return View(new List<CarritoViewModel>());
             }
 
@@ -41,32 +46,31 @@ namespace eCommerce.Areas.Negocio.Controllers
             {
                 var clienteId = GetClienteId();
 
-                // 🔍 DEBUG: Agregar estos logs
-                Console.WriteLine($"DEBUG Agregar - ClienteId obtenido: {clienteId}");
-                Console.WriteLine($"DEBUG Agregar - ProductoId: {productoId}");
-                Console.WriteLine($"DEBUG Agregar - Cantidad: {cantidad}");
-                Console.WriteLine($"DEBUG Agregar - Usuario autenticado: {User.Identity.IsAuthenticated}");
-
-                foreach (var claim in User.Claims)
-                {
-                    Console.WriteLine($"DEBUG Agregar - Claim: {claim.Type} = {claim.Value}");
-                }
-
+                // Si NO está autenticado, devolver success para que JS maneje con localStorage
                 if (clienteId == 0)
                 {
-                    return Json(new { success = false, message = "Debe iniciar sesión" });
+                    // Validar que el producto existe
+                    var producto = await _productoService.GetByIdAsync(productoId);
+                    if (producto == null || !producto.Activo.GetValueOrDefault())
+                    {
+                        return Json(new { success = false, message = "Producto no disponible" });
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Producto agregado al carrito",
+                        sinSesion = true // Flag para que JS use localStorage
+                    });
                 }
 
+                // Usuario autenticado - agregar a BD
                 await _carritoService.AgregarProductoAsync(clienteId, productoId, cantidad);
-                return Json(new { success = true });
+                return Json(new { success = true, sinSesion = false });
             }
             catch (Exception ex)
             {
-               
-                Console.WriteLine($"DEBUG Agregar - Error: {ex.Message}");
-                Console.WriteLine($"DEBUG Agregar - StackTrace: {ex.StackTrace}");
-                Console.WriteLine($"DEBUG Agregar - InnerException: {ex.InnerException?.Message}");
-
+                Console.WriteLine($"Error al agregar: {ex.Message}");
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
@@ -79,11 +83,11 @@ namespace eCommerce.Areas.Negocio.Controllers
                 var clienteId = GetClienteId();
                 if (clienteId == 0)
                 {
-                    return Json(new { success = false, message = "Debe iniciar sesión" });
+                    return Json(new { success = true, sinSesion = true });
                 }
 
                 await _carritoService.EliminarProductoAsync(clienteId, productoId);
-                return Json(new { success = true });
+                return Json(new { success = true, sinSesion = false });
             }
             catch (Exception ex)
             {
@@ -99,11 +103,11 @@ namespace eCommerce.Areas.Negocio.Controllers
                 var clienteId = GetClienteId();
                 if (clienteId == 0)
                 {
-                    return Json(new { success = false, message = "Debe iniciar sesión" });
+                    return Json(new { success = true, sinSesion = true });
                 }
 
                 await _carritoService.VaciarCarritoAsync(clienteId);
-                return Json(new { success = true });
+                return Json(new { success = true, sinSesion = false });
             }
             catch (Exception ex)
             {
@@ -126,5 +130,69 @@ namespace eCommerce.Areas.Negocio.Controllers
                 return 0;
             }
         }
+
+        // NUEVO: Migrar carrito de localStorage a BD al iniciar sesión
+        [HttpPost]
+        public async Task<IActionResult> MigrarCarrito([FromBody] List<CarritoLocalStorageItem> items)
+        {
+            try
+            {
+                var clienteId = GetClienteId();
+                if (clienteId == 0)
+                {
+                    return Json(new { success = false, message = "Debe iniciar sesión" });
+                }
+
+                foreach (var item in items)
+                {
+                    await _carritoService.AgregarProductoAsync(clienteId, item.IdProducto, item.Cantidad);
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+       
+        [HttpPost]
+        public async Task<IActionResult> ObtenerProductosInfo([FromBody] List<int> productosIds)
+        {
+            try
+            {
+                var productos = new List<object>();
+
+                foreach (var id in productosIds)
+                {
+                    var producto = await _productoService.GetByIdAsync(id);
+                    if (producto != null && producto.Activo.GetValueOrDefault())
+                    {
+                        productos.Add(new
+                        {
+                            idProducto = producto.IdProducto,
+                            nombre = producto.Nombre,
+                            precio = producto.Precio,
+                            rutaImagen = producto.RutaImagen,
+                            stock = producto.Stock
+                        });
+                    }
+                }
+
+                return Json(new { success = true, productos });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+    }
+
+    // Modelo para migración
+    public class CarritoLocalStorageItem
+    {
+        public int IdProducto { get; set; }
+        public int Cantidad { get; set; }
     }
 }

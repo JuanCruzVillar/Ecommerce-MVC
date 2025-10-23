@@ -23,6 +23,8 @@ namespace eCommerce.Entities
         public int MetodoPagoSeleccionado { get; set; }
         public List<MetodoPago> MetodosPagoDisponibles { get; set; } = new List<MetodoPago>();
 
+        public int CantidadCuotas { get; set; } = 1;
+
         // Cupón de descuento
         public string CodigoCupon { get; set; }
         public bool CuponAplicado { get; set; } = false;
