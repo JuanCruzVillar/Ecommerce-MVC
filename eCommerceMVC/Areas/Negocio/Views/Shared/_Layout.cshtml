@@ -197,20 +197,17 @@
         }
 
         @@media (max-width: 768px) {
-            footer .row > div
+            footer .row > div {
+                margin-bottom: 2rem;
+            }
 
-        {
-            margin-bottom: 2rem;
-        }
+            footer h6 {
+                font-size: 1rem;
+            }
 
-        footer h6 {
-            font-size: 1rem;
-        }
-
-        .navbar-secondary .nav-link::after {
-            display: none;
-        }
-
+            .navbar-secondary .nav-link::after {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -311,7 +308,6 @@
                         <i class="bi bi-tools me-1"></i>Arma tu PC
                     </a>
                 </li>
-
 
                 <li class="nav-item">
                     <a class="nav-link" href="#">
@@ -477,44 +473,196 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Confirmacion logout
-        document.getElementById("logoutLink")?.addEventListener("click", function(e){
-            e.preventDefault();
-            Swal.fire({
-                title: 'Cerrar sesión',
-                text: "¿Seguro que querés salir?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#667eea',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, cerrar sesión',
-                cancelButtonText: 'Cancelar'
-            }).then((result)=>{
-                if(result.isConfirmed){
-                    window.location.href = this.href;
-                }
-            });
-        });
+        // ========== CARRITO LOCALSTORAGE ==========
+        const CarritoLS = {
+            STORAGE_KEY: 'carrito_hardware_store',
 
-        // Actualizar la cantidad en el badge del carrito
-        $(document).ready(function(){
-            function actualizarBadge(){
-                $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
-                    $('#carrito-badge').text(total);
-                }).fail(function() {
-                    // Silenciosamente falla si hay error
+            obtener: function() {
+                try {
+                    const carrito = localStorage.getItem(this.STORAGE_KEY);
+                    return carrito ? JSON.parse(carrito) : [];
+                } catch (error) {
+                    console.error('Error al obtener carrito:', error);
+                    return [];
+                }
+            },
+
+            guardar: function(carrito) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(carrito));
+                    this.actualizarBadge();
+                } catch (error) {
+                    console.error('Error al guardar carrito:', error);
+                }
+            },
+
+            agregar: function(productoId, cantidad = 1) {
+                const carrito = this.obtener();
+                const itemExistente = carrito.find(item => item.idProducto === productoId);
+
+                if (itemExistente) {
+                    itemExistente.cantidad += cantidad;
+                } else {
+                    carrito.push({ idProducto: productoId, cantidad: cantidad });
+                }
+
+                this.guardar(carrito);
+            },
+
+            eliminar: function(productoId) {
+                let carrito = this.obtener();
+                carrito = carrito.filter(item => item.idProducto !== productoId);
+                this.guardar(carrito);
+            },
+
+            vaciar: function() {
+                localStorage.removeItem(this.STORAGE_KEY);
+                this.actualizarBadge();
+            },
+
+            cantidadTotal: function() {
+                const carrito = this.obtener();
+                return carrito.reduce((total, item) => total + item.cantidad, 0);
+            },
+
+            actualizarBadge: function() {
+                const userAuth = @(User.Identity.IsAuthenticated ? "true" : "false");
+
+                if (userAuth) {
+                    $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total) {
+                        $('#carrito-badge').text(total);
+                    }).fail(function() {
+                        $('#carrito-badge').text('0');
+                    });
+                } else {
+                    const cantidad = CarritoLS.cantidadTotal();
+                    $('#carrito-badge').text(cantidad);
+                }
+            },
+
+            migrarAServidor: function() {
+                const carrito = this.obtener();
+                if (carrito.length === 0) return;
+
+                console.log('🔄 Migrando carrito al servidor...', carrito);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("MigrarCarrito", "Carrito", new { area = "Negocio" })',
+                    contentType: 'application/json',
+                    data: JSON.stringify(carrito.map(item => ({
+                        idProducto: item.idProducto,
+                        cantidad: item.cantidad
+                    }))),
+                    success: function(response) {
+                        if (response.success) {
+                            CarritoLS.vaciar();
+                            CarritoLS.actualizarBadge();
+                            console.log('✅ Carrito migrado exitosamente');
+
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Carrito actualizado',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        }
+                    },
+                    error: function(error) {
+                        console.error('❌ Error al migrar carrito:', error);
+                    }
                 });
             }
+        };
 
-            actualizarBadge();
-            setInterval(actualizarBadge, 30000);
+        // ========== INICIALIZACIÓN ==========
+        $(document).ready(function() {
+            const userAuth = @(User.Identity.IsAuthenticated ? "true" : "false");
 
-            // Búsqueda con sugerencias en navbar
-            let timeoutId;
-            $('#navbarBusqueda').on('keyup', function(e) {
-                if (e.key === 'Enter') {
+            CarritoLS.actualizarBadge();
+
+            if (userAuth) {
+                setInterval(function() {
+                    CarritoLS.actualizarBadge();
+                }, 30000);
+            }
+
+            const acabaDeLogear = sessionStorage.getItem('recien_logeado');
+            if (acabaDeLogear === 'true' && userAuth) {
+                sessionStorage.removeItem('recien_logeado');
+                setTimeout(function() {
+                    CarritoLS.migrarAServidor();
+                }, 500);
+            }
+
+            // EVENTO GLOBAL: Agregar al carrito
+            $(document).on('click', '.agregar-carrito', function(e) {
+                e.preventDefault();
+
+                const productoId = parseInt($(this).data('producto'));
+                const boton = $(this);
+                const textoOriginal = boton.html();
+
+                if (!productoId) {
+                    console.error('ID de producto inválido');
                     return;
                 }
+
+                boton.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Agregando...');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
+                    data: {
+                        productoId: productoId,
+                        cantidad: 1
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            if (response.sinSesion) {
+                                CarritoLS.agregar(productoId, 1);
+                            }
+
+                            CarritoLS.actualizarBadge();
+
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Agregado al carrito',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'No se pudo agregar el producto',
+                                confirmButtonColor: '#667eea'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error de conexión',
+                            confirmButtonColor: '#667eea'
+                        });
+                    },
+                    complete: function() {
+                        boton.prop('disabled', false).html(textoOriginal);
+                    }
+                });
+            });
+
+            // Búsqueda con sugerencias
+            let timeoutId;
+            $('#navbarBusqueda').on('keyup', function(e) {
+                if (e.key === 'Enter') return;
 
                 clearTimeout(timeoutId);
                 const termino = $(this).val();
@@ -556,14 +704,12 @@
                 }, 300);
             });
 
-            // Ocultar sugerencias al hacer clic fuera
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('#navbarBusqueda, #navbarSugerencias').length) {
                     $('#navbarSugerencias').hide();
                 }
             });
 
-            // Mostrar sugerencias al hacer foco si hay texto
             $('#navbarBusqueda').on('focus', function() {
                 if ($(this).val().length >= 2 && $('#navbarSugerencias').children().length > 0) {
                     $('#navbarSugerencias').show();
@@ -571,29 +717,50 @@
             });
         });
 
+        window.CarritoLS = CarritoLS;
+
+        // Confirmacion logout
+        document.getElementById("logoutLink")?.addEventListener("click", function(e){
+            e.preventDefault();
+            Swal.fire({
+                title: 'Cerrar sesión',
+                text: "¿Seguro que querés salir?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#667eea',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar'
+            }).then((result)=>{
+                if(result.isConfirmed){
+                    window.location.href = this.href;
+                }
+            });
+        });
+
         // Mensajes de éxito/error con SweetAlert2
         @if (TempData["Success"] != null)
         {
-                        <text>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: '@TempData["Success"]',
-                            confirmButtonColor: '#667eea'
-                        });
-                        </text>
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: '@TempData["Success"]',
+                    confirmButtonColor: '#667eea'
+                });
+                </text>
         }
 
         @if (TempData["Error"] != null)
         {
-                        <text>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: '@TempData["Error"]',
-                            confirmButtonColor: '#667eea'
-                        });
-                        </text>
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@TempData["Error"]',
+                    confirmButtonColor: '#667eea'
+                });
+                </text>
         }
 
         // Submenús de categorías
@@ -624,8 +791,6 @@
             });
         });
     </script>
-
-    
 
     @RenderSection("Scripts", required: false)
 </body>

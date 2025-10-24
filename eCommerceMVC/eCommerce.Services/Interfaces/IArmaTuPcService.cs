@@ -18,6 +18,8 @@ namespace eCommerce.Services.Interfaces
         Task<List<ProductoDTO>> ObtenerAlmacenamientoAsync();
         Task<List<ProductoDTO>> ObtenerPsusAsync();
         Task<List<ProductoDTO>> ObtenerCoolersAsync();
+
+        Task<List<ProductoDTO>> ObtenerGabinetesAsync();
         Task<ProductoDTO> ObtenerProductoDetalladoAsync(int idProducto);
         Task<ArmaPcViewModel> ObtenerConfiguracionActualAsync(int idCliente);
         Task<bool> GuardarConfiguracionAsync(int idCliente, GuardarConfiguracionViewModel model);

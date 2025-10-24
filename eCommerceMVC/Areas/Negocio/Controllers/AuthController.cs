@@ -22,16 +22,19 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
         // GET: Negocio/Auth/Login
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl = null)
         {
-            return View(); 
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
         }
 
         // POST: Negocio/Auth/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string correo, string contrasena)
+        public async Task<IActionResult> Login(string correo, string contrasena, string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contrasena))
             {
                 ViewBag.Error = "Debés completar todos los campos";
@@ -59,21 +62,32 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 return View();
             }
 
+            // Crear claims
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, usuario.Nombres),
-        new Claim(ClaimTypes.Email, usuario.Correo),
-        new Claim(ClaimTypes.Role, usuario.Rol),
-        new Claim("IdCliente", usuario.IdCliente.Value.ToString()),
-        new Claim("IdUsuario", usuario.IdUsuario.ToString())
-    };
+            {
+                new Claim(ClaimTypes.Name, usuario.Nombres),
+                new Claim(ClaimTypes.Email, usuario.Correo),
+                new Claim(ClaimTypes.Role, usuario.Rol),
+                new Claim("IdCliente", usuario.IdCliente.Value.ToString()),
+                new Claim("IdUsuario", usuario.IdUsuario.ToString())
+            };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 new AuthenticationProperties { IsPersistent = true }
             );
+
+            
+            TempData["MigrarCarrito"] = true;
+
+            // Redireccionar
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
 
             return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
         }
@@ -84,7 +98,13 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Catalogo", new { area = "Negocio" });
+        }
 
+        // GET: Negocio/Auth/Register (si lo tienes)
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
         }
     }
 }

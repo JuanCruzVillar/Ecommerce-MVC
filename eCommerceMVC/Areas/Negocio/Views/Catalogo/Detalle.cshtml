@@ -256,6 +256,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // ========== CÁLCULO DE CUOTAS ==========
             var precioProducto = parseFloat("@(Model.Producto.Precio?.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) ?? "0")");
 
             var cuotasDisponibles = [
@@ -286,70 +287,17 @@
                 });
             }
 
+            // Calcular cuotas cuando se abre el modal
             $('#modalCuotas').on('show.bs.modal', function () {
                 calcularCuotas();
             });
 
-            // Función para actualizar badge del carrito
-            function actualizarBadge(){
-                $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total){
-                    $('#carrito-badge').text(total);
-                });
-            }
-
-            // Obtener token antiforgery
-            var token = $('input[name="__RequestVerificationToken"]').val();
-
-            // Agregar al carrito
-            $('.agregar-carrito').off('click').on('click', function(e){
-                e.preventDefault();
-                var productoId = $(this).data('producto');
-                var boton = $(this);
-                var textoOriginal = boton.html();
-
-                boton.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Agregando...');
-
-                $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
-                    data: {
-                        __RequestVerificationToken: token,
-                        productoId: productoId,
-                        cantidad: 1
-                    },
-                    success: function(){
-                        actualizarBadge();
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Agregado al carrito',
-                            showConfirmButton: false,
-                            timer: 2000,
-                            timerProgressBar: true
-                        });
-                        boton.prop('disabled', false).html(textoOriginal);
-                    },
-                    error: function(){
-                        Swal.fire({
-                            icon:'error',
-                            title:'Error',
-                            text:'No se pudo agregar el producto al carrito',
-                            confirmButtonColor: '#667eea'
-                        });
-                        boton.prop('disabled', false).html(textoOriginal);
-                    }
-                });
-            });
-
-            // Inicializar badge al cargar la página
-            actualizarBadge();
-
-            // Sincronizar thumbnails con carrusel
+            // ========== CARRUSEL DE IMÁGENES ==========
             const thumbnails = document.querySelectorAll('.thumbnail-item');
             const carousel = document.querySelector('#carouselProducto');
 
             if (carousel) {
+                // Sincronizar thumbnails con el carrusel
                 carousel.addEventListener('slide.bs.carousel', function(e) {
                     thumbnails.forEach(thumb => thumb.classList.remove('active'));
                     if (thumbnails[e.to]) {
@@ -358,13 +306,16 @@
                 });
             }
 
-            // Click en thumbnails
+            // Click en thumbnails para cambiar imagen
             thumbnails.forEach((thumb, index) => {
                 thumb.addEventListener('click', function() {
                     const bsCarousel = bootstrap.Carousel.getInstance(carousel) || new bootstrap.Carousel(carousel);
                     bsCarousel.to(index);
                 });
             });
+
+           
         });
     </script>
+
 }

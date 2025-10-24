@@ -432,6 +432,38 @@ namespace eCommerce.Services.Implementations
                     .Select(e => new EspecificacionProductoDTO { Clave = e.Clave, Valor = e.Valor })
                     .ToList()
             };
+
+        }
+        
+
+        public async Task<List<ProductoDTO>> ObtenerGabinetesAsync()
+        {
+            var productos = await _context.Productos
+                .Include(p => p.IdMarcaNavigation)
+                .Include(p => p.IdCategoriaNavigation)
+                .ThenInclude(c => c.CategoriaPadre)
+                .Include(p => p.ProductoEspecificaciones)
+                .Where(p => p.Activo == true &&
+                           p.Stock > 0 &&
+                           (
+                               p.IdCategoriaNavigation.Descripcion.Contains("Gabinete") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Case") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Caja") ||
+                               p.IdCategoriaNavigation.Descripcion.Contains("Chasis") ||
+                               (p.IdCategoriaNavigation.CategoriaPadre != null &&
+                                (p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Gabinete") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Case") ||
+                                 p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Caja")))
+                           ))
+                .ToListAsync();
+
+            Console.WriteLine($"DEBUG - Gabinetes encontrados: {productos.Count}");
+            foreach (var p in productos)
+            {
+                Console.WriteLine($"  - {p.Nombre} | Categoría: {p.IdCategoriaNavigation?.Descripcion} | Padre: {p.IdCategoriaNavigation?.CategoriaPadre?.Descripcion}");
+            }
+
+            return MapearProductosADTO(productos);
         }
     }
 }

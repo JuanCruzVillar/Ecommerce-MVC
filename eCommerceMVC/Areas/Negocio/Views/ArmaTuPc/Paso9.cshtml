@@ -1,0 +1,188 @@
+﻿@using eCommerce.Entities.ViewModels
+@{
+    ViewData["Title"] = "Arma tu PC - Resumen";
+    Layout = "~/Areas/Negocio/Views/Shared/_Layout.cshtml";
+}
+
+@model ArmaPcViewModel
+
+@Html.Partial("Partials/_EstilosComunes")
+
+<div class="arma-pc-container">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="text-white mb-3">
+                    <a href="javascript:history.back()" class="text-white text-decoration-none">
+                        <i class="fas fa-arrow-left me-2"></i>Volver Atrás
+                    </a>
+                </div>
+                <h1 class="display-4 fw-bold text-white mb-2">
+                    <i class="fas fa-check-circle me-3"></i>¡Tu PC está lista!
+                </h1>
+                <p class="text-white-50 mb-3">Revisa tu configuración antes de agregar al carrito</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Columna izquierda - Lista de componentes -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Componentes Seleccionados</h5>
+
+                        @foreach (var componente in Model.ComponentesSeleccionados)
+                        {
+                            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                                <div class="me-3">
+                                    @if (!string.IsNullOrEmpty(componente.RutaImagen))
+                                    {
+                                        <img src="@componente.RutaImagen" alt="@componente.Nombre"
+                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                                    }
+                                    else
+                                    {
+                                        <div style="width: 80px; height: 80px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-box text-muted"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="flex-grow-1">
+                                    <small class="text-muted d-block">@componente.Tipo</small>
+                                    <h6 class="fw-bold mb-1">@componente.Nombre</h6>
+                                    <small class="text-muted">@componente.Marca</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold">$@componente.PrecioUnitario.ToString("N0")</div>
+                                    <small class="text-muted">x @componente.Cantidad</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Opciones adicionales -->
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">¿Deseas guardar esta configuración?</h6>
+                        <p class="text-muted small mb-3">Guarda tu PC para compararla o comprarla más tarde</p>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" id="nombreConfig" placeholder="Nombre (ej: Mi PC Gaming)">
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-primary w-100" onclick="guardarConfiguracion()">
+                                    <i class="fas fa-save me-2"></i>Guardar Configuración
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna derecha - Resumen y acciones -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-lg sticky-top" style="top: 20px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Resumen de Compra</h5>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal (@Model.TotalComponentes items)</span>
+                                <span>$@Model.Subtotal.ToString("N0")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                <span class="text-muted">Envío</span>
+                                <span class="text-success fw-bold">Gratis</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h5 class="mb-0">Total</h5>
+                                <h4 class="mb-0" style="color: #667eea;">$@Model.Total.ToString("N0")</h4>
+                            </div>
+                        </div>
+
+                        <form method="post" action="@Url.Action("AgregarAlCarrito")">
+                            <input type="hidden" name="idProcesador" value="@Model.IdProcesadorSeleccionado">
+                            <input type="hidden" name="idMotherboard" value="@Model.IdMotherboardSeleccionado">
+                            @foreach (var idRam in Model.IdsRamSeleccionados ?? new List<int>())
+                            {
+                                <input type="hidden" name="idsRam" value="@idRam">
+                            }
+                            @if (Model.IdGpuSeleccionada.HasValue)
+                            {
+                                <input type="hidden" name="idGpu" value="@Model.IdGpuSeleccionada">
+                            }
+                            @foreach (var idAlm in Model.IdsAlmacenamientoSeleccionados ?? new List<int>())
+                            {
+                                <input type="hidden" name="idsAlmacenamiento" value="@idAlm">
+                            }
+                            <input type="hidden" name="idPsu" value="@Model.IdPsuSeleccionada">
+                            <input type="hidden" name="idGabinete" value="@Model.IdGabineteSeleccionado">
+
+                            <button type="submit" class="btn btn-gradient btn-lg w-100 fw-bold mb-2">
+                                <i class="fas fa-shopping-cart me-2"></i>Agregar al Carrito
+                            </button>
+                        </form>
+
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg w-100">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+
+                        <div class="alert alert-info mt-4 mb-0">
+                            <small>
+                                <i class="fas fa-info-circle me-2"></i>
+                                Todos los componentes son 100% compatibles y están en stock.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function guardarConfiguracion() {
+        const nombre = document.getElementById('nombreConfig').value.trim();
+
+        if (!nombre) {
+            alert('Por favor ingresa un nombre para la configuración');
+            return;
+        }
+
+        fetch('@Url.Action("GuardarConfiguracion")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nombre: nombre,
+                descripcion: '',
+                configuracion: {
+                    idProcesadorSeleccionado: @Model.IdProcesadorSeleccionado,
+                    idMotherboardSeleccionado: @Model.IdMotherboardSeleccionado,
+                    idsRamSeleccionados: @System.Text.Json.JsonSerializer.Serialize(Model.IdsRamSeleccionados ?? new List<int>()),
+                    idGpuSeleccionada: @(Model.IdGpuSeleccionada?.ToString() ?? "null"),
+                    idsAlmacenamientoSeleccionados: @System.Text.Json.JsonSerializer.Serialize(Model.IdsAlmacenamientoSeleccionados ?? new List<int>()),
+                    idPsuSeleccionada: @Model.IdPsuSeleccionada,
+                    idGabineteSeleccionado: @Model.IdGabineteSeleccionado,
+                    total: @Model.Total
+                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('¡Configuración guardada exitosamente!');
+                document.getElementById('nombreConfig').value = '';
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al guardar la configuración');
+        });
+    }
+</script>

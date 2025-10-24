@@ -1,0 +1,175 @@
+﻿@model eCommerce.Entities.ViewModels.ArmaPcViewModel
+
+<div class="sticky-sidebar">
+    <div class="card border-0 shadow-lg">
+        <div class="card-body p-4">
+            <!-- Componentes seleccionados -->
+            <h6 class="fw-bold mb-4">Tu Configuración</h6>
+
+            <div class="mb-4">
+                @{
+                    var procesador = Model.ComponentesSeleccionados?.FirstOrDefault(c => c.Tipo == "Procesador");
+                    var motherboard = Model.ComponentesSeleccionados?.FirstOrDefault(c => c.Tipo == "Motherboard");
+                    var rams = Model.ComponentesSeleccionados?.Where(c => c.Tipo == "Memoria RAM").ToList();
+                    var gpu = Model.ComponentesSeleccionados?.FirstOrDefault(c => c.Tipo == "Tarjeta Gráfica");
+                    var almacenamientos = Model.ComponentesSeleccionados?.Where(c => c.Tipo == "Almacenamiento").ToList();
+                    var psu = Model.ComponentesSeleccionados?.FirstOrDefault(c => c.Tipo == "Fuente de Poder");
+                    var gabinete = Model.ComponentesSeleccionados?.Where(c => c.Tipo == "Gabinete").ToList();
+                }
+
+                <!-- Procesador -->
+                <div class="component-item @(procesador != null ? "" : "opacity-50")">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <small class="text-muted d-block">Procesador</small>
+                        <strong class="component-name">@(procesador?.Nombre ?? "-")</strong>
+                    </div>
+                </div>
+
+                <!-- Motherboard -->
+                <div class="component-item @(motherboard != null ? "" : "opacity-50")">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-memory"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <small class="text-muted d-block">Motherboard</small>
+                        <strong class="component-name">@(motherboard?.Nombre ?? "-")</strong>
+                    </div>
+                </div>
+
+                <!-- RAM -->
+                <div class="component-item @(rams?.Any() == true ? "" : "opacity-50")">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-memory"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <small class="text-muted d-block">Memoria RAM</small>
+                        <strong class="component-name">
+                            @if (rams?.Any() == true)
+                            {
+                                @($"{rams.Count}x RAM")
+                            }
+                            else
+                            {
+                                @("-")
+                            }
+                        </strong>
+                    </div>
+                </div>
+
+                <!-- GPU -->
+                <div class="component-item @(gpu != null ? "" : "opacity-50")">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-display"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <small class="text-muted d-block">Tarjeta Gráfica</small>
+                        <strong class="component-name">@(gpu?.Nombre ?? "-")</strong>
+                    </div>
+                </div>
+
+                <!-- Almacenamiento -->
+                <div class="component-item @(almacenamientos?.Any() == true ? "" : "opacity-50")">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <small class="text-muted d-block">Almacenamiento</small>
+                        <strong class="component-name">
+                            @if (almacenamientos?.Any() == true)
+                            {
+                                @($"{almacenamientos.Count}x Disco")
+                            }
+                            else
+                            {
+                                @("-")
+                            }
+                        </strong>
+                    </div>
+                </div>
+
+                <!-- Fuente -->
+                <div class="component-item @(psu != null ? "" : "opacity-50")">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <small class="text-muted d-block">Fuente de Poder</small>
+                        <strong class="component-name">@(psu?.Nombre ?? "-")</strong>
+                    </div>
+                </div>
+
+                <!-- Gabinete -->
+                <div class="component-item @(gabinete != null ? "" : "opacity-50")">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-computer"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <small class="text-muted d-block">Gabinete</small>
+                         @* <strong class="component-name">@(gabinete?.Nombre ?? "-")</strong>  *@
+                    </div>
+                </div>
+            </div>
+
+            <!-- Separador -->
+            <hr class="my-4">
+
+            <!-- Precio total -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Total</span>
+                    <h4 class="mb-0 fw-bold">$@Model.Total.ToString("N0")</h4>
+                </div>
+                <small class="text-muted">(@Model.TotalComponentes componentes)</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .component-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        transition: opacity 0.3s ease;
+    }
+
+    .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .component-name {
+        font-size: 0.85rem;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sticky-sidebar {
+        position: sticky;
+        top: 20px;
+    }
+
+    @@media (max-width: 991px) {
+        .sticky-sidebar
+
+    {
+        position: relative;
+        top: 0;
+    }
+
+    }
+</style>

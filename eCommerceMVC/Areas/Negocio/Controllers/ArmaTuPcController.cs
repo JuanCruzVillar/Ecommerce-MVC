@@ -54,16 +54,17 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             var model = new ArmaPcViewModel
             {
                 Paso = 2,
-                Titulo = "Selecciona tu Procesador",
-                Descripcion = $"Procesadores {marca} disponibles",
+                Titulo = "Elegí tu Procesador",
+                Descripcion = "Tu procesador es la pieza central del rendimiento de los programas",
                 MarcaSeleccionada = marca,
-                ProcesadoresDisponibles = procesadores
+                ProcesadoresDisponibles = procesadores,
+                ComponentesSeleccionados = new List<ComponenteSeleccionadoDTO>()
             };
 
             return View("Paso2", model);
         }
 
-        // PASO 2B: Ir a seleccionar motherboard
+        // PASO 3: Seleccionar Motherboard
         [HttpPost]
         public async Task<IActionResult> SeleccionarProcesador(int idProcesador, string marca)
         {
@@ -76,33 +77,29 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
             var motherboards = await _armatuPcService.ObtenerMotherboardsAsync(marca);
 
+            var componentesSeleccionados = new List<ComponenteSeleccionadoDTO>
+            {
+                MapearAComponente(procesador, "Procesador")
+            };
+
             var model = new ArmaPcViewModel
             {
-                Paso = 2,
-                Titulo = "Selecciona tu Motherboard",
-                Descripcion = "Elige el motherboard compatible con tu procesador",
+                Paso = 3,
+                Titulo = "Elegí tu Motherboard",
+                Descripcion = "La placa madre que conecta todos tus componentes",
                 MarcaSeleccionada = marca,
                 IdProcesadorSeleccionado = idProcesador,
-                ProcesadorSeleccionadoInfo = new ComponenteSeleccionadoDTO
-                {
-                    IdProducto = procesador.IdProducto,
-                    Nombre = procesador.Nombre,
-                    Marca = procesador.Marca,
-                    Tipo = "Procesador",
-                    PrecioUnitario = procesador.Precio,
-                    Cantidad = 1,
-                    RutaImagen = procesador.RutaImagen
-                },
                 MotherboardsDisponibles = motherboards,
+                ComponentesSeleccionados = componentesSeleccionados,
                 Subtotal = procesador.Precio,
                 Total = procesador.Precio,
                 TotalComponentes = 1
             };
 
-            return View("Paso2B", model);
+            return View("Paso3", model);
         }
 
-        // PASO 3: Seleccionar RAM
+        // PASO 4: Seleccionar RAM
         [HttpPost]
         public async Task<IActionResult> SeleccionarMotherboard(int idProcesador, int idMotherboard, string marca)
         {
@@ -117,109 +114,52 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
             var rams = await _armatuPcService.ObtenerRamsAsync();
 
+            var componentesSeleccionados = new List<ComponenteSeleccionadoDTO>
+            {
+                MapearAComponente(procesador, "Procesador"),
+                MapearAComponente(motherboard, "Motherboard")
+            };
+
             var model = new ArmaPcViewModel
             {
-                Paso = 3,
-                Titulo = "Selecciona tu Memoria RAM",
-                Descripcion = "Puedes seleccionar 1 o más módulos de RAM",
+                Paso = 4,
+                Titulo = "Elegí tu Memoria RAM",
+                Descripcion = "Más RAM significa más multitarea y mejor rendimiento",
                 MarcaSeleccionada = marca,
                 IdProcesadorSeleccionado = idProcesador,
                 IdMotherboardSeleccionado = idMotherboard,
-                ProcesadorSeleccionadoInfo = MapearAComponente(procesador, "Procesador"),
-                MotherboardSeleccionadoInfo = MapearAComponente(motherboard, "Motherboard"),
                 RamsDisponibles = rams,
+                ComponentesSeleccionados = componentesSeleccionados,
                 Subtotal = procesador.Precio + motherboard.Precio,
                 Total = procesador.Precio + motherboard.Precio,
                 TotalComponentes = 2
             };
 
-            return View("Paso3", model);
+            return View("Paso4", model);
         }
 
-        // PASO 4: Seleccionar GPU
+        // PASO 5: Seleccionar GPU
         [HttpPost]
         public async Task<IActionResult> SeleccionarRam(int idProcesador, int idMotherboard, string marca,
             [FromForm] List<int> idsRam)
         {
-            var procesador = await _armatuPcService.ObtenerProductoDetalladoAsync(idProcesador);
-            var motherboard = await _armatuPcService.ObtenerProductoDetalladoAsync(idMotherboard);
-
-            if (procesador == null || motherboard == null)
-            {
-                TempData["Error"] = "Producto no encontrado";
-                return RedirectToAction("Index");
-            }
+            var componentesSeleccionados = await ObtenerComponentesSeleccionadosAsync(
+                idProcesador, idMotherboard, idsRam);
 
             var gpus = await _armatuPcService.ObtenerGpusAsync();
-            var ramSeleccionados = new List<ComponenteSeleccionadoDTO>();
-            decimal totalRam = 0;
-
-            if (idsRam != null && idsRam.Any())
-            {
-                foreach (var idRam in idsRam.Distinct())
-                {
-                    var ram = await _armatuPcService.ObtenerProductoDetalladoAsync(idRam);
-                    if (ram != null)
-                    {
-                        ramSeleccionados.Add(MapearAComponente(ram, "Memoria RAM"));
-                        totalRam += ram.Precio;
-                    }
-                }
-            }
-
-            var model = new ArmaPcViewModel
-            {
-                Paso = 4,
-                Titulo = "Selecciona tu Tarjeta Gráfica",
-                Descripcion = "Elige una tarjeta gráfica (opcional)",
-                MarcaSeleccionada = marca,
-                IdProcesadorSeleccionado = idProcesador,
-                IdMotherboardSeleccionado = idMotherboard,
-                IdsRamSeleccionados = idsRam ?? new List<int>(),
-                ProcesadorSeleccionadoInfo = MapearAComponente(procesador, "Procesador"),
-                MotherboardSeleccionadoInfo = MapearAComponente(motherboard, "Motherboard"),
-                ComponentesSeleccionados = ramSeleccionados,
-                GpusDisponibles = gpus,
-                Subtotal = procesador.Precio + motherboard.Precio + totalRam,
-                Total = procesador.Precio + motherboard.Precio + totalRam,
-                TotalComponentes = 2 + ramSeleccionados.Count
-            };
-
-            return View("Paso4", model);
-        }
-
-        // PASO 5: Seleccionar Almacenamiento
-        [HttpPost]
-        public async Task<IActionResult> SeleccionarGpu(int idProcesador, int idMotherboard, string marca,
-            [FromForm] List<int> idsRam, int? idGpu)
-        {
-            var procesador = await _armatuPcService.ObtenerProductoDetalladoAsync(idProcesador);
-            var motherboard = await _armatuPcService.ObtenerProductoDetalladoAsync(idMotherboard);
-
-            if (procesador == null || motherboard == null)
-            {
-                TempData["Error"] = "Producto no encontrado";
-                return RedirectToAction("Index");
-            }
-
-            var almacenamiento = await _armatuPcService.ObtenerAlmacenamientoAsync();
-            var componentesSeleccionados = await ObtenerComponentesSeleccionadosAsync(
-                idProcesador, idMotherboard, idsRam, idGpu);
-
             var total = componentesSeleccionados.Sum(c => c.Subtotal);
 
             var model = new ArmaPcViewModel
             {
                 Paso = 5,
-                Titulo = "Selecciona tu Almacenamiento",
-                Descripcion = "SSD o HDD (puedes seleccionar varios)",
+                Titulo = "Elegí tu Tarjeta Gráfica",
+                Descripcion = "Para gaming y tareas gráficas intensivas (opcional)",
                 MarcaSeleccionada = marca,
                 IdProcesadorSeleccionado = idProcesador,
                 IdMotherboardSeleccionado = idMotherboard,
                 IdsRamSeleccionados = idsRam ?? new List<int>(),
-                IdGpuSeleccionada = idGpu,
+                GpusDisponibles = gpus,
                 ComponentesSeleccionados = componentesSeleccionados,
-                AlmacenamientoDisponible = almacenamiento,
                 Subtotal = total,
                 Total = total,
                 TotalComponentes = componentesSeleccionados.Count
@@ -228,30 +168,29 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return View("Paso5", model);
         }
 
-        // PASO 6: Seleccionar Fuente
+        // PASO 6: Seleccionar Almacenamiento
         [HttpPost]
-        public async Task<IActionResult> SeleccionarAlmacenamiento(int idProcesador, int idMotherboard, string marca,
-            [FromForm] List<int> idsRam, int? idGpu, [FromForm] List<int> idsAlmacenamiento)
+        public async Task<IActionResult> SeleccionarGpu(int idProcesador, int idMotherboard, string marca,
+            [FromForm] List<int> idsRam, int? idGpu)
         {
-            var psu = await _armatuPcService.ObtenerPsusAsync();
             var componentesSeleccionados = await ObtenerComponentesSeleccionadosAsync(
-                idProcesador, idMotherboard, idsRam, idGpu, idsAlmacenamiento);
+                idProcesador, idMotherboard, idsRam, idGpu);
 
+            var almacenamiento = await _armatuPcService.ObtenerAlmacenamientoAsync();
             var total = componentesSeleccionados.Sum(c => c.Subtotal);
 
             var model = new ArmaPcViewModel
             {
                 Paso = 6,
-                Titulo = "Selecciona tu Fuente de Poder",
-                Descripcion = "Elige una fuente de poder adecuada",
+                Titulo = "Elegí tu Almacenamiento",
+                Descripcion = "SSD para velocidad, HDD para capacidad",
                 MarcaSeleccionada = marca,
                 IdProcesadorSeleccionado = idProcesador,
                 IdMotherboardSeleccionado = idMotherboard,
                 IdsRamSeleccionados = idsRam ?? new List<int>(),
                 IdGpuSeleccionada = idGpu,
-                IdsAlmacenamientoSeleccionados = idsAlmacenamiento ?? new List<int>(),
+                AlmacenamientoDisponible = almacenamiento,
                 ComponentesSeleccionados = componentesSeleccionados,
-                PsusDisponibles = psu,
                 Subtotal = total,
                 Total = total,
                 TotalComponentes = componentesSeleccionados.Count
@@ -260,31 +199,30 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return View("Paso6", model);
         }
 
-        // PASO 7: Seleccionar Cooler (Opcional)
+        // PASO 7: Seleccionar Fuente
         [HttpPost]
-        public async Task<IActionResult> SeleccionarPsu(int idProcesador, int idMotherboard, string marca,
-            [FromForm] List<int> idsRam, int? idGpu, [FromForm] List<int> idsAlmacenamiento, int idPsu)
+        public async Task<IActionResult> SeleccionarAlmacenamiento(int idProcesador, int idMotherboard, string marca,
+            [FromForm] List<int> idsRam, int? idGpu, [FromForm] List<int> idsAlmacenamiento)
         {
-            var coolers = await _armatuPcService.ObtenerCoolersAsync();
             var componentesSeleccionados = await ObtenerComponentesSeleccionadosAsync(
-                idProcesador, idMotherboard, idsRam, idGpu, idsAlmacenamiento, idPsu);
+                idProcesador, idMotherboard, idsRam, idGpu, idsAlmacenamiento);
 
+            var psu = await _armatuPcService.ObtenerPsusAsync();
             var total = componentesSeleccionados.Sum(c => c.Subtotal);
 
             var model = new ArmaPcViewModel
             {
                 Paso = 7,
-                Titulo = "Selecciona un Cooler (Opcional)",
-                Descripcion = "Mejora la refrigeración de tu PC",
+                Titulo = "Elegí tu Fuente de Poder",
+                Descripcion = "Asegura energía estable y eficiente",
                 MarcaSeleccionada = marca,
                 IdProcesadorSeleccionado = idProcesador,
                 IdMotherboardSeleccionado = idMotherboard,
                 IdsRamSeleccionados = idsRam ?? new List<int>(),
                 IdGpuSeleccionada = idGpu,
                 IdsAlmacenamientoSeleccionados = idsAlmacenamiento ?? new List<int>(),
-                IdPsuSeleccionada = idPsu,
+                PsusDisponibles = psu,
                 ComponentesSeleccionados = componentesSeleccionados,
-                CoolersDisponibles = coolers,
                 Subtotal = total,
                 Total = total,
                 TotalComponentes = componentesSeleccionados.Count
@@ -293,22 +231,22 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return View("Paso7", model);
         }
 
-        // PASO 8: Resumen y confirmación
+        // PASO 8: Seleccionar Gabinete
         [HttpPost]
-        public async Task<IActionResult> SeleccionarCooler(int idProcesador, int idMotherboard, string marca,
-            [FromForm] List<int> idsRam, int? idGpu, [FromForm] List<int> idsAlmacenamiento,
-            int idPsu, [FromForm] List<int> idsCooler)
+        public async Task<IActionResult> SeleccionarPsu(int idProcesador, int idMotherboard, string marca,
+            [FromForm] List<int> idsRam, int? idGpu, [FromForm] List<int> idsAlmacenamiento, int idPsu)
         {
             var componentesSeleccionados = await ObtenerComponentesSeleccionadosAsync(
-                idProcesador, idMotherboard, idsRam, idGpu, idsAlmacenamiento, idPsu, idsCooler);
+                idProcesador, idMotherboard, idsRam, idGpu, idsAlmacenamiento, idPsu);
 
+            var gabinetes = await _armatuPcService.ObtenerGabinetesAsync();
             var total = componentesSeleccionados.Sum(c => c.Subtotal);
 
             var model = new ArmaPcViewModel
             {
                 Paso = 8,
-                Titulo = "Resumen de tu PC",
-                Descripcion = "Revisa tu configuración antes de agregar al carrito",
+                Titulo = "Elegí tu Gabinete",
+                Descripcion = "El hogar de todos tus componentes",
                 MarcaSeleccionada = marca,
                 IdProcesadorSeleccionado = idProcesador,
                 IdMotherboardSeleccionado = idMotherboard,
@@ -316,7 +254,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 IdGpuSeleccionada = idGpu,
                 IdsAlmacenamientoSeleccionados = idsAlmacenamiento ?? new List<int>(),
                 IdPsuSeleccionada = idPsu,
-                IdsCoolerSeleccionados = idsCooler ?? new List<int>(),
+                GabinetesDisponibles = gabinetes,
                 ComponentesSeleccionados = componentesSeleccionados,
                 Subtotal = total,
                 Total = total,
@@ -326,11 +264,44 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return View("Paso8", model);
         }
 
+        // PASO 9: Resumen final
+        [HttpPost]
+        public async Task<IActionResult> SeleccionarGabinete(int idProcesador, int idMotherboard, string marca,
+            [FromForm] List<int> idsRam, int? idGpu, [FromForm] List<int> idsAlmacenamiento,
+            int idPsu, int idGabinete)
+        {
+            var componentesSeleccionados = await ObtenerComponentesSeleccionadosAsync(
+                idProcesador, idMotherboard, idsRam, idGpu, idsAlmacenamiento, idPsu, null, idGabinete);
+
+            var total = componentesSeleccionados.Sum(c => c.Subtotal);
+
+            var model = new ArmaPcViewModel
+            {
+                Paso = 9,
+                Titulo = "Resumen de tu PC",
+                Descripcion = "Revisa tu configuración antes de agregar al carrito",
+                MarcaSeleccionada = marca,
+                IdProcesadorSeleccionado = idProcesador,
+                IdMotherboardSeleccionado = idMotherboard,
+                IdsRamSeleccionados = idsRam ?? new List<int>(),
+                IdGpuSeleccionada = idGpu,
+                IdsAlmacenamientoSeleccionados = idsAlmacenamiento ?? new List<int>(),
+                IdPsuSeleccionada = idPsu,
+                IdGabineteSeleccionado = idGabinete,
+                ComponentesSeleccionados = componentesSeleccionados,
+                Subtotal = total,
+                Total = total,
+                TotalComponentes = componentesSeleccionados.Count
+            };
+
+            return View("Paso9", model);
+        }
+
         // Agregar todos los componentes al carrito
         [HttpPost]
         public async Task<IActionResult> AgregarAlCarrito(int idProcesador, int idMotherboard,
             [FromForm] List<int> idsRam, int? idGpu, [FromForm] List<int> idsAlmacenamiento,
-            int idPsu, [FromForm] List<int> idsCooler)
+            int idPsu, int idGabinete)
         {
             var clienteId = GetClienteId();
             if (clienteId == 0)
@@ -341,7 +312,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
             try
             {
-                // Agregar cada componente al carrito
                 await _carritoService.AgregarProductoAsync(clienteId, idProcesador, 1);
                 await _carritoService.AgregarProductoAsync(clienteId, idMotherboard, 1);
 
@@ -357,10 +327,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                         await _carritoService.AgregarProductoAsync(clienteId, idAlm, 1);
 
                 await _carritoService.AgregarProductoAsync(clienteId, idPsu, 1);
-
-                if (idsCooler != null)
-                    foreach (var idCooler in idsCooler.Distinct())
-                        await _carritoService.AgregarProductoAsync(clienteId, idCooler, 1);
+                await _carritoService.AgregarProductoAsync(clienteId, idGabinete, 1);
 
                 TempData["Success"] = "¡PC agregado al carrito exitosamente!";
                 return RedirectToAction("Index", "Carrito");
@@ -372,7 +339,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
         }
 
-        // Guardar configuración
         [HttpPost]
         public async Task<IActionResult> GuardarConfiguracion(GuardarConfiguracionViewModel model)
         {
@@ -391,7 +357,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return Json(new { success = resultado, message = resultado ? "Configuración guardada exitosamente" : "Error al guardar configuración" });
         }
 
-        // Obtener configuraciones guardadas
         public async Task<IActionResult> MisConfiguraciones()
         {
             var clienteId = GetClienteId();
@@ -405,7 +370,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return View(configuraciones);
         }
 
-        // Eliminar configuración guardada
         [HttpPost]
         public async Task<IActionResult> EliminarConfiguracion(int id)
         {
@@ -419,7 +383,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             return Json(new { success = resultado });
         }
 
-        // Métodos privados
         private ComponenteSeleccionadoDTO MapearAComponente(ProductoDTO producto, string tipo)
         {
             return new ComponenteSeleccionadoDTO
@@ -436,7 +399,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
         private async Task<List<ComponenteSeleccionadoDTO>> ObtenerComponentesSeleccionadosAsync(
             int idProcesador, int idMotherboard, List<int> idsRam, int? idGpu = null,
-            List<int> idsAlmacenamiento = null, int? idPsu = null, List<int> idsCooler = null)
+            List<int> idsAlmacenamiento = null, int? idPsu = null, List<int> idsCooler = null, int? idGabinete = null)
         {
             var componentes = new List<ComponenteSeleccionadoDTO>();
 
@@ -478,17 +441,14 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     componentes.Add(MapearAComponente(psu, "Fuente de Poder"));
             }
 
-            if (idsCooler != null)
-                foreach (var idCooler in idsCooler.Distinct())
-                {
-                    var cooler = await _armatuPcService.ObtenerProductoDetalladoAsync(idCooler);
-                    if (cooler != null)
-                        componentes.Add(MapearAComponente(cooler, "Cooler"));
-                }
+            if (idGabinete.HasValue)
+            {
+                var gabinete = await _armatuPcService.ObtenerProductoDetalladoAsync(idGabinete.Value);
+                if (gabinete != null)
+                    componentes.Add(MapearAComponente(gabinete, "Gabinete"));
+            }
 
             return componentes;
-
-
         }
     }
 }

@@ -6,91 +6,87 @@
 
 @model ArmaPcViewModel
 
-<div class="container py-5">
-    <!-- Header -->
-    <div class="row mb-5">
-        <div class="col-lg-8 mx-auto text-center">
-            <h1 class="display-4 fw-bold mb-3">¡Arma tu PC!</h1>
-            <p class="lead text-muted">Construye tu computadora perfecta eligiendo cada componente</p>
-            <div class="progress mt-4" style="height: 8px;">
-                <div class="progress-bar bg-primary" role="progressbar" style="width: 12.5%"></div>
+<div class="arma-pc-container">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold text-white mb-3">¡Arma tu PC!</h1>
+                <p class="lead text-white-50">Construye tu computadora perfecta eligiendo cada componente</p>
+                <div class="progress-wrapper mt-4">
+                    <div class="progress-bar-custom" style="width: 12.5%;"></div>
+                </div>
+                <small class="text-white mt-2 d-block">Paso 1 de 8: Selecciona tu marca</small>
             </div>
-            <small class="text-muted">Paso 1 de 8: Selecciona tu marca</small>
         </div>
-    </div>
 
-    <!-- Selección de Marca -->
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-            <div class="row g-4 mb-5">
-                <!-- AMD -->
-                <div class="col-md-6">
-                    <form method="post" action="@Url.Action("SeleccionarMarca")" style="display: contents;">
-                        <button type="submit" name="marca" value="AMD" class="btn btn-unstyled w-100 p-0">
-                            <div class="card h-100 border-0 shadow-sm transition"
-                                 style="cursor: pointer; transition: all 0.3s ease;">
-                                <div class="card-body text-center p-5">
-                                    <div class="mb-4">
-                                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect width="80" height="80" fill="#ED1C24" />
-                                            <text x="40" y="55" font-size="48" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">A</text>
-                                        </svg>
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="row g-4 mb-5">
+                    <!-- AMD -->
+                    <div class="col-md-6">
+                        <form method="post" action="@Url.Action("SeleccionarMarca")" style="display: contents;">
+                            <button type="submit" name="marca" value="AMD" class="btn btn-unstyled w-100 p-0">
+                                <div class="card h-100 border-0 shadow-sm" style="cursor: pointer; transition: all 0.3s ease;">
+                                    <div class="card-body text-center p-5">
+                                        <div class="mb-4">
+                                            <div style="width: 80px; height: 80px; background: #ED1C24; border-radius: 12px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 48px; font-weight: bold; color: white;">A</span>
+                                            </div>
+                                        </div>
+                                        <h2 class="card-title fw-bold mb-3">AMD Ryzen</h2>
+                                        <p class="card-text text-muted">
+                                            Procesadores de alto rendimiento y excelente relación precio-rendimiento
+                                        </p>
                                     </div>
-                                    <h2 class="card-title fw-bold mb-3">AMD Ryzen</h2>
-                                    <p class="card-text text-muted">
-                                        Procesadores de alto rendimiento y excelente relación precio-rendimiento
-                                    </p>
                                 </div>
-                            </div>
-                        </button>
-                    </form>
-                </div>
+                            </button>
+                        </form>
+                    </div>
 
-                <!-- Intel -->
-                <div class="col-md-6">
-                    <form method="post" action="@Url.Action("SeleccionarMarca")" style="display: contents;">
-                        <button type="submit" name="marca" value="Intel" class="btn btn-unstyled w-100 p-0">
-                            <div class="card h-100 border-0 shadow-sm transition"
-                                 style="cursor: pointer; transition: all 0.3s ease;">
-                                <div class="card-body text-center p-5">
-                                    <div class="mb-4">
-                                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect width="80" height="80" fill="#0071C5" />
-                                            <text x="40" y="55" font-size="42" font-weight="bold" fill="white" text-anchor="middle" font-family="Arial">Intel</text>
-                                        </svg>
+                    <!-- Intel -->
+                    <div class="col-md-6">
+                        <form method="post" action="@Url.Action("SeleccionarMarca")" style="display: contents;">
+                            <button type="submit" name="marca" value="Intel" class="btn btn-unstyled w-100 p-0">
+                                <div class="card h-100 border-0 shadow-sm" style="cursor: pointer; transition: all 0.3s ease;">
+                                    <div class="card-body text-center p-5">
+                                        <div class="mb-4">
+                                            <div style="width: 80px; height: 80px; background: #0071C5; border-radius: 12px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 32px; font-weight: bold; color: white;">Intel</span>
+                                            </div>
+                                        </div>
+                                        <h2 class="card-title fw-bold mb-3">Intel Core</h2>
+                                        <p class="card-text text-muted">
+                                            Rendimiento estable y confiable para trabajo profesional
+                                        </p>
                                     </div>
-                                    <h2 class="card-title fw-bold mb-3">Intel Core</h2>
-                                    <p class="card-text text-muted">
-                                        Rendimiento estable y confiable para trabajo profesional y streaming
-                                    </p>
                                 </div>
-                            </div>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Info adicional -->
-            <div class="row mt-5">
-                <div class="col-lg-4">
-                    <div class="text-center">
-                        <i class="fas fa-box text-primary" style="font-size: 2rem;"></i>
-                        <h5 class="mt-3">Componentes Premium</h5>
-                        <p class="text-muted small">Seleccionamos los mejores productos del mercado</p>
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="text-center">
-                        <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
-                        <h5 class="mt-3">Compatibilidad Garantizada</h5>
-                        <p class="text-muted small">Todos los componentes son 100% compatibles</p>
+
+                <!-- Info adicional -->
+                <div class="row mt-5">
+                    <div class="col-lg-4">
+                        <div class="text-center text-white">
+                            <i class="fas fa-box" style="font-size: 2rem;"></i>
+                            <h5 class="mt-3">Componentes Premium</h5>
+                            <p class="text-white-50 small">Seleccionamos los mejores productos del mercado</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="text-center">
-                        <i class="fas fa-save text-info" style="font-size: 2rem;"></i>
-                        <h5 class="mt-3">Guarda tu Config</h5>
-                        <p class="text-muted small">Puedes guardar varias configuraciones</p>
+                    <div class="col-lg-4">
+                        <div class="text-center text-white">
+                            <i class="fas fa-check-circle" style="font-size: 2rem;"></i>
+                            <h5 class="mt-3">Compatibilidad Garantizada</h5>
+                            <p class="text-white-50 small">Todos los componentes son 100% compatibles</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="text-center text-white">
+                            <i class="fas fa-save" style="font-size: 2rem;"></i>
+                            <h5 class="mt-3">Guarda tu Config</h5>
+                            <p class="text-white-50 small">Puedes guardar varias configuraciones</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,15 +95,6 @@
 </div>
 
 <style>
-    .transition {
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2) !important;
-    }
-
     .btn-unstyled {
         background: none;
         border: none;
@@ -116,7 +103,8 @@
         color: inherit;
     }
 
-        .btn-unstyled:hover {
-            color: inherit;
+        .btn-unstyled:hover .card {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2) !important;
         }
 </style>
