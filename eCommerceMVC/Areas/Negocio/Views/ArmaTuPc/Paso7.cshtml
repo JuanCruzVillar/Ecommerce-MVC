@@ -8,24 +8,37 @@
 
 @Html.Partial("Partials/_EstilosComunes")
 
-<div class="arma-pc-container">
+<div class="arma-pc-page">
     <div class="container">
         <div class="row mb-4">
             <div class="col-12">
-                <div class="text-white mb-3">
-                    <a href="javascript:history.back()" class="text-white text-decoration-none">
-                        <i class="fas fa-arrow-left me-2"></i>Volver Atrás
-                    </a>
-                </div>
-                <h1 class="display-5 fw-bold text-white mb-2">@Model.Titulo</h1>
-                <p class="text-white-50 mb-3">@Model.Descripcion</p>
+                <a href="javascript:history.back()" class="text-decoration-none text-muted mb-3 d-inline-block">
+                    <i class="fas fa-arrow-left me-2"></i>Volver Atrás
+                </a>
+                <h1 class="display-5 fw-bold mb-2">@Model.Titulo</h1>
+                <p class="text-muted mb-3">@Model.Descripcion</p>
 
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <div class="flex-grow-1 progress-wrapper">
-                        <div class="progress-bar-custom" style="width: 87.5%;"></div>
-                    </div>
-                    <small class="text-white">Paso 7/8</small>
+                <div class="progress-custom mb-2">
+                    <div class="progress-bar-custom" style="width: 87.5%;"></div>
                 </div>
+                <small class="text-muted">Paso 7 de 8</small>
+            </div>
+        </div>
+
+        <!-- Filtro de Ordenamiento -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted small">
+                <span id="productCount"></span> productos disponibles
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <label class="text-muted small mb-0">Ordenar por:</label>
+                <select class="form-select form-select-sm" id="sortFilter" style="width: auto; min-width: 180px;">
+                    <option value="default">Relevancia</option>
+                    <option value="price-asc">Precio: Menor a Mayor</option>
+                    <option value="price-desc">Precio: Mayor a Menor</option>
+                    <option value="name-asc">Nombre: A-Z</option>
+                    <option value="name-desc">Nombre: Z-A</option>
+                </select>
             </div>
         </div>
 
@@ -53,9 +66,9 @@
                         {
                             <div class="col-md-6">
                                 <label class="product-card">
-                                    <input type="radio" name="idPsu" value="@psu.IdProducto" class="d-none" onchange="habilitarBoton()">
+                                    <input type="radio" name="idPsu" value="@psu.IdProducto" class="d-none">
 
-                                    <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card h-100 shadow-sm">
                                         <div class="card-body p-3">
                                             <div class="text-center mb-3">
                                                 @if (!string.IsNullOrEmpty(psu.RutaImagen))
@@ -83,7 +96,7 @@
                                             }
 
                                             <div class="mb-2">
-                                                <h5 class="mb-0 fw-bold">$@psu.Precio.ToString("N0")</h5>
+                                                <h5 class="mb-0 fw-bold" style="color: #667eea;">$@psu.Precio.ToString("N0")</h5>
                                             </div>
 
                                             <div class="d-flex align-items-center justify-content-between">
@@ -104,7 +117,7 @@
                     </div>
 
                     <div class="d-lg-none mt-4">
-                        <button type="submit" class="btn btn-light btn-lg w-100 fw-bold" id="btnSiguienteMobile" disabled>
+                        <button type="submit" class="btn btn-gradient btn-lg w-100 fw-bold" id="btnSiguienteMobile" disabled>
                             Siguiente Paso <i class="fas fa-arrow-right ms-2"></i>
                         </button>
                     </div>
@@ -125,9 +138,63 @@
 </div>
 
 <script>
-    function habilitarBoton() {
-        document.getElementById('btnSiguiente').disabled = false;
-        const btnMobile = document.getElementById('btnSiguienteMobile');
-        if (btnMobile) btnMobile.disabled = false;
+    document.querySelectorAll('input[name="idPsu"]').forEach(input => {
+        input.addEventListener('change', function() {
+            document.getElementById('btnSiguiente').disabled = false;
+            const btnMobile = document.getElementById('btnSiguienteMobile');
+            if (btnMobile) btnMobile.disabled = false;
+        });
+    });
+
+        // Script de Filtro de Ordenamiento
+    const sortFilter = document.getElementById('sortFilter');
+    const productGrid = document.querySelector('.row.g-3');
+    const productCards = Array.from(productGrid.children);
+
+    // Mostrar contador de productos
+    const productCount = document.getElementById('productCount');
+    if (productCount) {
+        productCount.textContent = productCards.length;
     }
+
+    // Función para obtener datos del producto
+    function getProductData(card) {
+        const priceText = card.querySelector('h5')?.textContent || '0';
+        const price = parseInt(priceText.replace(/\D/g, '')) || 0;
+        const name = card.querySelector('h6')?.textContent?.trim() || '';
+        return { element: card, price, name };
+    }
+
+    // Guardar datos originales
+    const products = productCards.map(getProductData);
+
+    // Evento de cambio en el filtro
+    sortFilter.addEventListener('change', function() {
+        const sortValue = this.value;
+        let sortedProducts = [...products];
+
+        switch(sortValue) {
+            case 'price-asc':
+                sortedProducts.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-desc':
+                sortedProducts.sort((a, b) => b.price - a.price);
+                break;
+            case 'name-asc':
+                sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'name-desc':
+                sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+            case 'default':
+                sortedProducts = [...products];
+                break;
+        }
+
+        // Reordenar elementos en el DOM
+        productGrid.innerHTML = '';
+        sortedProducts.forEach(product => {
+            productGrid.appendChild(product.element);
+        });
+    });
 </script>

@@ -312,20 +312,33 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
             try
             {
+                // Procesador y Motherboard
                 await _carritoService.AgregarProductoAsync(clienteId, idProcesador, 1);
                 await _carritoService.AgregarProductoAsync(clienteId, idMotherboard, 1);
 
-                if (idsRam != null)
-                    foreach (var idRam in idsRam.Distinct())
+                // RAM - SIN Distinct() para permitir duplicados
+                if (idsRam != null && idsRam.Any())
+                {
+                    foreach (var idRam in idsRam)
+                    {
                         await _carritoService.AgregarProductoAsync(clienteId, idRam, 1);
+                    }
+                }
 
+                // GPU (opcional)
                 if (idGpu.HasValue)
                     await _carritoService.AgregarProductoAsync(clienteId, idGpu.Value, 1);
 
-                if (idsAlmacenamiento != null)
-                    foreach (var idAlm in idsAlmacenamiento.Distinct())
+                // Almacenamiento - SIN Distinct() para permitir duplicados
+                if (idsAlmacenamiento != null && idsAlmacenamiento.Any())
+                {
+                    foreach (var idAlm in idsAlmacenamiento)
+                    {
                         await _carritoService.AgregarProductoAsync(clienteId, idAlm, 1);
+                    }
+                }
 
+                // PSU y Gabinete
                 await _carritoService.AgregarProductoAsync(clienteId, idPsu, 1);
                 await _carritoService.AgregarProductoAsync(clienteId, idGabinete, 1);
 
@@ -403,22 +416,37 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
         {
             var componentes = new List<ComponenteSeleccionadoDTO>();
 
+            // Procesador
             var procesador = await _armatuPcService.ObtenerProductoDetalladoAsync(idProcesador);
             if (procesador != null)
                 componentes.Add(MapearAComponente(procesador, "Procesador"));
 
+            // Motherboard
             var motherboard = await _armatuPcService.ObtenerProductoDetalladoAsync(idMotherboard);
             if (motherboard != null)
                 componentes.Add(MapearAComponente(motherboard, "Motherboard"));
 
-            if (idsRam != null)
-                foreach (var idRam in idsRam.Distinct())
-                {
-                    var ram = await _armatuPcService.ObtenerProductoDetalladoAsync(idRam);
-                    if (ram != null)
-                        componentes.Add(MapearAComponente(ram, "Memoria RAM"));
-                }
+            // RAM - SIN Distinct() para permitir cantidades múltiples
+            if (idsRam != null && idsRam.Any())
+            {
+                // Agrupar por ID para optimizar consultas pero mantener cantidades
+                var ramGroups = idsRam.GroupBy(id => id);
 
+                foreach (var group in ramGroups)
+                {
+                    var ram = await _armatuPcService.ObtenerProductoDetalladoAsync(group.Key);
+                    if (ram != null)
+                    {
+                        // Agregar tantas veces como aparece en la lista
+                        for (int i = 0; i < group.Count(); i++)
+                        {
+                            componentes.Add(MapearAComponente(ram, "Memoria RAM"));
+                        }
+                    }
+                }
+            }
+
+            // GPU
             if (idGpu.HasValue)
             {
                 var gpu = await _armatuPcService.ObtenerProductoDetalladoAsync(idGpu.Value);
@@ -426,14 +454,27 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     componentes.Add(MapearAComponente(gpu, "Tarjeta Gráfica"));
             }
 
-            if (idsAlmacenamiento != null)
-                foreach (var idAlm in idsAlmacenamiento.Distinct())
-                {
-                    var almacenamiento = await _armatuPcService.ObtenerProductoDetalladoAsync(idAlm);
-                    if (almacenamiento != null)
-                        componentes.Add(MapearAComponente(almacenamiento, "Almacenamiento"));
-                }
+            // Almacenamiento - SIN Distinct() para permitir cantidades múltiples
+            if (idsAlmacenamiento != null && idsAlmacenamiento.Any())
+            {
+                // Agrupar por ID para optimizar consultas pero mantener cantidades
+                var almGroups = idsAlmacenamiento.GroupBy(id => id);
 
+                foreach (var group in almGroups)
+                {
+                    var almacenamiento = await _armatuPcService.ObtenerProductoDetalladoAsync(group.Key);
+                    if (almacenamiento != null)
+                    {
+                        // Agregar tantas veces como aparece en la lista
+                        for (int i = 0; i < group.Count(); i++)
+                        {
+                            componentes.Add(MapearAComponente(almacenamiento, "Almacenamiento"));
+                        }
+                    }
+                }
+            }
+
+            // PSU
             if (idPsu.HasValue)
             {
                 var psu = await _armatuPcService.ObtenerProductoDetalladoAsync(idPsu.Value);
@@ -441,6 +482,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     componentes.Add(MapearAComponente(psu, "Fuente de Poder"));
             }
 
+            // Gabinete
             if (idGabinete.HasValue)
             {
                 var gabinete = await _armatuPcService.ObtenerProductoDetalladoAsync(idGabinete.Value);

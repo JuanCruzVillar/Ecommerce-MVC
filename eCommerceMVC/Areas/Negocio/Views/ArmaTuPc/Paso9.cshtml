@@ -8,30 +8,49 @@
 
 @Html.Partial("Partials/_EstilosComunes")
 
-<div class="arma-pc-container">
+<div class="arma-pc-page">
     <div class="container">
         <div class="row mb-4">
             <div class="col-12">
-                <div class="text-white mb-3">
-                    <a href="javascript:history.back()" class="text-white text-decoration-none">
-                        <i class="fas fa-arrow-left me-2"></i>Volver Atrás
-                    </a>
-                </div>
-                <h1 class="display-4 fw-bold text-white mb-2">
-                    <i class="fas fa-check-circle me-3"></i>¡Tu PC está lista!
+                <a href="javascript:history.back()" class="text-decoration-none text-muted mb-3 d-inline-block">
+                    <i class="fas fa-arrow-left me-2"></i>Volver Atrás
+                </a>
+                <h1 class="display-4 fw-bold mb-2">
+                    <i class="fas fa-check-circle me-3" style="color: #667eea;"></i>¡Tu PC está lista!
                 </h1>
-                <p class="text-white-50 mb-3">Revisa tu configuración antes de agregar al carrito</p>
+                <p class="text-muted mb-3">Revisa tu configuración antes de agregar al carrito</p>
             </div>
         </div>
 
         <div class="row g-4">
             <!-- Columna izquierda - Lista de componentes -->
             <div class="col-lg-8">
-                <div class="card border-0 shadow-lg mb-4">
+                <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4">Componentes Seleccionados</h5>
+                        <h5 class="fw-bold mb-4">
+                            <i class="fas fa-list-check me-2" style="color: #667eea;"></i>
+                            Componentes Seleccionados
+                        </h5>
 
-                        @foreach (var componente in Model.ComponentesSeleccionados)
+                        @{
+                            // Agrupar componentes por IdProducto para mostrar cantidades
+                            var componentesAgrupados = Model.ComponentesSeleccionados?
+                            .GroupBy(c => new { c.IdProducto, c.Nombre, c.Tipo, c.Marca, c.PrecioUnitario, c.RutaImagen })
+                            .Select(g => new
+                            {
+                                g.Key.IdProducto,
+                                g.Key.Nombre,
+                                g.Key.Tipo,
+                                g.Key.Marca,
+                                g.Key.PrecioUnitario,
+                                g.Key.RutaImagen,
+                                Cantidad = g.Count(),
+                                Subtotal = g.Key.PrecioUnitario * g.Count()
+                            })
+                            .ToList();
+                        }
+
+                        @foreach (var componente in componentesAgrupados)
                         {
                             <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                                 <div class="me-3">
@@ -50,11 +69,18 @@
                                 <div class="flex-grow-1">
                                     <small class="text-muted d-block">@componente.Tipo</small>
                                     <h6 class="fw-bold mb-1">@componente.Nombre</h6>
-                                    <small class="text-muted">@componente.Marca</small>
+                                    <small class="text-muted d-block">@componente.Marca</small>
+                                    @if (componente.Cantidad > 1)
+                                    {
+                                        <small class="text-muted" style="font-size: 0.75rem;">$@componente.PrecioUnitario.ToString("N0") c/u</small>
+                                    }
                                 </div>
                                 <div class="text-end">
-                                    <div class="fw-bold">$@componente.PrecioUnitario.ToString("N0")</div>
-                                    <small class="text-muted">x @componente.Cantidad</small>
+                                    <div class="fw-bold" style="color: #667eea; font-size: 1.1rem;">$@componente.Subtotal.ToString("N0")</div>
+                                    @if (componente.Cantidad > 1)
+                                    {
+                                        <small class="text-muted">@componente.Cantidad unidades</small>
+                                    }
                                 </div>
                             </div>
                         }
@@ -62,9 +88,12 @@
                 </div>
 
                 <!-- Opciones adicionales -->
-                <div class="card border-0 shadow-lg">
+                <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <h6 class="fw-bold mb-3">¿Deseas guardar esta configuración?</h6>
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-save me-2" style="color: #667eea;"></i>
+                            ¿Deseas guardar esta configuración?
+                        </h6>
                         <p class="text-muted small mb-3">Guarda tu PC para compararla o comprarla más tarde</p>
 
                         <div class="row g-3">
@@ -83,22 +112,33 @@
 
             <!-- Columna derecha - Resumen y acciones -->
             <div class="col-lg-4">
-                <div class="card border-0 shadow-lg sticky-top" style="top: 20px;">
+                <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-4">Resumen de Compra</h5>
 
+                        <!-- Visualización de PC completa -->
+                        <div class="pc-visualization-complete mb-4 p-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px;">
+                            <div class="text-center text-white">
+                                <i class="fas fa-desktop mb-2" style="font-size: 3rem;"></i>
+                                <p class="small mb-0 fw-bold">PC Completa</p>
+                                <p class="small mb-0">@Model.TotalComponentes Componentes</p>
+                            </div>
+                        </div>
+
                         <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Subtotal (@Model.TotalComponentes items)</span>
-                                <span>$@Model.Subtotal.ToString("N0")</span>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span class="fw-bold">$@Model.Subtotal.ToString("N0")</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                                <span class="text-muted">Envío</span>
-                                <span class="text-success fw-bold">Gratis</span>
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                <span class="text-muted small">Envío</span>
+                                <span class="text-success fw-bold small">Gratis</span>
                             </div>
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Total</h5>
-                                <h4 class="mb-0" style="color: #667eea;">$@Model.Total.ToString("N0")</h4>
+                                <h4 class="mb-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                    $@Model.Total.ToString("N0")
+                                </h4>
                             </div>
                         </div>
 
@@ -186,3 +226,11 @@
         });
     }
 </script>
+
+<style>
+    .badge {
+        font-weight: 600;
+        padding: 0.35rem 0.6rem;
+        border-radius: 50px;
+    }
+</style>

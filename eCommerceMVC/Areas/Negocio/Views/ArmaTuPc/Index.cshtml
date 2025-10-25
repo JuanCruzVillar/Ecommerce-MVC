@@ -6,87 +6,94 @@
 
 @model ArmaPcViewModel
 
-<div class="arma-pc-container">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-8 mx-auto text-center">
-                <h1 class="display-4 fw-bold text-white mb-3">¡Arma tu PC!</h1>
-                <p class="lead text-white-50">Construye tu computadora perfecta eligiendo cada componente</p>
-                <div class="progress-wrapper mt-4">
-                    <div class="progress-bar-custom" style="width: 12.5%;"></div>
-                </div>
-                <small class="text-white mt-2 d-block">Paso 1 de 8: Selecciona tu marca</small>
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 fw-bold mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                ¡Arma tu PC!
+            </h1>
+            <p class="lead text-muted">Construye tu computadora perfecta eligiendo cada componente</p>
+            <div class="progress-custom mt-4">
+                <div class="progress-bar-custom" style="width: 12.5%;"></div>
             </div>
+            <small class="text-muted mt-2 d-block">Paso 1 de 8: Selecciona tu marca</small>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <div class="row g-4 mb-5">
-                    <!-- AMD -->
-                    <div class="col-md-6">
-                        <form method="post" action="@Url.Action("SeleccionarMarca")" style="display: contents;">
-                            <button type="submit" name="marca" value="AMD" class="btn btn-unstyled w-100 p-0">
-                                <div class="card h-100 border-0 shadow-sm" style="cursor: pointer; transition: all 0.3s ease;">
-                                    <div class="card-body text-center p-5">
-                                        <div class="mb-4">
-                                            <div style="width: 80px; height: 80px; background: #ED1C24; border-radius: 12px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                                                <span style="font-size: 48px; font-weight: bold; color: white;">A</span>
-                                            </div>
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="row g-4 mb-5">
+                <!-- AMD -->
+                <div class="col-md-6">
+                    <form method="post" action="@Url.Action("SeleccionarMarca")">
+                        <button type="submit" name="marca" value="AMD" class="btn w-100 p-0" style="background: none; border: none;">
+                            <div class="card h-100 border-0 shadow-sm" style="cursor: pointer; transition: all 0.3s ease;">
+                                <div class="card-body text-center p-5">
+                                    <div class="mb-4">
+                                        <div style="width: 80px; height: 80px; background: #ED1C24; border-radius: 12px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 48px; font-weight: bold; color: white;">A</span>
                                         </div>
-                                        <h2 class="card-title fw-bold mb-3">AMD Ryzen</h2>
-                                        <p class="card-text text-muted">
-                                            Procesadores de alto rendimiento y excelente relación precio-rendimiento
-                                        </p>
                                     </div>
+                                    <h2 class="card-title fw-bold mb-3">AMD Ryzen</h2>
+                                    <p class="card-text text-muted">
+                                        Procesadores de alto rendimiento y excelente relación precio-rendimiento
+                                    </p>
                                 </div>
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Intel -->
-                    <div class="col-md-6">
-                        <form method="post" action="@Url.Action("SeleccionarMarca")" style="display: contents;">
-                            <button type="submit" name="marca" value="Intel" class="btn btn-unstyled w-100 p-0">
-                                <div class="card h-100 border-0 shadow-sm" style="cursor: pointer; transition: all 0.3s ease;">
-                                    <div class="card-body text-center p-5">
-                                        <div class="mb-4">
-                                            <div style="width: 80px; height: 80px; background: #0071C5; border-radius: 12px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                                                <span style="font-size: 32px; font-weight: bold; color: white;">Intel</span>
-                                            </div>
-                                        </div>
-                                        <h2 class="card-title fw-bold mb-3">Intel Core</h2>
-                                        <p class="card-text text-muted">
-                                            Rendimiento estable y confiable para trabajo profesional
-                                        </p>
-                                    </div>
-                                </div>
-                            </button>
-                        </form>
-                    </div>
+                            </div>
+                        </button>
+                    </form>
                 </div>
 
-                <!-- Info adicional -->
-                <div class="row mt-5">
-                    <div class="col-lg-4">
-                        <div class="text-center text-white">
-                            <i class="fas fa-box" style="font-size: 2rem;"></i>
-                            <h5 class="mt-3">Componentes Premium</h5>
-                            <p class="text-white-50 small">Seleccionamos los mejores productos del mercado</p>
+                <!-- Intel -->
+                <div class="col-md-6">
+                    <form method="post" action="@Url.Action("SeleccionarMarca")">
+                        <button type="submit" name="marca" value="Intel" class="btn w-100 p-0" style="background: none; border: none;">
+                            <div class="card h-100 border-0 shadow-sm" style="cursor: pointer; transition: all 0.3s ease;">
+                                <div class="card-body text-center p-5">
+                                    <div class="mb-4">
+                                        <div style="width: 80px; height: 80px; background: #0071C5; border-radius: 12px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 32px; font-weight: bold; color: white;">Intel</span>
+                                        </div>
+                                    </div>
+                                    <h2 class="card-title fw-bold mb-3">Intel Core</h2>
+                                    <p class="card-text text-muted">
+                                        Rendimiento estable y confiable para trabajo profesional
+                                    </p>
+                                </div>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info adicional -->
+            <div class="row mt-5">
+                <div class="col-lg-4">
+                    <div class="text-center">
+                        <div class="mb-3" style="width: 60px; height: 60px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-box text-white" style="font-size: 1.5rem;"></i>
                         </div>
+                        <h5 class="mt-3">Componentes Premium</h5>
+                        <p class="text-muted small">Seleccionamos los mejores productos del mercado</p>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="text-center text-white">
-                            <i class="fas fa-check-circle" style="font-size: 2rem;"></i>
-                            <h5 class="mt-3">Compatibilidad Garantizada</h5>
-                            <p class="text-white-50 small">Todos los componentes son 100% compatibles</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="text-center">
+                        <div class="mb-3" style="width: 60px; height: 60px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-check-circle text-white" style="font-size: 1.5rem;"></i>
                         </div>
+                        <h5 class="mt-3">Compatibilidad Garantizada</h5>
+                        <p class="text-muted small">Todos los componentes son 100% compatibles</p>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="text-center text-white">
-                            <i class="fas fa-save" style="font-size: 2rem;"></i>
-                            <h5 class="mt-3">Guarda tu Config</h5>
-                            <p class="text-white-50 small">Puedes guardar varias configuraciones</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="text-center">
+                        <div class="mb-3" style="width: 60px; height: 60px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-save text-white" style="font-size: 1.5rem;"></i>
                         </div>
+                        <h5 class="mt-3">Guarda tu Config</h5>
+                        <p class="text-muted small">Puedes guardar varias configuraciones</p>
                     </div>
                 </div>
             </div>
@@ -95,16 +102,63 @@
 </div>
 
 <style>
-    .btn-unstyled {
-        background: none;
-        border: none;
-        padding: 0;
-        text-decoration: none;
-        color: inherit;
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+
+                            <script>
+
+                                    // Script de Filtro de Ordenamiento
+    const sortFilter = document.getElementById('sortFilter');
+    const productGrid = document.querySelector('.row.g-3');
+    const productCards = Array.from(productGrid.children);
+
+    // Mostrar contador de productos
+    const productCount = document.getElementById('productCount');
+    if (productCount) {
+        productCount.textContent = productCards.length;
     }
 
-        .btn-unstyled:hover .card {
-            transform: translateY(-5px);
-            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2) !important;
+    // Función para obtener datos del producto
+    function getProductData(card) {
+        const priceText = card.querySelector('h5')?.textContent || '0';
+        const price = parseInt(priceText.replace(/\D/g, '')) || 0;
+        const name = card.querySelector('h6')?.textContent?.trim() || '';
+        return { element: card, price, name };
+    }
+
+    // Guardar datos originales
+    const products = productCards.map(getProductData);
+
+    // Evento de cambio en el filtro
+    sortFilter.addEventListener('change', function() {
+        const sortValue = this.value;
+        let sortedProducts = [...products];
+
+        switch(sortValue) {
+            case 'price-asc':
+                sortedProducts.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-desc':
+                sortedProducts.sort((a, b) => b.price - a.price);
+                break;
+            case 'name-asc':
+                sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'name-desc':
+                sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+            case 'default':
+                sortedProducts = [...products];
+                break;
         }
-</style>
+
+        // Reordenar elementos en el DOM
+        productGrid.innerHTML = '';
+        sortedProducts.forEach(product => {
+            productGrid.appendChild(product.element);
+        });
+    });
+                            </script>
