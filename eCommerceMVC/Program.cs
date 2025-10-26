@@ -39,13 +39,15 @@ if (builder.Environment.IsProduction())
 builder.Services.AddControllersWithViews();
 
 // DbContext con validación de connection string
-var connectionString = builder.Configuration.GetConnectionString("EcommerceContext");
+var connectionString = Environment.GetEnvironmentVariable("ECOMMERCE_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("EcommerceContext");
 
 if (string.IsNullOrEmpty(connectionString))
 {
     throw new InvalidOperationException(
-        "⚠️ Connection string 'EcommerceContext' no encontrado. " +
-        "Configuralo en appsettings.json o como variable de entorno.");
+        "⚠️ Connection string no configurado. " +
+        "En producción: establece la variable de entorno 'ECOMMERCE_CONNECTION_STRING'. " +
+        "En desarrollo: configurala en appsettings.json");
 }
 
 builder.Services.AddDbContext<DbecommerceContext>(options =>

@@ -199,7 +199,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
         }
 
-        // POST: Procesar pedido final
+        // POST: Procesar pedido final 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcesarPedido(CheckoutViewModel model)
@@ -208,6 +208,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
             try
             {
+                // Limpiar ModelState de propiedades calculadas
                 ModelState.Remove("Cliente");
                 ModelState.Remove("ItemsCarrito");
                 ModelState.Remove("DireccionesDisponibles");
@@ -216,13 +217,28 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                 ModelState.Remove("MensajeCupon");
                 ModelState.Remove("NotasEspeciales");
                 ModelState.Remove("CantidadCuotas");
+                ModelState.Remove("Subtotal");
+                ModelState.Remove("CostoEnvio");
+                ModelState.Remove("Total");
 
+                //  RECALCULAR TODO EN SERVIDOR
+                var checkoutActualizado = await _checkoutService.ObtenerCheckoutAsync(idCliente);
+
+                //  Validar que el carrito no esté vacío
+                if (!checkoutActualizado.ItemsCarrito.Any())
+                {
+                    ModelState.AddModelError("", "El carrito está vacío");
+                    return await RecargarCheckoutConError(model, idCliente);
+                }
+
+                //  Validar método de pago
                 if (model.MetodoPagoSeleccionado == 0)
                 {
                     ModelState.AddModelError("MetodoPagoSeleccionado", "Debe seleccionar un método de pago");
                     return await RecargarCheckoutConError(model, idCliente);
                 }
 
+                //  Validar y crear dirección si es nueva
                 if (model.UsarNuevaDireccion)
                 {
                     if (model.NuevaDireccion == null)
@@ -232,7 +248,6 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     }
 
                     var erroresDireccion = new List<string>();
-
                     if (string.IsNullOrWhiteSpace(model.NuevaDireccion.NombreCompleto))
                         erroresDireccion.Add("El nombre completo es requerido");
                     if (string.IsNullOrWhiteSpace(model.NuevaDireccion.Direccion))
@@ -272,11 +287,11 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
 
                     _context.DireccionesEnvio.Add(nuevaDireccion);
                     await _context.SaveChangesAsync();
-
                     model.DireccionEnvioSeleccionada = nuevaDireccion.IdDireccionEnvio;
                 }
                 else
                 {
+                    //  Validar dirección existente
                     if (!model.DireccionEnvioSeleccionada.HasValue || model.DireccionEnvioSeleccionada == 0)
                     {
                         ModelState.AddModelError("DireccionEnvioSeleccionada", "Debe seleccionar una dirección de envío");
@@ -295,12 +310,14 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     }
                 }
 
+                //  Validar términos
                 if (!model.AceptaTerminos)
                 {
                     ModelState.AddModelError("AceptaTerminos", "Debe aceptar los términos y condiciones");
                     return await RecargarCheckoutConError(model, idCliente);
                 }
 
+                //  Validar stock disponible
                 var stockDisponible = await _checkoutService.ValidarStockProductosAsync(idCliente);
                 if (!stockDisponible)
                 {
@@ -308,34 +325,53 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
                     return await RecargarCheckoutConError(model, idCliente);
                 }
 
-                var checkoutActualizado = await _checkoutService.ObtenerCheckoutAsync(idCliente);
-
-                if (!string.IsNullOrEmpty(model.CodigoCupon))
-                {
-                    var resultadoCupon = await _checkoutService.ValidarCuponAsync(model.CodigoCupon, checkoutActualizado.Subtotal);
-                    if (resultadoCupon.EsValido)
-                    {
-                        model.DescuentoAplicado = resultadoCupon.DescuentoAplicado;
-                        model.CuponAplicado = true;
-                    }
-                }
-
+               
                 model.ItemsCarrito = checkoutActualizado.ItemsCarrito;
                 model.Subtotal = checkoutActualizado.Subtotal;
                 model.TotalItems = checkoutActualizado.TotalItems;
 
+                //  Recalcular costo de envío
                 if (model.DireccionEnvioSeleccionada.HasValue)
                 {
                     model.CostoEnvio = await _checkoutService.CalcularCostoEnvioAsync(model.DireccionEnvioSeleccionada.Value);
                 }
 
+                //  Validar y aplicar cupón 
+                model.DescuentoAplicado = 0;
+                if (!string.IsNullOrEmpty(model.CodigoCupon))
+                {
+                    var resultadoCupon = await _checkoutService.ValidarCuponAsync(model.CodigoCupon, model.Subtotal);
+                    if (resultadoCupon.EsValido)
+                    {
+                        model.DescuentoAplicado = resultadoCupon.DescuentoAplicado;
+                        model.CuponAplicado = true;
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Cupón inválido '{Cupon}' para cliente {ClienteId}", model.CodigoCupon, idCliente);
+                        model.CodigoCupon = null; // Ignorar cupón inválido
+                    }
+                }
+
+                //  CALCULAR TOTAL FINAL (NUNCA CONFIAR EN EL CLIENTE)
                 model.Total = model.Subtotal + model.CostoEnvio - model.DescuentoAplicado;
 
+                //  Validación adicional: total debe ser positivo
+                if (model.Total < 0)
+                {
+                    _logger.LogError("Total negativo detectado para cliente {ClienteId}. Subtotal: {Subtotal}, Envío: {Envio}, Descuento: {Descuento}",
+                        idCliente, model.Subtotal, model.CostoEnvio, model.DescuentoAplicado);
+                    ModelState.AddModelError("", "Error en el cálculo del total. Por favor, intente nuevamente.");
+                    return await RecargarCheckoutConError(model, idCliente);
+                }
+
+                //  Procesar pedido con datos validados
                 var idVenta = await _checkoutService.ProcesarPedidoAsync(model, idCliente);
 
                 if (idVenta > 0)
                 {
-                    _logger.LogInformation("Pedido {VentaId} procesado exitosamente para cliente {ClienteId}", idVenta, idCliente);
+                    _logger.LogInformation("Pedido {VentaId} procesado exitosamente. Cliente: {ClienteId}, Total: {Total:C}",
+                        idVenta, idCliente, model.Total);
                     TempData["Success"] = "¡Pedido procesado exitosamente!";
                     return RedirectToAction("Confirmacion", new { id = idVenta });
                 }
@@ -348,7 +384,7 @@ namespace eCommerceMVC.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al procesar pedido para cliente {ClienteId}", idCliente);
+                _logger.LogError(ex, "Error crítico al procesar pedido para cliente {ClienteId}", idCliente);
                 ModelState.AddModelError("", "Error al procesar el pedido. Por favor, intente nuevamente.");
                 return await RecargarCheckoutConError(model, idCliente);
             }
