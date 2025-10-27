@@ -62,11 +62,10 @@ Durante el desarrollo de Hardware Store, pude aplicar y profundizar en:
 
 ### 🔧 Arma tu PC
 
-Sistema interactivo paso a paso para configurar una PC personalizada:
+Sistema interactivo paso a paso para configurar una PC personalizada segun presupuesto y necesidades del cliente:
 
 - ✅ Selección guiada de componentes (CPU, Motherboard, RAM, GPU, etc.)
 - ✅ **Validación automática de compatibilidad** entre procesador y motherboard
-- ✅ Cálculo de consumo de energía y recomendación de fuente
 - ✅ **Guardado de configuraciones** personalizadas por usuario
 - ✅ Resumen con precio total y specs completas
 - ✅ Agregar configuración completa al carrito
@@ -158,7 +157,7 @@ Sistema interactivo paso a paso para configurar una PC personalizada:
           ┌──────────────▼──────────────┐
           │      SERVICE LAYER          │
           │  ┌──────────────────────┐   │
-          │  │  Business Logic      │   │
+          │  │  Logica de negocio   │   │
           │  │  - ProductoService   │   │
           │  │  - CarritoService    │   │
           │  │  - CheckoutService   │   │
@@ -169,7 +168,7 @@ Sistema interactivo paso a paso para configurar una PC personalizada:
           ┌─────────────▼───────────────┐
           │    REPOSITORY LAYER         │
           │  ┌──────────────────────┐   │
-          │  │  Data Access         │   │
+          │  │  Acceso a datos      │   │
           │  │  - Repository<T>     │   │
           │  │  - UnitOfWork        │   │
           │  └──────────┬───────────┘   │
@@ -339,7 +338,6 @@ Email: test@correo.com
 Password: 123456
 ```
 
-> ⚠️ **Nota**: Estas credenciales son solo para pruebas. En producción, cámbialas inmediatamente.
 
 ---
 
@@ -407,27 +405,6 @@ eCommerceMVC/
 
 ---
 
-## 🐛 Problemas Conocidos y Soluciones
-
-### Error de Conexión a SQL Server
-
-**Error**: `A network-related or instance-specific error occurred`
-
-**Solución**:
-1. Verifica que SQL Server esté corriendo
-2. Revisa la cadena de conexión en `appsettings.json`
-3. Asegúrate de que el servidor permita conexiones TCP/IP
-
-### Las Migraciones No Se Aplican
-
-**Solución**:
-```bash
-# Elimina la base de datos existente
-dotnet ef database drop
-
-# Vuelve a crear
-dotnet ef database update
-```
 
 ### Error 404 en Imágenes
 
@@ -439,15 +416,10 @@ dotnet ef database update
 
 
 
-## 🤝 Contribuciones
+## 🤝 Notas
 
-Este es un proyecto de aprendizaje, pero estoy **abierto a feedback y sugerencias**. Si encontrás algún bug, tenés ideas de mejora o querés contribuir:
+Este es un proyecto de aprendizaje para poder adquirir experiencia y conocimientos como programador, pero estoy **abierto a feedback y sugerencias**.
 
-1. 🍴 Haz un fork del proyecto
-2. 🔀 Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. 💾 Commit tus cambios (`git commit -m 'Add: Amazing Feature'`)
-4. 📤 Push a la rama (`git push origin feature/AmazingFeature`)
-5. 🎉 Abre un Pull Request
 
 ---
 
