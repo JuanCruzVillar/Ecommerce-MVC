@@ -13,11 +13,13 @@ namespace eCommerce.Services.Implementations
     {
         private readonly DbecommerceContext _context;
         private readonly ICarritoService _carritoService;
+        private readonly ILogger<CheckoutService> _logger;
 
-        public CheckoutService(DbecommerceContext context, ICarritoService carritoService)
+        public CheckoutService(DbecommerceContext context, ICarritoService carritoService, ILogger<CheckoutService> logger)
         {
             _context = context;
             _carritoService = carritoService;
+            _logger = logger;
         }
 
         public async Task<CheckoutViewModel> ObtenerCheckoutAsync(int idCliente)
@@ -118,17 +120,11 @@ namespace eCommerce.Services.Implementations
         {
             try
             {
-                Console.WriteLine($"DEBUG - Intentando guardar dirección para cliente: {idCliente}");
-                Console.WriteLine($"DEBUG - Nombre: '{direccionVM?.NombreCompleto}'");
-                Console.WriteLine($"DEBUG - Dirección: '{direccionVM?.Direccion}'");
-                Console.WriteLine($"DEBUG - Ciudad: '{direccionVM?.Ciudad}'");
-                Console.WriteLine($"DEBUG - Provincia: '{direccionVM?.Provincia}'");
-                Console.WriteLine($"DEBUG - CodigoPostal: '{direccionVM?.CodigoPostal}'");
-                Console.WriteLine($"DEBUG - Telefono: '{direccionVM?.Telefono}'");
+              
 
                 if (direccionVM == null)
                 {
-                    Console.WriteLine("DEBUG - ERROR: direccionVM es null");
+                    _logger.LogWarning("Intento de agregar dirección nula para cliente {ClienteId}", idCliente);
                     return false;
                 }
 

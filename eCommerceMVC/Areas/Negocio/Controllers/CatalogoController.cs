@@ -76,22 +76,24 @@ public class CatalogoController : BaseNegocioController
             var productos = await _productoService.GetAllAsync();
             var resultados = productos
                 .Where(p => p.Activo == true &&
-                       (p.Nombre.ToLower().Contains(termino.ToLower()) ||
-                        p.Descripcion.ToLower().Contains(termino.ToLower())))
+                       (p.Nombre != null && p.Nombre.ToLower().Contains(termino.ToLower()) ||
+                        (p.Descripcion != null && p.Descripcion.ToLower().Contains(termino.ToLower()))))
                 .Take(5)
                 .Select(p => new
                 {
                     id = p.IdProducto,
-                    nombre = p.Nombre,
-                    precio = p.Precio?.ToString("N2"),
-                    imagen = p.RutaImagen
+                    nombre = p.Nombre ?? "Sin nombre",
+                    precio = p.Precio?.ToString("N2") ?? "0.00",
+                    imagen = p.RutaImagen ?? ""
                 })
                 .ToList();
 
             return Json(new { success = true, resultados });
         }
-        catch
+        catch (Exception ex)
         {
+            // Log del error para debugging
+            Console.WriteLine($"Error en BuscarAjax: {ex.Message}");
             return Json(new { success = false, message = "Error en la búsqueda" });
         }
     }

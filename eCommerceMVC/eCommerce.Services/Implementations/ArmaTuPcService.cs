@@ -14,9 +14,12 @@ namespace eCommerce.Services.Implementations
     {
         private readonly DbecommerceContext _context;
 
-        public ArmatuPcService(DbecommerceContext context)
+        private readonly ILogger<ArmatuPcService> _logger;
+
+        public ArmatuPcService(DbecommerceContext context, ILogger<ArmatuPcService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // Obtener memorias RAM (Categorías: DDR4, DDR5 - Padre: Memoria Ram)
@@ -39,11 +42,7 @@ namespace eCommerce.Services.Implementations
                            ))
                 .ToListAsync();
 
-            Console.WriteLine($"DEBUG - RAMs encontradas: {productos.Count}");
-            foreach (var p in productos)
-            {
-                Console.WriteLine($"  - {p.Nombre} | Categoría: {p.IdCategoriaNavigation?.Descripcion} | Padre: {p.IdCategoriaNavigation?.CategoriaPadre?.Descripcion}");
-            }
+            _logger.LogDebug("Encontradas {Count} memorias RAM disponibles", productos.Count);
 
             return MapearProductosADTO(productos);
         }
@@ -75,11 +74,7 @@ namespace eCommerce.Services.Implementations
                            ))
                 .ToListAsync();
 
-            Console.WriteLine($"DEBUG - GPUs encontradas: {productos.Count}");
-            foreach (var p in productos)
-            {
-                Console.WriteLine($"  - {p.Nombre} | Categoría: {p.IdCategoriaNavigation?.Descripcion} | Padre: {p.IdCategoriaNavigation?.CategoriaPadre?.Descripcion}");
-            }
+           
 
             return MapearProductosADTO(productos);
         }
@@ -102,7 +97,7 @@ namespace eCommerce.Services.Implementations
                               p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("CPU")))))
                 .ToListAsync();
 
-            Console.WriteLine($"DEBUG - Procesadores {marca} encontrados: {productos.Count}");
+           
             return MapearProductosADTO(productos);
         }
 
@@ -136,7 +131,7 @@ namespace eCommerce.Services.Implementations
                              p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains(socket))))
                 .ToListAsync();
 
-            Console.WriteLine($"DEBUG - Motherboards {socket} encontrados: {productos.Count}");
+           
             return MapearProductosADTO(productos);
         }
 
@@ -161,7 +156,7 @@ namespace eCommerce.Services.Implementations
                            ))
                 .ToListAsync();
 
-            Console.WriteLine($"DEBUG - Almacenamiento encontrado: {productos.Count}");
+           
             return MapearProductosADTO(productos);
         }
 
@@ -185,7 +180,7 @@ namespace eCommerce.Services.Implementations
                            ))
                 .ToListAsync();
 
-            Console.WriteLine($"DEBUG - Fuentes encontradas: {productos.Count}");
+           
             return MapearProductosADTO(productos);
         }
 
@@ -210,7 +205,7 @@ namespace eCommerce.Services.Implementations
                            ))
                 .ToListAsync();
 
-            Console.WriteLine($"DEBUG - Coolers encontrados: {productos.Count}");
+            
             return MapearProductosADTO(productos);
         }
 
@@ -456,12 +451,6 @@ namespace eCommerce.Services.Implementations
                                  p.IdCategoriaNavigation.CategoriaPadre.Descripcion.Contains("Caja")))
                            ))
                 .ToListAsync();
-
-            Console.WriteLine($"DEBUG - Gabinetes encontrados: {productos.Count}");
-            foreach (var p in productos)
-            {
-                Console.WriteLine($"  - {p.Nombre} | Categoría: {p.IdCategoriaNavigation?.Descripcion} | Padre: {p.IdCategoriaNavigation?.CategoriaPadre?.Descripcion}");
-            }
 
             return MapearProductosADTO(productos);
         }

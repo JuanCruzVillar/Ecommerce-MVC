@@ -107,7 +107,6 @@ namespace eCommerce.Services.Implementations
                 ClienteCorreo = venta.IdClienteNavigation?.Correo ?? "N/A",
                 IdProducto = detalle?.IdProducto ?? 0,
                 ProductoNombre = detalle?.IdProductoNavigation?.Nombre ?? "Sin nombre",
-                // FIX: Cálculo correcto del precio unitario
                 Precio = detalle?.Cantidad > 0 ? (detalle?.Total ?? 0) / detalle.Cantidad.Value : 0,
                 TotalProductos = venta.TotalProductos ?? 0,
                 ImporteTotal = venta.ImporteTotal ?? 0,
@@ -144,7 +143,7 @@ namespace eCommerce.Services.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error en ObtenerEstadisticasDashboardAsync: {ex.Message}");
+                
                 return new Dashboard();
             }
         }

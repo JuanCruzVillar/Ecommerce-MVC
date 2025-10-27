@@ -17,7 +17,6 @@
             --secondary-color: #764ba2;
         }
 
-        /* Navbar principal */
         .navbar-main {
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -33,7 +32,6 @@
             background-clip: text;
         }
 
-        /* Navbar secundario */
         .navbar-secondary {
             background: white;
             border-top: 3px solid var(--primary-color);
@@ -67,7 +65,6 @@
                     width: 100%;
                 }
 
-        /* Botones de acción */
         .btn-auth {
             background: var(--primary-gradient);
             border: none;
@@ -109,7 +106,6 @@
             min-width: 24px;
         }
 
-        /* Buscador */
         .input-group .form-control {
             border: 2px solid #e0e0e0;
             border-radius: 8px 0 0 8px;
@@ -134,7 +130,6 @@
                 border-color: var(--secondary-color);
             }
 
-        /* Sugerencias */
         #navbarSugerencias .list-group-item {
             cursor: pointer;
             transition: all 0.2s;
@@ -153,7 +148,6 @@
             border: 1px solid #e0e0e0;
         }
 
-        /* Dropdown menus */
         .dropdown-menu {
             border: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -171,13 +165,11 @@
                     padding-left: 1.75rem;
                 }
 
-        /* User dropdown */
         #userDropdown {
             color: var(--primary-color) !important;
             font-weight: 600;
         }
 
-        /* Footer */
         footer {
             background: var(--primary-gradient);
             margin-top: auto;
@@ -212,7 +204,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar Principal -->
     <nav class="navbar navbar-expand-lg navbar-main">
         <div class="container px-4 px-lg-5">
             <a class="navbar-brand" href="@Url.Action("Index", "Catalogo", new { area = "Negocio" })">
@@ -222,7 +213,6 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Buscador -->
                 <form class="d-flex me-3 position-relative" style="flex: 1; max-width: 500px;" method="get"
                       asp-area="Negocio" asp-controller="Catalogo" asp-action="Index">
                     <div class="input-group w-100">
@@ -236,7 +226,6 @@
                          style="top: 100%; z-index: 1050; display: none; max-height: 400px; overflow-y: auto;"></div>
                 </form>
 
-                <!-- Botones derechos -->
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                     @if (User.Identity.IsAuthenticated)
                     {
@@ -289,7 +278,6 @@
         </div>
     </nav>
 
-    <!-- Navbar Secundario -->
     <nav class="navbar-secondary">
         <div class="container">
             <ul class="nav justify-content-center">
@@ -331,7 +319,6 @@
     <footer class="mt-5">
         <div class="container py-5">
             <div class="row g-4 mb-5">
-                <!-- Información de la Empresa -->
                 <div class="col-md-3 col-sm-6">
                     <h5 class="fw-bold text-white mb-3">
                         <i class="bi bi-laptop me-2"></i>Hardware Store
@@ -355,7 +342,6 @@
                     </div>
                 </div>
 
-                <!-- Enlaces útiles -->
                 <div class="col-md-3 col-sm-6">
                     <h6 class="fw-bold text-white mb-3">
                         <i class="bi bi-link-45deg me-2"></i>Enlaces Útiles
@@ -384,7 +370,6 @@
                     </ul>
                 </div>
 
-                <!-- Información de envíos y compras -->
                 <div class="col-md-3 col-sm-6">
                     <h6 class="fw-bold text-white mb-3">
                         <i class="bi bi-truck me-2"></i>Compra y Envío
@@ -413,7 +398,6 @@
                     </ul>
                 </div>
 
-                <!-- Contacto -->
                 <div class="col-md-3 col-sm-6">
                     <h6 class="fw-bold text-white mb-3">
                         <i class="bi bi-telephone me-2"></i>Contacto
@@ -446,10 +430,8 @@
                 </div>
             </div>
 
-            <!-- Divider -->
             <hr class="bg-white-50">
 
-            <!-- Newsletter y Copyright -->
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <p class="text-white-50 small mb-0">
@@ -473,7 +455,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // ========== CARRITO LOCALSTORAGE ==========
         const CarritoLS = {
             STORAGE_KEY: 'carrito_hardware_store',
 
@@ -529,7 +510,7 @@
                 const userAuth = @(User.Identity.IsAuthenticated ? "true" : "false");
 
                 if (userAuth) {
-                    $.get('@Url.Action("Cantidad", "Carrito", new { area = "Negocio" })', function(total) {
+                    $.get('/Negocio/Carrito/Cantidad', function(total) {
                         $('#carrito-badge').text(total);
                     }).fail(function() {
                         $('#carrito-badge').text('0');
@@ -548,7 +529,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: '@Url.Action("MigrarCarrito", "Carrito", new { area = "Negocio" })',
+                    url: '/Negocio/Carrito/MigrarCarrito',
                     contentType: 'application/json',
                     data: JSON.stringify(carrito.map(item => ({
                         idProducto: item.idProducto,
@@ -577,8 +558,7 @@
             }
         };
 
-        // ========== INICIALIZACIÓN ==========
-        $(document).ready(function() {
+               $(document).ready(function() {
             const userAuth = @(User.Identity.IsAuthenticated ? "true" : "false");
 
             CarritoLS.actualizarBadge();
@@ -597,7 +577,7 @@
                 }, 500);
             }
 
-            // EVENTO GLOBAL: Agregar al carrito
+            // AGREGAR AL CARRITO
             $(document).on('click', '.agregar-carrito', function(e) {
                 e.preventDefault();
 
@@ -614,7 +594,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: '@Url.Action("Agregar", "Carrito", new { area = "Negocio" })',
+                    url: '/Negocio/Carrito/Agregar',
                     data: {
                         productoId: productoId,
                         cantidad: 1
@@ -659,29 +639,47 @@
                 });
             });
 
-            // Búsqueda con sugerencias
+            // ========== BÚSQUEDA CON SUGERENCIAS (CON LOGS) ==========
             let timeoutId;
+
+            console.log('🔧 Inicializando buscador...');
+            console.log('📍 Input existe:', $('#navbarBusqueda').length > 0);
+
             $('#navbarBusqueda').on('keyup', function(e) {
+                console.log('🔍 Keyup detectado, tecla:', e.key);
+
                 if (e.key === 'Enter') return;
 
                 clearTimeout(timeoutId);
                 const termino = $(this).val();
+                console.log('📝 Término:', termino, '(largo:', termino.length + ')');
 
                 if (termino.length < 2) {
+                    console.log('⚠️ Término muy corto');
                     $('#navbarSugerencias').hide().empty();
                     return;
                 }
 
+                console.log('⏳ Esperando 300ms...');
+
                 timeoutId = setTimeout(function() {
-                    $.get('@Url.Action("BuscarAjax", "Catalogo", new { area = "Negocio" })',
-                        { termino: termino },
-                        function(data) {
+                    console.log('🚀 Enviando petición AJAX...');
+
+                    $.ajax({
+                        url: '/Negocio/Catalogo/BuscarAjax',
+                        type: 'GET',
+                        data: { termino: termino },
+                        success: function(data) {
+                            console.log('✅ Respuesta:', data);
+
                             if (data.success && data.resultados.length > 0) {
+                                console.log('📦 Mostrando', data.resultados.length, 'resultados');
                                 let html = '';
                                 data.resultados.forEach(function(p) {
+                                    const urlDetalle = '/Negocio/Catalogo/Detalle?id=' + p.id;
+
                                     html += `
-                                        <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio" })?id=${p.id}"
-                                           class="list-group-item list-group-item-action bg-white">
+                                        <a href="${urlDetalle}" class="list-group-item list-group-item-action bg-white">
                                             <div class="d-flex align-items-center">
                                                 <img src="${p.imagen || 'https://dummyimage.com/50x50/dee2e6/6c757d.jpg'}"
                                                      class="me-2 rounded" style="width:50px;height:50px;object-fit:cover;">
@@ -694,12 +692,18 @@
                                     `;
                                 });
                                 $('#navbarSugerencias').html(html).show();
+                                console.log('✅ Dropdown mostrado');
                             } else {
+                                console.log('⚠️ Sin resultados o error:', data.message);
                                 $('#navbarSugerencias').hide().empty();
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('❌ Error AJAX:', error);
+                            console.error('❌ Status:', xhr.status);
+                            console.error('❌ Response:', xhr.responseText);
+                            $('#navbarSugerencias').hide().empty();
                         }
-                    ).fail(function() {
-                        $('#navbarSugerencias').hide().empty();
                     });
                 }, 300);
             });
@@ -715,80 +719,8 @@
                     $('#navbarSugerencias').show();
                 }
             });
-        });
 
-        window.CarritoLS = CarritoLS;
-
-        // Confirmacion logout
-        document.getElementById("logoutLink")?.addEventListener("click", function(e){
-            e.preventDefault();
-            Swal.fire({
-                title: 'Cerrar sesión',
-                text: "¿Seguro que querés salir?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#667eea',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, cerrar sesión',
-                cancelButtonText: 'Cancelar'
-            }).then((result)=>{
-                if(result.isConfirmed){
-                    window.location.href = this.href;
-                }
-            });
-        });
-
-        // Mensajes de éxito/error con SweetAlert2
-        @if (TempData["Success"] != null)
-        {
-                <text>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: '@TempData["Success"]',
-                    confirmButtonColor: '#667eea'
-                });
-                </text>
-        }
-
-        @if (TempData["Error"] != null)
-        {
-                <text>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '@TempData["Error"]',
-                    confirmButtonColor: '#667eea'
-                });
-                </text>
-        }
-
-        // Submenús de categorías
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropendItems = document.querySelectorAll('.dropdown-menu .dropend');
-
-            dropendItems.forEach(function(dropend) {
-                const toggle = dropend.querySelector('[data-bs-toggle="dropdown"]');
-                const menu = dropend.querySelector('.dropdown-menu');
-
-                if (toggle && menu) {
-                    dropend.addEventListener('mouseenter', function() {
-                        menu.classList.add('show');
-                        toggle.setAttribute('aria-expanded', 'true');
-                    });
-
-                    dropend.addEventListener('mouseleave', function() {
-                        menu.classList.remove('show');
-                        toggle.setAttribute('aria-expanded', 'false');
-                    });
-
-                    toggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        menu.classList.toggle('show');
-                    });
-                }
-            });
+            console.log('✅ Buscador inicializado correctamente');
         });
     </script>
 

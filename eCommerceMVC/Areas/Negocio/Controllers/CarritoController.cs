@@ -10,11 +10,13 @@ namespace eCommerce.Areas.Negocio.Controllers
     {
         private readonly ICarritoService _carritoService;
         private readonly IProductoService _productoService;
+        private readonly ILogger<CarritoController> _logger;
 
-        public CarritoController(ICarritoService carritoService, IProductoService productoService)
+        public CarritoController(ICarritoService carritoService, IProductoService productoService, ILogger<CarritoController> logger)
         {
             _carritoService = carritoService;
             _productoService = productoService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -70,8 +72,8 @@ namespace eCommerce.Areas.Negocio.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al agregar: {ex.Message}");
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
+                _logger.LogError(ex, "Error al agregar producto {ProductoId} al carrito", productoId);
+                return Json(new { success = false, message = "Error al agregar producto" });
             }
         }
 
