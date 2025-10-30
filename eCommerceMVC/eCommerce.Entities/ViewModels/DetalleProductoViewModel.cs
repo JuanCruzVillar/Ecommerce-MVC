@@ -13,5 +13,9 @@ namespace eCommerce.Entities.ViewModels
         public string? RutaImagen { get; set; }
 
         public int? IdCategoria { get; set; }
+
+        public decimal? PrecioOferta { get; set; }
+        public int? PorcentajeDescuento { get; set; }
+        public bool TieneOferta => PrecioOferta.HasValue && PrecioOferta < Precio;
     }
 }

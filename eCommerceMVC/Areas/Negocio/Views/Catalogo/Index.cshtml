@@ -54,7 +54,20 @@
                                     <a href="@Url.Action("Detalle", "Catalogo", new { area = "Negocio", id = producto.IdProducto })" class="text-decoration-none text-dark">
                                         <h5 class="fw-bolder">@producto.Nombre</h5>
                                     </a>
-                                    @if (producto.Precio.HasValue)
+                                    @if (producto.TieneOferta)
+                                    {
+                                        <div class="mb-2">
+                                            <span class="badge bg-danger">-@producto.PorcentajeDescuento%</span>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted text-decoration-line-through">$@producto.Precio?.ToString("N2")</small>
+                                        </div>
+                                        <span class="fw-bold fs-5" style="color: #dc3545;">$@producto.PrecioOferta?.ToString("N2")</span>
+                                        <div class="text-success small">
+                                            <i class="bi bi-piggy-bank"></i> Ahorrás $@((producto.Precio - producto.PrecioOferta)?.ToString("N2"))
+                                        </div>
+                                    }
+                                    else if (producto.Precio.HasValue)
                                     {
                                         <span class="fw-bold" style="color: #667eea;">$@producto.Precio.Value.ToString("N2")</span>
                                     }

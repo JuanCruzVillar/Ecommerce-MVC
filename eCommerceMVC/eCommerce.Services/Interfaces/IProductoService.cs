@@ -25,6 +25,8 @@ namespace eCommerce.Services.Interfaces
         Task<bool> MarcarImagenPrincipalAsync(int idImagen, int idProducto);
         Task<bool> ReordenarImagenesAsync(List<OrdenImagenDto> orden);
 
+        Task<decimal?> ObtenerPrecioConOferta(int idProducto);
+
         Task<CatalogoFiltrosViewModel> BuscarProductosConFiltrosAsync(
     string busqueda,
     int? categoriaId,

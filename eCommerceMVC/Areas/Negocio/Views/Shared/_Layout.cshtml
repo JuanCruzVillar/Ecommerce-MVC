@@ -298,8 +298,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-laptop me-1"></i>Notebooks
+                    <a class="nav-link" href="@Url.Action("Index", "Ofertas", new { area = "Negocio" })">
+                        <i class="bi bi-tags me-1"></i>Ofertas
                     </a>
                 </li>
 
@@ -639,7 +639,7 @@
                 });
             });
 
-            // ========== BÚSQUEDA CON SUGERENCIAS (CON LOGS) ==========
+            // ========== BÚSQUEDA CON SUGERENCIAS ==========
             let timeoutId;
 
             console.log('🔧 Inicializando buscador...');

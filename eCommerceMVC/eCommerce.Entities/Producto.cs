@@ -44,5 +44,7 @@ namespace eCommerce.Entities
 
         public virtual ICollection<ProductoEspecificacion> ProductoEspecificaciones { get; set; }
             = new List<ProductoEspecificacion>();
+
+        public virtual ICollection<Oferta> Ofertas { get; set; } = new List<Oferta>();
     }
 }

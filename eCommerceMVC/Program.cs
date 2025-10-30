@@ -68,6 +68,7 @@ builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IMarcaRepository, MarcaRepository>();
 builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
+builder.Services.AddScoped<IOfertaRepository, OfertaRepository>();
 
 // Services
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
@@ -78,6 +79,7 @@ builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<ICarritoService, CarritoService>();
 builder.Services.AddScoped<IArmatuPcService, ArmatuPcService>();
+builder.Services.AddScoped<IOfertaService, OfertaService>();
 
 builder.Services.AddHttpContextAccessor();
 

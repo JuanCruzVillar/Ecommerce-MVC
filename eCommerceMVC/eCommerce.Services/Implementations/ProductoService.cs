@@ -86,9 +86,9 @@ namespace eCommerce.Services.Implementations
             return await _productoRepository.ReordenarImagenesAsync(orden);
         }
 
-        
+       
 
-          public async Task<int> GetCantidadPorMarcaAsync(int idMarca)
+        public async Task<int> GetCantidadPorMarcaAsync(int idMarca)
             {
                 var productos = await _productoRepository.GetAllAsync();
                 return productos.Count(p => p.IdMarca == idMarca);
@@ -152,6 +152,21 @@ namespace eCommerce.Services.Implementations
             };
 
             return viewModel;
+        }
+
+
+        private readonly IOfertaRepository _ofertaRepository;
+
+        public ProductoService(IProductoRepository productoRepository, IOfertaRepository ofertaRepository)
+        {
+            _productoRepository = productoRepository;
+            _ofertaRepository = ofertaRepository;
+        }
+
+        public async Task<decimal?> ObtenerPrecioConOferta(int idProducto)
+        {
+            var oferta = await _ofertaRepository.ObtenerOfertaPorProductoAsync(idProducto);
+            return oferta?.PrecioOferta;
         }
     }
 }

@@ -35,6 +35,8 @@ namespace eCommerce.Data
         public virtual DbSet<ConfiguracionPc> ConfiguracionesPc { get; set; }
         public virtual DbSet<ConfiguracionPcDetalle> ConfiguracionesPcDetalles { get; set; }
 
+        public virtual DbSet<Oferta> Ofertas { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -464,6 +466,34 @@ namespace eCommerce.Data
                 entity.Property(e => e.FechaRegistro)
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
+            });
+
+            // Oferta
+            modelBuilder.Entity<Oferta>(entity =>
+            {
+                entity.HasKey(e => e.IdOferta);
+                entity.ToTable("OFERTA");
+
+                entity.Property(e => e.PrecioOferta)
+                    .HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.FechaInicio)
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.FechaFin)
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.FechaRegistro)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+
+                entity.HasOne(d => d.IdProductoNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdProducto)
+                    .HasConstraintName("FK_OFERTA_PRODUCTO");
             });
 
             // ProductoEspecificacion

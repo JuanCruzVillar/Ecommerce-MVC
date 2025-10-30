@@ -1,4 +1,5 @@
 ﻿using eCommerce.Areas.Negocio.Controllers;
+using eCommerce.Entities;
 using eCommerce.Entities.ViewModels;
 using eCommerce.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,23 @@ public class CatalogoController : BaseNegocioController
             productos = productos.Where(p => categoriasHijas.Contains(p.IdCategoria ?? 0)).ToList();
         }
 
+        // Obtener ofertas usando el servicio
+        var ahora = DateTime.Now;
+        var ofertasService = HttpContext.RequestServices.GetService<IOfertaService>();
+        var ofertas = new Dictionary<int, Oferta>();
+
+        if (ofertasService != null)
+        {
+            foreach (var producto in productos)
+            {
+                var oferta = await ofertasService.ObtenerOfertaVigentePorProducto(producto.IdProducto);
+                if (oferta != null)
+                {
+                    ofertas[producto.IdProducto] = oferta;
+                }
+            }
+        }
+
         var viewModels = productos.Select(p => new DetalleProductoViewModel
         {
             IdProducto = p.IdProducto,
@@ -49,7 +67,9 @@ public class CatalogoController : BaseNegocioController
             Descripcion = p.Descripcion,
             Precio = p.Precio,
             RutaImagen = p.RutaImagen,
-            IdCategoria = p.IdCategoria
+            IdCategoria = p.IdCategoria,
+            PrecioOferta = ofertas.ContainsKey(p.IdProducto) ? ofertas[p.IdProducto].PrecioOferta : null,
+            PorcentajeDescuento = ofertas.ContainsKey(p.IdProducto) ? ofertas[p.IdProducto].PorcentajeDescuento : null
         }).ToList();
 
         if (categoria.HasValue)
@@ -61,7 +81,6 @@ public class CatalogoController : BaseNegocioController
 
         return View(viewModels);
     }
-
 
     [HttpGet]
     public async Task<IActionResult> BuscarAjax(string termino)
