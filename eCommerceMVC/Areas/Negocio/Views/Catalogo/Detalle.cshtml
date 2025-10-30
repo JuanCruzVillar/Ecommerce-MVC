@@ -72,11 +72,30 @@
         <!-- Detalles principales -->
         <div class="col-md-6">
             <h2 class="fw-bolder mb-3">@Model.Producto.Nombre</h2>
-            <h4 class="mb-3" style="color: #667eea;">$@Model.Producto.Precio?.ToString("N2")</h4>
+
+            @* ⭐ MOSTRAR PRECIO CON/SIN OFERTA *@
+            @if (Model.Producto.TieneOferta)
+            {
+                <div class="mb-2">
+                    <span class="badge bg-danger fs-6">🔥 -@Model.Producto.PorcentajeDescuento% OFF</span>
+                </div>
+                <div class="mb-1">
+                    <small class="text-muted text-decoration-line-through">$@Model.Producto.Precio?.ToString("N2")</small>
+                </div>
+                <h4 class="mb-3" style="color: #dc3545;">$@Model.Producto.PrecioOferta?.ToString("N2")</h4>
+                <div class="text-success mb-3">
+                    <i class="bi bi-piggy-bank me-1"></i>
+                    <strong>Ahorrás $@((Model.Producto.Precio - Model.Producto.PrecioOferta)?.ToString("N2"))</strong>
+                </div>
+            }
+            else
+            {
+                <h4 class="mb-3" style="color: #667eea;">$@Model.Producto.Precio?.ToString("N2")</h4>
+            }
 
             <p class="fw-bold mb-4" style="color: #764ba2;">
                 <i class="bi bi-credit-card me-1"></i>
-                3 cuotas sin interés de $@((Model.Producto.Precio / 3)?.ToString("N2"))
+                3 cuotas sin interés de $@(((Model.Producto.TieneOferta ? Model.Producto.PrecioOferta : Model.Producto.Precio) / 3)?.ToString("N2"))
             </p>
 
             <!-- Beneficios -->
@@ -257,7 +276,8 @@
     <script>
         $(document).ready(function () {
             // ========== CÁLCULO DE CUOTAS ==========
-            var precioProducto = parseFloat("@(Model.Producto.Precio?.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) ?? "0")");
+            @* ⭐ USAR PRECIO CON OFERTA SI EXISTE *@
+            var precioProducto = parseFloat("@((Model.Producto.TieneOferta ? Model.Producto.PrecioOferta : Model.Producto.Precio)?.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) ?? "0")");
 
             var cuotasDisponibles = [
                 { nro: 3, interes: 0.00 },
@@ -297,7 +317,6 @@
             const carousel = document.querySelector('#carouselProducto');
 
             if (carousel) {
-                // Sincronizar thumbnails con el carrusel
                 carousel.addEventListener('slide.bs.carousel', function(e) {
                     thumbnails.forEach(thumb => thumb.classList.remove('active'));
                     if (thumbnails[e.to]) {
@@ -306,16 +325,12 @@
                 });
             }
 
-            // Click en thumbnails para cambiar imagen
             thumbnails.forEach((thumb, index) => {
                 thumb.addEventListener('click', function() {
                     const bsCarousel = bootstrap.Carousel.getInstance(carousel) || new bootstrap.Carousel(carousel);
                     bsCarousel.to(index);
                 });
             });
-
-           
         });
     </script>
-
 }

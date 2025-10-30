@@ -119,11 +119,15 @@ public class CatalogoController : BaseNegocioController
 
     public async Task<IActionResult> Detalle(int id)
     {
-        // Usar el nuevo método que incluye imágenes
+       
         var producto = await _productoService.GetByIdWithImagenesAsync(id);
 
         if (producto == null)
             return NotFound();
+
+        
+        var ofertaService = HttpContext.RequestServices.GetService<IOfertaService>();
+        var oferta = await ofertaService?.ObtenerOfertaVigentePorProducto(producto.IdProducto);
 
         var productoVM = new DetalleProductoViewModel
         {
@@ -132,7 +136,10 @@ public class CatalogoController : BaseNegocioController
             Descripcion = producto.Descripcion,
             Precio = producto.Precio,
             RutaImagen = producto.RutaImagen,
-            IdCategoria = producto.IdCategoria
+            IdCategoria = producto.IdCategoria,
+           
+            PrecioOferta = oferta?.PrecioOferta,
+            PorcentajeDescuento = oferta?.PorcentajeDescuento
         };
 
         var todosProductos = await _productoService.GetAllAsync();
@@ -163,16 +170,16 @@ public class CatalogoController : BaseNegocioController
 
         // Mapear imagenes
         var imagenes = producto.Imagenes
-     .OrderByDescending(i => i.EsPrincipal ?? false) // Principal primero
-     .ThenBy(i => i.Orden) // Luego por orden
-     .Select(i => new ProductoImagenViewModel
-     {
-         IdImagen = i.IdImagen,
-         RutaImagen = i.RutaImagen,
-         EsPrincipal = i.EsPrincipal ?? false,
-         Orden = i.Orden ?? 0
-     })
-     .ToList();
+            .OrderByDescending(i => i.EsPrincipal ?? false)
+            .ThenBy(i => i.Orden)
+            .Select(i => new ProductoImagenViewModel
+            {
+                IdImagen = i.IdImagen,
+                RutaImagen = i.RutaImagen,
+                EsPrincipal = i.EsPrincipal ?? false,
+                Orden = i.Orden ?? 0
+            })
+            .ToList();
 
         var viewModel = new DetalleProductoPaginaViewModel
         {
