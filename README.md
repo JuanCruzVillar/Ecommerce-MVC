@@ -129,23 +129,6 @@ Sistema interactivo paso a paso para configurar una PC personalizada segun presu
 - 🔄 Manejo seguro de sesiones
 
 
-### 🚀 Deployment en Azure
-Este proyecto está completamente deployado en Azure y funcional en producción:
-Infraestructura
-
-✅ Azure App Service - Hosting con .NET 8 en Windows
-✅ Azure SQL Database - Base de datos SQL Server en la nube
-✅ CI/CD Automatizado - Pipeline con GitHub Actions
-✅ Variables de Entorno - Configuración segura mediante App Settings
-
-Pipeline CI/CD
-El workflow de GitHub Actions para poder automatizar:
-
-Build automático en cada push a main
-Tests y validación de código
-Deploy automático a Azure App Service
----
-
 ## 👥 Funcionalidad según Rol
 
 ### 🛒 CLIENTE
@@ -291,93 +274,7 @@ ConfiguracionPc ──→ ConfiguracionPcDetalle ──→ Producto
 
 ---
 
-## 🚀 Instalación y Configuración
 
-### Requisitos Previos
-
-- ✅ [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- ✅ [SQL Server 2019+](https://www.microsoft.com/sql-server) o SQL Server Express
-- ✅ [Visual Studio 2022](https://visualstudio.microsoft.com/) (recomendado) o VS Code
-- ✅ [SQL Server Management Studio (SSMS)](https://docs.microsoft.com/sql/ssms/download-sql-server-management-studio-ssms) (opcional)
-
-### Pasos de Instalación
-
-#### 1️⃣ Clonar el Repositorio
-
-```bash
-git clone https://github.com/JuanCruzVillar/Ecommerce-MVC.git
-cd Ecommerce-MVC/eCommerceMVC
-```
-
-#### 2️⃣ Configurar la Cadena de Conexión
-
-Edita el archivo `appsettings.json` y actualiza la cadena de conexión:
-
-```json
-{
-  "ConnectionStrings": {
-    "EcommerceContext": "Server=TU_SERVIDOR;Database=DBECOMMERCE;Trusted_Connection=True;TrustServerCertificate=True;"
-  }
-}
-```
-
-**Ejemplos comunes:**
-- SQL Server local: `Server=localhost;Database=DBECOMMERCE;Trusted_Connection=True;TrustServerCertificate=True;`
-- SQL Server Express: `Server=.\\SQLEXPRESS;Database=DBECOMMERCE;Trusted_Connection=True;TrustServerCertificate=True;`
-- Con autenticación SQL: `Server=localhost;Database=DBECOMMERCE;User Id=sa;Password=TuPassword;TrustServerCertificate=True;`
-
-#### 3️⃣ Restaurar Dependencias
-
-```bash
-dotnet restore
-```
-
-#### 4️⃣ Aplicar Migraciones
-
-```bash
-dotnet ef database update
-```
-
-Si no tienes las herramientas de EF Core instaladas:
-```bash
-dotnet tool install --global dotnet-ef
-```
-
-#### 5️⃣ Ejecutar el Proyecto
-
-**Desde la terminal:**
-```bash
-dotnet run
-```
-
-**Desde Visual Studio:**
-- Presiona `F5` o click en el botón ▶️ Play
-
-#### 6️⃣ Acceder a la Aplicación
-
-- 🌐 **Cliente**: `https://localhost:7XXX/Negocio/Catalogo`
-- 👨‍💼 **Admin**: `https://localhost:7XXX/Admin/Auth/Login`
-
-*(El puerto puede variar, revisa la consola)*
-
----
-
-## 🔑 Credenciales de Prueba
-
-### Administrador
-```
-Email: testadmin@gmail.com
-Password: 123456
-```
-
-### Cliente
-```
-Email: test@correo.com
-Password: 123456
-```
-
-
----
 
 ## 📁 Estructura de Carpetas
 
@@ -420,29 +317,23 @@ eCommerceMVC/
 
 ---
 
-## 🎓 Controladores Importantes
+🚀 Deploy en Azure
+Este proyecto está deployado en Azure:
 
-### Área Admin
 
-| Controlador | Responsabilidad |
-|------------|----------------|
-| `HomeController` | Dashboard con métricas, gráficos y exportación PDF |
-| `ProductosController` | CRUD de productos, imágenes y especificaciones |
-| `CategoriasController` | Gestión de categorías jerárquicas |
-| `UsuariosController` | Administración de usuarios y roles |
+✅ Azure App Service - Hosting con .NET 8 en Windows
+✅ Azure SQL Database - Base de datos SQL Server en la nube
+✅ CI/CD Automatizado - Pipeline con GitHub Actions
+✅ Variables de Entorno - Configuración segura mediante App Settings
 
-### Área Negocio
 
-| Controlador | Responsabilidad |
-|------------|----------------|
-| `CatalogoController` | Listado, búsqueda y detalle de productos |
-| `CarritoController` | Gestión del carrito de compras |
-| `CheckoutController` | Proceso completo de checkout y pago |
-| `ArmatuPcController` | Sistema paso a paso de configuración de PC |
-| `PerfilController` | Perfil, historial de compras y direcciones |
+El workflow de GitHub Actions automatiza:
+
+Build automático en cada push a main
+Tests y validación de código
+Deploy automático a Azure App Service
 
 ---
-
 
 ## 🤝 Notas
 
@@ -455,9 +346,10 @@ Este es un proyecto de aprendizaje para poder adquirir experiencia y conocimient
 
 **Juan Cruz Villar**
 
-- 💼 LinkedIn: [linkedin.com/in/juancruzvillar](https://www.linkedin.com/in/juancruzvillar/)
-- 📧 Email: juuancvillar@gmail.com
-- 🐙 GitHub: [@JuanCruzVillar](https://github.com/JuanCruzVillar)
+-  LinkedIn: [linkedin.com/in/juancruzvillar](https://www.linkedin.com/in/juancruzvillar/)
+-  Email: juuancvillar@gmail.com
+-  GitHub: [@JuanCruzVillar](https://github.com/JuanCruzVillar)
+-  Portfolio: [juancruzvillar.github.io](https://juancruzvillar.github.io/)
 
 ---
 
