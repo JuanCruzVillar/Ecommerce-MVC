@@ -4,6 +4,7 @@
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?style=flat&logo=microsoft-sql-server)](https://www.microsoft.com/sql-server)
+[![Azure](https://img.shields.io/badge/Azure-Deployed-0078D4?style=flat&logo=microsoft-azure)](https://azure.microsoft.com/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat&logo=bootstrap)](https://getbootstrap.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -56,6 +57,12 @@ Durante el desarrollo de Hardware Store, pude aplicar y profundizar en:
 - **SixLabors.ImageSharp** - Procesamiento de imágenes
 - **ASP.NET Core Identity PasswordHasher** - Seguridad de contraseñas
 
+### DevOps & Cloud
+
+- Azure App Service - Hosting de la aplicación
+- Azure SQL Database - Base de datos en la nube
+- GitHub Actions - CI/CD automatizado
+  
 ---
 
 ## ⚡ Características Principales
@@ -106,6 +113,22 @@ Sistema interactivo paso a paso para configurar una PC personalizada segun presu
 - 🛡️ Validación de datos en cliente y servidor
 - 🔄 Manejo seguro de sesiones
 
+
+### 🚀 Deployment en Azure
+Este proyecto está completamente deployado en Azure y funcional en producción:
+Infraestructura
+
+✅ Azure App Service - Hosting con .NET 8 en Windows
+✅ Azure SQL Database - Base de datos SQL Server en la nube
+✅ CI/CD Automatizado - Pipeline con GitHub Actions
+✅ Variables de Entorno - Configuración segura mediante App Settings
+
+Pipeline CI/CD
+El workflow de GitHub Actions para poder automatizar:
+
+Build automático en cada push a main
+Tests y validación de código
+Deploy automático a Azure App Service
 ---
 
 ## 👥 Funcionalidad según Rol
@@ -406,26 +429,10 @@ eCommerceMVC/
 ---
 
 
-### Error 404 en Imágenes
-
-**Solución**:
-- Las imágenes de productos deben estar en `wwwroot/images/productos/`
-- Verifica los permisos de escritura en la carpeta
-
----
-
-
-
 ## 🤝 Notas
 
 Este es un proyecto de aprendizaje para poder adquirir experiencia y conocimientos como programador, pero estoy **abierto a feedback y sugerencias**.
 
-
----
-
-## 📝 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
@@ -439,11 +446,10 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 
 ---
 
-## 💝 Agradecimientos
+## Si llegaste hasta aca:
 
-Gracias por tomarte el tiempo de revisar mi proyecto. Este eCommerce representa meses de aprendizaje, investigación y desarrollo. 
+Gracias por tomarte el tiempo de revisar mi proyecto. Este eCommerce representa meses de aprendizaje, curiosidad, investigación y desarrollo. 
 
-Si te gustó o te sirvió de referencia, **una ⭐ en el repo me ayudaria un monton** 😊
 
 ---
 
