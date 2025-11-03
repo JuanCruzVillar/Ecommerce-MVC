@@ -317,20 +317,26 @@ eCommerceMVC/
 
 ---
 
-🚀 Deploy en Azure
+## 🚀 Deploy en Azure
+
 Este proyecto está deployado en Azure:
 
 
 ✅ Azure App Service - Hosting con .NET 8 en Windows
+
 ✅ Azure SQL Database - Base de datos SQL Server en la nube
+
 ✅ CI/CD Automatizado - Pipeline con GitHub Actions
+
 ✅ Variables de Entorno - Configuración segura mediante App Settings
 
 
 El workflow de GitHub Actions automatiza:
 
 Build automático en cada push a main
+
 Tests y validación de código
+
 Deploy automático a Azure App Service
 
 ---
@@ -347,8 +353,11 @@ Este es un proyecto de aprendizaje para poder adquirir experiencia y conocimient
 **Juan Cruz Villar**
 
 -  LinkedIn: [linkedin.com/in/juancruzvillar](https://www.linkedin.com/in/juancruzvillar/)
+  
 -  Email: juuancvillar@gmail.com
+   
 -  GitHub: [@JuanCruzVillar](https://github.com/JuanCruzVillar)
+  
 -  Portfolio: [juancruzvillar.github.io](https://juancruzvillar.github.io/)
 
 ---
