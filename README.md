@@ -7,9 +7,24 @@
 [![Azure](https://img.shields.io/badge/Azure-Deployed-0078D4?style=flat&logo=microsoft-azure)](https://azure.microsoft.com/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat&logo=bootstrap)](https://getbootstrap.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Deploy Status](https://img.shields.io/badge/Azure-Online-success?style=flat&logo=microsoft-azure)](https://ecommerce-hardware-store-cueng0bahab0bxbx.brazilsouth-01.azurewebsites.net)
+[![Demo](https://img.shields.io/badge/Demo-Live-brightgreen?style=flat)](https://ecommerce-hardware-store-cueng0bahab0bxbx.brazilsouth-01.azurewebsites.net)
 
 ---
+## 🌐 Demo en Vivo
 
+**[🚀 Ver proyecto funcionando en Azure](https://ecommerce-hardware-store-cueng0bahab0bxbx.brazilsouth-01.azurewebsites.net)**
+
+> ⚠️ **Nota importante:** El sitio está en un plan gratuito de Azure, por lo que puede tardar 10-15 segundos en cargar la primera vez si no se ha usado recientemente. Gracias por tu paciencia!
+
+### Credenciales de Prueba
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| 👨‍💼 **Administrador** | testadmin@gmail.com | 123456 |
+| 🛒 **Cliente** | test@correo.com | 123456 |
+
+---
 ## 📖 Introducción
 
 Este es mi **primer proyecto completo**, desarrollado como parte de mi proceso de aprendizaje autodidacta. Implementa un sistema de eCommerce funcional utilizando arquitectura en capas, patrones de diseño y buenas prácticas de desarrollo.
